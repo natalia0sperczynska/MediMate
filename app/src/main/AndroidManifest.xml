@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -11,9 +13,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MediMate"
-        tools:targetApi="31">
+        tools:targetApi="34">
         <activity
-            android:name=".MainActivity"
+            android:name=".notifications.SetNotificationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".login.LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".mainViews.BaseActivity"
+            android:exported="false" />
+        <activity
+            android:name=".mainViews.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.MediMate">
@@ -22,7 +33,18 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
+        </activity> <!-- <activity -->
+        <!-- android:name=".mainViews.MainAdminActivity" -->
+        <!-- android:exported="false" /> -->
+        <activity
+            android:name=".mainViews.MainUser"
+            android:exported="false" />
+        <activity
+            android:name=".register.DataEntryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".updateData.UpdateDataActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

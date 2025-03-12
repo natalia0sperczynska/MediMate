@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">MediMate</string>
+    <string name="err_msg_enter_email">Please enter e-mail</string>
+    <string name="err_msg_enter_password">Please enter password</string>
+    <string name="weight_kg">Weight(kg)</string>
+    <string name="required">Required</string>
+    <string name="password">Password</string>
+    <string name="email">Email</string>
+    <string name="height">Height</string>
+    <string name="surname">Surname</string>
+    <string name="name">Name</string>
+    <string name="height_cm">Height(cm)</string>
 </resources>
