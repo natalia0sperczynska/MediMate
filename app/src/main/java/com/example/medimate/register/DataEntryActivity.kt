@@ -10,6 +10,9 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.example.medimate.login.LoginActivity
 import com.example.medimate.R
+import com.example.medimate.firebase.Admin
+import com.example.medimate.firebase.Availability
+import com.example.medimate.firebase.Doctor
 import com.example.medimate.firebase.FireStore
 import com.example.medimate.firebase.User
 import com.example.medimate.mainViews.BaseActivity
@@ -56,7 +59,6 @@ class DataEntryActivity : BaseActivity() {
         alredyHaveAccount.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
-
         }
         /**
          * Listener for showing the DatePickerDialog to select the user's birthdate.
@@ -159,23 +161,49 @@ class DataEntryActivity : BaseActivity() {
                                 false
                             )
 
-                            val user = User(
-                                id = firebaseUser.uid,
-                                name = name,
-                                surname = surname,
-                                email=email,
-                                dateOfBirth = dateOfBirth,
-                                phoneNumber = "",
-                                profilePictureUrl = "" ,
-                                address = mapOf(),
-                                allergies = listOf(),
-                                diseases= listOf(),
-                                medications = listOf()
-                            )
                             lifecycleScope.launch {
+                                val firestoreClass = FireStore()
                                 try {
-                                    val firestoreClass = FireStore()
-                                    firestoreClass.registerOrUpdateUser(user)
+                                    if(email.contains("@doc", ignoreCase = true)){
+                                        val doctor = Doctor(
+                                            id = firebaseUser.uid,
+                                            name = name,
+                                            surname = surname,
+                                            email=email,
+                                            phoneNumber = "",
+                                            profilePicture = "",
+                                            specialisation = "",
+                                            room = "",
+                                            availability = Availability()
+                                        )
+                                        firestoreClass.registerOrUpdateDoctor(doctor)
+                                    }
+                                    else if(email.contains("@admin", ignoreCase = true)){
+                                        val admin = Admin(
+                                            id = firebaseUser.uid,
+                                            name = name,
+                                            surname = surname,
+                                            email=email,
+                                        )
+                                        firestoreClass.registerOrUpdateAdmin(admin)
+                                    }
+                                    else{
+                                        val user = User(
+                                            id = firebaseUser.uid,
+                                            name = name,
+                                            surname = surname,
+                                            email=email,
+                                            dateOfBirth = dateOfBirth,
+                                            phoneNumber = "",
+                                            profilePictureUrl = "" ,
+                                            address = mapOf(),
+                                            allergies = listOf(),
+                                            diseases= listOf(),
+                                            medications = listOf()
+                                        )
+                                        firestoreClass.registerOrUpdateUser(user)
+                                    }
+
                                     Toast.makeText(this@DataEntryActivity, "Data saved successfully!", Toast.LENGTH_SHORT).show()
                                     FirebaseAuth.getInstance().signOut()
                                     finish()
@@ -188,16 +216,6 @@ class DataEntryActivity : BaseActivity() {
                             showErrorSnackBar(task.exception!!.message.toString(), true)
                         }
                     }
-        }
-        /**
-         * Displays a success message after a user has been successfully registered.
-         */
-        fun userRegistrationSuccess() {
-            Toast.makeText(
-                this@DataEntryActivity,
-                "You are registered successfully.",
-                Toast.LENGTH_SHORT
-            ).show()
         }
     }
 }

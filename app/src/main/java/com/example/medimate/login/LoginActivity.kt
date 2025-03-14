@@ -6,6 +6,8 @@ import android.widget.Button
 import android.widget.EditText
 import com.example.medimate.R
 import com.example.medimate.mainViews.BaseActivity
+import com.example.medimate.mainViews.MainAdmin
+import com.example.medimate.mainViews.MainDoctor
 import com.example.medimate.mainViews.MainUser
 import com.example.medimate.register.DataEntryActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -74,10 +76,19 @@ class LoginActivity : BaseActivity() {
 
             FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
+                    if (task.isSuccessful&&email.contains("@doc", ignoreCase = true)) {
+                        showErrorSnackBar("You are logged in successfully.", false)
+                        goToMainDoctor()
+                    }
+                    else if (task.isSuccessful&&email.contains("@admin", ignoreCase = true)) {
+                        showErrorSnackBar("You are logged in successfully.", false)
+                        goToMainAdmin()
+                    }
+                    else if (task.isSuccessful) {
                         showErrorSnackBar("You are logged in successfully.", false)
                         goToMainUser()
-                    } else {
+                    }
+                    else {
                         showErrorSnackBar(task.exception?.message.toString(), true)
                     }
                 }
@@ -92,6 +103,30 @@ class LoginActivity : BaseActivity() {
 
         val intent = Intent(this, MainUser::class.java).apply {
             putExtra("uID", email)
+        }
+        startActivity(intent)
+    }
+    /**
+     * Navigates to the main doctor activity after successful login.
+     */
+    private fun goToMainDoctor() {
+        val doctor = FirebaseAuth.getInstance().currentUser
+        val email = doctor?.email.orEmpty()
+
+        val intent = Intent(this, MainDoctor::class.java).apply {
+            putExtra("dID", email)
+        }
+        startActivity(intent)
+    }
+    /**
+     * Navigates to the main admin activity after successful login.
+     */
+    private fun goToMainAdmin() {
+        val admin = FirebaseAuth.getInstance().currentUser
+        val email = admin?.email.orEmpty()
+
+        val intent = Intent(this, MainAdmin::class.java).apply {
+            putExtra("aID", email)
         }
         startActivity(intent)
     }

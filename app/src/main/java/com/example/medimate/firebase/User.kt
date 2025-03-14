@@ -27,7 +27,9 @@ data class User (
     val address:Map<String,String> = mapOf(),
     val allergies:List<String> = listOf(),
     val diseases:List<String> = listOf(),
-    val medications:List<String> = listOf()
+    val medications:List<String> = listOf(),
+    val documents:List<String> = listOf(),
+    val medicalHistory:List<Appointment> = listOf(),
 ){
 
     companion object {

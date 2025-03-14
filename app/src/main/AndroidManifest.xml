@@ -15,6 +15,12 @@
         android:theme="@style/Theme.MediMate"
         tools:targetApi="34">
         <activity
+            android:name=".mainViews.MainAdmin"
+            android:exported="false" />
+        <activity
+            android:name=".mainViews.MainDoctor"
+            android:exported="false" />
+        <activity
             android:name=".notifications.SetNotificationActivity"
             android:exported="false" />
         <activity
