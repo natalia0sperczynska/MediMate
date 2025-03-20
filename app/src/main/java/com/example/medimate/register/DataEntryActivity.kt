@@ -19,6 +19,7 @@ import com.example.medimate.mainViews.BaseActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
+import java.lang.reflect.Modifier
 import java.util.Calendar
 /**
  * DataEntryActivity is responsible for the user registration process, including collecting user details,
