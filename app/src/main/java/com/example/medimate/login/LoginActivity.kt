@@ -1,133 +1,94 @@
 package com.example.medimate.login
 
-import android.content.Intent
-import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import com.example.medimate.R
-import com.example.medimate.mainViews.BaseActivity
-import com.example.medimate.mainViews.MainAdmin
-import com.example.medimate.mainViews.MainDoctor
-import com.example.medimate.mainViews.MainUser
-import com.example.medimate.register.DataEntryActivity
+import android.widget.Toast
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.medimate.Screen
+//import com.example.medimate.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
-/**
- * Activity for handling user login.
- * Allows the user to log in using their email and password.
- * Provides a link to the registration activity if the user doesn't have an account.
- */
-class LoginActivity : BaseActivity() {
 
-    private var inputEmail: EditText? = null
-    private var inputPassword: EditText? = null
-    private var loginButton: Button? = null
+@Composable
+fun LoginScreen(navController: NavController) {
+    val context = LocalContext.current
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "MediMate", style = MaterialTheme.typography.headlineMedium)
 
-        inputEmail = findViewById(R.id.editTextTextEmailAddressLogin)
-        inputPassword = findViewById(R.id.editTextTextPasswordLogin)
-        loginButton = findViewById(R.id.loginButton)
+        Spacer(modifier = Modifier.height(16.dp))
 
-        loginButton?.setOnClickListener {
-            logInRegisteredUser()
-        }
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            modifier = Modifier.fillMaxWidth()
+        )
 
-        val goToRegisterActivityButton = findViewById<Button>(R.id.dontHaveAccountButton)
-        goToRegisterActivityButton.setOnClickListener {
-            val intent = Intent(this, DataEntryActivity::class.java)
-            startActivity(intent)
-        }
-    }
-    /**
-     * Function validates the login details entered by the user.
-     *
-     * @return True if the email and password are valid, false otherwise.
-     */
-    private fun validateLoginDetails(): Boolean {
-        val email = inputEmail?.text.toString().trim { it <= ' ' }
-        val password = inputPassword?.text.toString().trim { it <= ' ' }
+        Spacer(modifier = Modifier.height(8.dp))
 
-        return when {
-            email.isEmpty() -> {
-                showErrorSnackBar(resources.getString(R.string.err_msg_enter_email), true)
-                false
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Password") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                isLoading = true
+                FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener { task ->
+                        isLoading = false
+                        if (task.isSuccessful) {
+                            Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
+                            when {
+                                email.contains("@doc", ignoreCase = true) -> {
+                                    navController.navigate(Screen.MainDoctor.route)
+                                }
+                                email.contains("@admin", ignoreCase = true) -> {
+                                    navController.navigate(Screen.MainAdmin.route)
+                                }
+                                else -> {
+                                    navController.navigate(Screen.MainUser.route)
+                                }
+                            }
+                        } else {
+                            Toast.makeText(context, "Login Failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                        }
+                    }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = email.isNotBlank() && password.isNotBlank()
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary)
+            } else {
+                Text("Login")
             }
-
-            password.isEmpty() -> {
-                showErrorSnackBar(resources.getString(R.string.err_msg_enter_password), true)
-                false
-            }
-
-            else -> {
-                true
-            }
         }
-    }
-    /**
-     * Attempts to log in the user using Firebase Authentication.
-     * If successful, the user is redirected to the main user activity.
-     */
-    private fun logInRegisteredUser() {
-        if (validateLoginDetails()) {
-            val email = inputEmail?.text.toString().trim { it <= ' ' }
-            val password = inputPassword?.text.toString().trim { it <= ' ' }
 
-            FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful&&email.contains("@doc", ignoreCase = true)) {
-                        showErrorSnackBar("You are logged in successfully.", false)
-                        goToMainDoctor()
-                    }
-                    else if (task.isSuccessful&&email.contains("@admin", ignoreCase = true)) {
-                        showErrorSnackBar("You are logged in successfully.", false)
-                        goToMainAdmin()
-                    }
-                    else if (task.isSuccessful) {
-                        showErrorSnackBar("You are logged in successfully.", false)
-                        goToMainUser()
-                    }
-                    else {
-                        showErrorSnackBar(task.exception?.message.toString(), true)
-                    }
-                }
-        }
-    }
-    /**
-     * Navigates to the main user activity after successful login.
-     */
-    private fun goToMainUser() {
-        val user = FirebaseAuth.getInstance().currentUser
-        val email = user?.email.orEmpty()
+        Spacer(modifier = Modifier.height(16.dp))
 
-        val intent = Intent(this, MainUser::class.java).apply {
-            putExtra("uID", email)
+        TextButton(onClick = { navController.navigate(Screen.Register.route) }) {
+            Text("Don't have an account? Register here")
         }
-        startActivity(intent)
-    }
-    /**
-     * Navigates to the main doctor activity after successful login.
-     */
-    private fun goToMainDoctor() {
-        val doctor = FirebaseAuth.getInstance().currentUser
-        val email = doctor?.email.orEmpty()
-
-        val intent = Intent(this, MainDoctor::class.java).apply {
-            putExtra("dID", email)
-        }
-        startActivity(intent)
-    }
-    /**
-     * Navigates to the main admin activity after successful login.
-     */
-    private fun goToMainAdmin() {
-        val admin = FirebaseAuth.getInstance().currentUser
-        val email = admin?.email.orEmpty()
-
-        val intent = Intent(this, MainAdmin::class.java).apply {
-            putExtra("aID", email)
-        }
-        startActivity(intent)
     }
 }

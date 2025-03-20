@@ -1,69 +1,65 @@
 package com.example.medimate.mainViews
-import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Bundle
-import android.widget.Button
-import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.example.medimate.register.DataEntryActivity
-import com.example.medimate.login.LoginActivity
-import com.example.medimate.R
-/**
- * Main activity shown when the app starts.
- * Handles permissions for notifications and navigation to login or registration.
- */
-class MainActivity : AppCompatActivity() {
 
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission(),
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-        } else {
-        }
-    }
-    /**
-     * Requests permission to send notifications if not already granted.
-     */
-    private fun askNotificationPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
-            PackageManager.PERMISSION_GRANTED
-        ) {
-        } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-        } else {
+import android.Manifest
+import android.os.Build
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.medimate.Screen
+
+@Composable
+fun MainScreen(navController: NavController) {
+    val context = LocalContext.current
+    var hasPermission by remember { mutableStateOf(false) }
+
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted -> hasPermission = isGranted }
+    )
+
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        askNotificationPermission();
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("MediMate", style = MaterialTheme.typography.headlineMedium)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = { navController.navigate(Screen.Login.route) }) {
+            Text("Login")
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
 
-        val goToRegisterActivityButton = findViewById<Button>(R.id.registerButton)
-        val goToLoginActivityButton: Button = findViewById(R.id.loginButton)
-
-
-        goToLoginActivityButton.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
+        Button(onClick = { navController.navigate(Screen.Register.route) }) {
+            Text("Register")
         }
 
-        goToRegisterActivityButton.setOnClickListener {
-            val intent = Intent(this, DataEntryActivity::class.java)
-            startActivity(intent)
+        if (!hasPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Toast.makeText(context, "Notification permission required!", Toast.LENGTH_SHORT).show()
         }
-
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainScreenPreview() {
+    MainScreen(navController = rememberNavController()) // Mocked NavController for preview
 }

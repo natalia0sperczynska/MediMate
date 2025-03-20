@@ -2,221 +2,99 @@ package com.example.medimate.register
 
 import android.app.DatePickerDialog
 import android.content.Intent
-import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
-import androidx.lifecycle.lifecycleScope
-import com.example.medimate.login.LoginActivity
-import com.example.medimate.R
-import com.example.medimate.firebase.Admin
-import com.example.medimate.firebase.Availability
-import com.example.medimate.firebase.Doctor
-import com.example.medimate.firebase.FireStore
-import com.example.medimate.firebase.User
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import com.example.medimate.firebase.*
 import com.example.medimate.mainViews.BaseActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
-import java.lang.reflect.Modifier
-import java.util.Calendar
-/**
- * DataEntryActivity is responsible for the user registration process, including collecting user details,
- * validating inputs, and storing the data in Firestore after successful registration.
- * It also includes functionality for selecting the user's birthdate using a DatePickerDialog.
- *
- * @param savedInstanceState The saved instance state of the activity, passed from the system if available.
- */
-class DataEntryActivity : BaseActivity() {
+import java.util.*
 
-    private var registerButton: Button? = null
-    private var inputName: EditText? = null
-    private var inputSurname: EditText? = null
-    private var inputEmail: EditText? = null
-    private val inputDateOfBirth: EditText? = null
-    private var inputPassword: EditText? = null
-    private var inputRepeatPassword: EditText? = null
-    /**
-     * Called when the activity is created.
-     * Initializes the UI components and sets up event listeners for registration.
-     *
-     * @param savedInstanceState The saved instance state.
-     */
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_data_entry)
+@Composable
+fun DataEntryScreen(navigateToLogin: () -> Unit) {
+    var name by remember { mutableStateOf("") }
+    var surname by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var dateOfBirth by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var repeatPassword by remember { mutableStateOf("") }
+    var showDatePicker by remember { mutableStateOf(false) }
 
-        registerButton = findViewById(R.id.registerButton)
-        inputEmail = findViewById(R.id.email)
-        inputName = findViewById(R.id.name)
-        inputSurname = findViewById(R.id.surname)
-        inputPassword = findViewById(R.id.password)
-        inputRepeatPassword = findViewById(R.id.repeatPassword)
-        val alredyHaveAccount : Button = findViewById(R.id.alreadyHaveAccountButton)
-        val birthDateButton: Button = findViewById(R.id.birthDateButton)
-        val birthDateTextView: TextView = findViewById(R.id.birthDateTextView)
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text("Register", style = MaterialTheme.typography.h4)
 
-        alredyHaveAccount.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
-        }
-        /**
-         * Listener for showing the DatePickerDialog to select the user's birthdate.
-         */
-        birthDateButton.setOnClickListener {
-            val calendar = Calendar.getInstance()
-            val year = calendar.get(Calendar.YEAR)
-            val month = calendar.get(Calendar.MONTH)
-            val day = calendar.get(Calendar.DAY_OF_MONTH)
+        OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name") })
+        OutlinedTextField(value = surname, onValueChange = { surname = it }, label = { Text("Surname") })
+        OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email))
+        OutlinedTextField(value = dateOfBirth, onValueChange = {}, label = { Text("Date of Birth") }, readOnly = true, modifier = Modifier.clickable { showDatePicker = true })
+        OutlinedTextField(value = password, onValueChange = { password = it }, label = { Text("Password") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password))
+        OutlinedTextField(value = repeatPassword, onValueChange = { repeatPassword = it }, label = { Text("Repeat Password") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password))
 
-            val datePickerDialog = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
-                val dateString = "$selectedDay-${selectedMonth + 1}-$selectedYear"
-                birthDateTextView.text = dateString
-            }, year, month, day)
-            datePickerDialog.show()
-        }
-        registerButton?.setOnClickListener {
-            registerUser()
+        Button(onClick = { registerUser(name, surname, email, dateOfBirth, password, repeatPassword) }) {
+            Text("Create an Account")
         }
 
-}
-    /**
-     * Validates the user's input data during the registration process.
-     * It checks if all the required fields are filled out and ensures the password matches the required pattern.
-     *
-     * @return True if the input is valid, otherwise false.
-     */
-        private fun validateRegisterDetails(): Boolean {
-            val passwordPattern = Regex("^(?=.*[A-Z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}$")
-
-            return when {
-                inputEmail.toString().isEmpty() -> {
-                    showErrorSnackBar("Please enter an email", true)
-                    false
-                }
-
-                !android.util.Patterns.EMAIL_ADDRESS.matcher(inputEmail?.text.toString()).matches() -> {
-                    showErrorSnackBar("Please enter a valid email", true)
-                    false
-                }
-
-                inputName?.text.toString().trim { it <= ' ' }.isEmpty() -> {
-                    showErrorSnackBar("Please enter a name", true)
-                    false
-                }
-
-                inputSurname?.text.toString().trim { it <= ' ' }.isEmpty() -> {
-                    showErrorSnackBar("Please enter a surname", true)
-                    false
-                }
-
-                inputDateOfBirth?.text.toString().trim { it <= ' ' }.isEmpty() -> {
-                    showErrorSnackBar("Please enter a date of birth", true)
-                    false
-
-                }
-
-                inputPassword?.text.toString().trim { it <= ' ' }.isEmpty() -> {
-                    showErrorSnackBar("Please enter a password", true)
-                    false
-                }
-
-                !passwordPattern.matches(inputPassword?.text.toString().trim()) -> {
-                    showErrorSnackBar("Password must be at least 8 characters, include an uppercase letter, a number, and a special character", true)
-                    false
-                }
-
-                inputRepeatPassword?.text.toString().trim { it <= ' ' }.isEmpty() -> {
-                    showErrorSnackBar("Please enter a repeat password", true)
-                    false
-                }
-
-                else -> true
-            }
-        }
-    /**
-     * Registers a new user by creating an account with the provided email and password.
-     * After successful registration, the user data is saved to Firestore and the user is signed out from Firebase.
-     * Displays appropriate messages based on success or failure.
-     */
-        private fun registerUser() {
-            if (validateRegisterDetails()) {
-                val email = inputEmail?.text.toString().trim { it <= ' ' }
-                val password = inputPassword?.text.toString().trim { it <= ' ' }
-                val repeatPassword = inputRepeatPassword?.text.toString().trim { it <= ' ' }
-                val dateOfBirth = inputDateOfBirth?.text.toString().trim{ it <= ' ' }
-                val name = inputName?.text.toString().trim { it <= ' ' }
-                val surname = inputSurname?.text.toString().trim { it <= ' ' }
-
-                if (password != repeatPassword) {
-                    showErrorSnackBar("Passwords do not match", true)
-                    return
-                }
-                FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            val firebaseUser: FirebaseUser = task.result!!.user!!
-                            showErrorSnackBar(
-                                "You are registered successfully. Your user id is ${firebaseUser.uid}",
-                                false
-                            )
-
-                            lifecycleScope.launch {
-                                val firestoreClass = FireStore()
-                                try {
-                                    if(email.contains("@doc", ignoreCase = true)){
-                                        val doctor = Doctor(
-                                            id = firebaseUser.uid,
-                                            name = name,
-                                            surname = surname,
-                                            email=email,
-                                            phoneNumber = "",
-                                            profilePicture = "",
-                                            specialisation = "",
-                                            room = "",
-                                            availability = Availability()
-                                        )
-                                        firestoreClass.registerOrUpdateDoctor(doctor)
-                                    }
-                                    else if(email.contains("@admin", ignoreCase = true)){
-                                        val admin = Admin(
-                                            id = firebaseUser.uid,
-                                            name = name,
-                                            surname = surname,
-                                            email=email,
-                                        )
-                                        firestoreClass.registerOrUpdateAdmin(admin)
-                                    }
-                                    else{
-                                        val user = User(
-                                            id = firebaseUser.uid,
-                                            name = name,
-                                            surname = surname,
-                                            email=email,
-                                            dateOfBirth = dateOfBirth,
-                                            phoneNumber = "",
-                                            profilePictureUrl = "" ,
-                                            address = mapOf(),
-                                            allergies = listOf(),
-                                            diseases= listOf(),
-                                            medications = listOf()
-                                        )
-                                        firestoreClass.registerOrUpdateUser(user)
-                                    }
-
-                                    Toast.makeText(this@DataEntryActivity, "Data saved successfully!", Toast.LENGTH_SHORT).show()
-                                    FirebaseAuth.getInstance().signOut()
-                                    finish()
-                                } catch (e: Exception) {
-                                    Toast.makeText(this@DataEntryActivity, "Failed to save data: ${e.message}", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-
-                        } else {
-                            showErrorSnackBar(task.exception!!.message.toString(), true)
-                        }
-                    }
+        TextButton(onClick = navigateToLogin) {
+            Text("Already have an account? Login")
         }
     }
+
+    if (showDatePicker) {
+        val calendar = Calendar.getInstance()
+        DatePickerDialog(
+            LocalContext.current,
+            { _, year, month, day ->
+                dateOfBirth = "$day-${month + 1}-$year"
+                showDatePicker = false
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).show()
+    }
+}
+
+@Composable
+private fun registerUser(name: String, surname: String, email: String, dateOfBirth: String, password: String, repeatPassword: String) {
+    if (password != repeatPassword) {
+        Toast.makeText(LocalContext.current, "Passwords do not match", Toast.LENGTH_SHORT).show()
+        return
+    }
+    FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val firebaseUser = task.result!!.user!!
+                val firestoreClass = FireStore()
+                val user = User(
+                    id = firebaseUser.uid,
+                    name = name,
+                    surname = surname,
+                    email = email,
+                    dateOfBirth = dateOfBirth,
+                    phoneNumber = "",
+                    profilePictureUrl = "",
+                    address = mapOf(),
+                    allergies = listOf(),
+                    diseases = listOf(),
+                    medications = listOf()
+                )
+                firestoreClass.registerOrUpdateUser(user)
+                FirebaseAuth.getInstance().signOut()
+            } else {
+                Toast.makeText(LocalContext.current, task.exception!!.message.toString(), Toast.LENGTH_SHORT).show()
+            }
+        }
 }

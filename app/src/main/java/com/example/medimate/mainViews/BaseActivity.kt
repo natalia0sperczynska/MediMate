@@ -2,7 +2,7 @@ package com.example.medimate.mainViews
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.medimate.R
+//import com.example.medimate.R
 import com.google.android.material.snackbar.Snackbar
 /**
  * Base activity class providing a utility method for showing SnackBars with custom error/success messages.
