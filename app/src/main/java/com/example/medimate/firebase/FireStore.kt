@@ -189,5 +189,16 @@ class FireStore {
             throw Exception("Error updating admin data: ${e.message}")
         }
     }
+    suspend fun checkIfUserExists(email: String): Boolean {
+        return try {
+            val querySnapshot = mFireStore.collection("users")
+                .whereEqualTo("email", email)
+                .get()
+                .await()
+            !querySnapshot.isEmpty
+        } catch (e: Exception) {
+            throw Exception("Error checking user existence: ${e.message}")
+        }
+    }
 
 }
