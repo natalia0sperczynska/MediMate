@@ -13,6 +13,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.medimate.firebase.FireStore
 import com.example.medimate.navigation.Screen
+import com.example.medimate.ui.theme.MediMateTheme
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
@@ -65,5 +66,7 @@ fun MainDoctorScreen(navController: NavController) {
 @Preview(showBackground = true)
 @Composable
 fun MainDoctorScreenPreview() {
-    MainDoctorScreen(navController = rememberNavController())
+    MediMateTheme {
+        MainDoctorScreen(navController = rememberNavController())
+    }
 }
