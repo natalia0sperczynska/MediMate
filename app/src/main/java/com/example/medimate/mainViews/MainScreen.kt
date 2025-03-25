@@ -38,18 +38,16 @@ fun MainScreen(navController: NavController) {
             requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
-    Image(
-        painter = painterResource(id = R.drawable.medimate_logo),
-        contentDescription = null)
-
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
+        Image(
+            painter = painterResource(id = R.drawable.medimate_logo),
+            contentDescription = null)
+        Spacer(modifier = Modifier.height(15.dp))
 
         Button(onClick = { navController.navigate(Screen.Login.route)}, shape = MaterialTheme.shapes.large,
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) {
