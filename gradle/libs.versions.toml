@@ -24,13 +24,19 @@ ui = "1.7.8"
 uiToolingPreview = "1.7.8"
 navigationRuntimeAndroid = "2.9.0-alpha08"
 navigationCompose = "2.8.9"
+composeNavigation = "2.8.9"
+serialization="1.7.3"
+uiTestAndroid = "1.7.8"
 
 [libraries]
 androidx-activity = { module = "androidx.activity:activity", version.ref = "activity" }
 androidx-activity-compose-v1101 = { module = "androidx.activity:activity-compose", version.ref = "androidxActivityCompose" }
 androidx-activity-compose-v180 = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
+androidx-compose-material3-material3 = { module = "androidx.compose.material3:material3" }
+androidx-compose-ui-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 androidx-core = { module = "androidx.core:core", version.ref = "coreKtx" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
@@ -54,13 +60,21 @@ material = { group = "com.google.android.material", name = "material", version.r
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
+ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
+ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
+ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
 androidx-navigation-runtime-android = { group = "androidx.navigation", name = "navigation-runtime-android", version.ref = "navigationRuntimeAndroid" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization"}
+androidx-ui-test-android = { group = "androidx.compose.ui", name = "ui-test-android", version.ref = "uiTestAndroid" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 #kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
