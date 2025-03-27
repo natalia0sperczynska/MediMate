@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.medimate.login.LoginScreen
 import com.example.medimate.mainViews.MainAdminScreen
+import com.example.medimate.mainViews.MainDoctorScreen
 import com.example.medimate.mainViews.MainScreen
 import com.example.medimate.mainViews.MainUserScreen
 import com.example.medimate.register.RegisterScreen
@@ -40,7 +41,7 @@ fun AppNavHost(navController: NavHostController) {
             UpdateDataScreen(navController)
         }
         composable(Screen.MainDoctor.route) {
-            MainScreen(navController)
+            MainDoctorScreen(navController)
         }
         composable(Screen.MainAdmin.route) {
             MainAdminScreen(navController)

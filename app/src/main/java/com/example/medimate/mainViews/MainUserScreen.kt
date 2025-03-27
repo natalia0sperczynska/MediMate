@@ -17,12 +17,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.medimate.firebase.FireStore
 import com.example.medimate.navigation.Screen
-import com.example.medimate.ui.theme.Black
-import com.example.medimate.ui.theme.LightGrey
-import com.example.medimate.ui.theme.PurpleGrey
-import com.example.medimate.ui.theme.PurpleGrey2
-import com.example.medimate.ui.theme.PurpleMain
-import com.example.medimate.ui.theme.White
+import com.example.medimate.ui.theme.MediMateTheme
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
@@ -110,7 +105,7 @@ fun MainUserScreen(navController: NavController) {
             }
         }
 
-        
+
         Box(
             modifier = Modifier
                 .fillMaxHeight()
@@ -126,6 +121,8 @@ fun MainUserScreen(navController: NavController) {
 @Preview(showSystemUi = true)
 @Composable
 fun MainUserScreenPreview() {
-    MainUserScreen(navController = rememberNavController())
+    MediMateTheme {
+        MainUserScreen(navController = rememberNavController())
+    }
 }
 

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
@@ -19,6 +20,7 @@ import com.example.medimate.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
@@ -26,7 +28,7 @@ fun RegisterScreen(navController: NavHostController) {
     var name by remember { mutableStateOf("") }
     var surname by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var dateOfBirth by remember { mutableStateOf("") }
+    var dateOfBirth by remember { mutableStateOf<Long?>(null) }
     var password by remember { mutableStateOf("") }
     var repeatPassword by remember { mutableStateOf("") }
     var showDatePicker by remember { mutableStateOf(false) }
@@ -34,7 +36,9 @@ fun RegisterScreen(navController: NavHostController) {
     val coroutineScope = rememberCoroutineScope()
     val fireStore = FireStore()
 
-    Column(modifier = Modifier.padding(16.dp).fillMaxSize()) {
+    Column(modifier = Modifier.padding(16.dp).fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center) {
         Text("Register", style = MaterialTheme.typography.headlineLarge)
 
         OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name") })
@@ -46,7 +50,7 @@ fun RegisterScreen(navController: NavHostController) {
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
         OutlinedTextField(
-            value = dateOfBirth,
+            value = dateOfBirth?.let { convertMillisToDate(it) } ?: "",
             onValueChange = {},
             label = { Text("Date of Birth") },
             readOnly = true,
@@ -67,7 +71,7 @@ fun RegisterScreen(navController: NavHostController) {
 
         Button(onClick = {
             coroutineScope.launch {
-                registerUser(name, surname, email, dateOfBirth, password, repeatPassword, fireStore, context)
+                registerUser(name, surname, email, dateOfBirth?.let { convertMillisToDate(it) } ?: "", password, repeatPassword, fireStore, context)
             }
         }) {
             Text("Create an Account")
@@ -79,17 +83,38 @@ fun RegisterScreen(navController: NavHostController) {
     }
 
     if (showDatePicker) {
-        val calendar = Calendar.getInstance()
-        DatePickerDialog(
-            context,
-            { _, year, month, day ->
-                dateOfBirth = "$day-${month + 1}-$year"
-                showDatePicker = false
-            },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        ).show()
+        DatePickerModal(
+            onDateSelected = { dateOfBirth = it },
+            onDismiss = { showDatePicker = false }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerModal(
+    onDateSelected: (Long?) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val datePickerState = rememberDatePickerState()
+
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = {
+                onDateSelected(datePickerState.selectedDateMillis)
+                onDismiss()
+            }) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    ) {
+        DatePicker(state = datePickerState)
     }
 }
 
@@ -144,6 +169,12 @@ private suspend fun registerUser(
         Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
     }
 }
+
+fun convertMillisToDate(millis: Long): String {
+    val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+    return formatter.format(Date(millis))
+}
+
 @Preview(showSystemUi = true)
 @Composable
 fun RegisterScreenPreview() {
