@@ -17,7 +17,13 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.medimate.firebase.FireStore
 import com.example.medimate.navigation.Screen
+import com.example.medimate.ui.theme.Black
+import com.example.medimate.ui.theme.LightGrey
 import com.example.medimate.ui.theme.MediMateTheme
+import com.example.medimate.ui.theme.PurpleGrey
+import com.example.medimate.ui.theme.PurpleGrey2
+import com.example.medimate.ui.theme.PurpleMain
+import com.example.medimate.ui.theme.White
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
@@ -52,15 +58,15 @@ fun MainUserScreen(navController: NavController) {
             ModalDrawerSheet(
                 modifier = Modifier.background(PurpleGrey2)
             ) {
-                Text("Menu", modifier = Modifier.padding(16.dp), color = White)
+                Text("Menu", modifier = Modifier.padding(16.dp), color = Black)
                 HorizontalDivider(color = LightGrey)
                 NavigationDrawerItem(
-                    label = { Text(text = "Appointments", color = White) },
+                    label = { Text(text = "Appointments", color = Black) },
                     selected = false,
                     onClick = { /*TODO*/ }
                 )
                 NavigationDrawerItem(
-                    label = { Text(text = "Doctors", color = White) },
+                    label = { Text(text = "Doctors", color = Black) },
                     selected = false,
                     onClick = { /*TODO*/ }
                 )
