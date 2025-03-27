@@ -1,6 +1,8 @@
 package com.example.medimate.navigation
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,6 +27,7 @@ sealed class Screen(val route: String) {
     object UpdateData : Screen("update_data")
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Composable
 fun AppNavHost(navController: NavHostController) {
     NavHost(navController = navController, startDestination = Screen.Main.route) {

@@ -1,4 +1,6 @@
 package com.example.medimate.firebase
+
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
@@ -7,6 +9,7 @@ import kotlinx.coroutines.tasks.await
  */
 class FireStore {
     private val mFireStore = FirebaseFirestore.getInstance()
+
     /**
      * Function registers or updates a user in the Firestore database.
      * If a user with the same ID already exists, their document will be overwritten.
@@ -21,6 +24,7 @@ class FireStore {
             throw Exception("Error saving user data: ${e.message}")
         }
     }
+
     /**
      * Function registers or updates a doctors in the Firestore database.
      * If a doctor with the same ID already exists, their document will be overwritten.
@@ -35,6 +39,7 @@ class FireStore {
             throw Exception("Error saving user data: ${e.message}")
         }
     }
+
     /**
      * Function registers or updates an admin in the Firestore database.
      * If an admin with the same ID already exists, their document will be overwritten.
@@ -49,6 +54,7 @@ class FireStore {
             throw Exception("Error saving user data: ${e.message}")
         }
     }
+
     /**
      * Function loads user data from Firestore based on the given user ID.
      *
@@ -69,6 +75,7 @@ class FireStore {
             throw Exception("Error loading user data: ${e.message}")
         }
     }
+
     /**
      * Function loads doctors data from Firestore based on the given user ID.
      *
@@ -89,6 +96,7 @@ class FireStore {
             throw Exception("Error loading doctor data: ${e.message}")
         }
     }
+
     /**
      * Function loads admin data from Firestore based on the given user ID.
      *
@@ -109,6 +117,7 @@ class FireStore {
             throw Exception("Error loading admin data: ${e.message}")
         }
     }
+
     /**
      * Function updates user data in Firestore.
      * Only non-null and non-blank values are updated in the user's document.
@@ -136,6 +145,7 @@ class FireStore {
             throw Exception("Error updating user data: ${e.message}")
         }
     }
+
     /**
      * Function updates doctors data in Firestore.
      * Only non-null and non-blank values are updated in the user's document.
@@ -162,6 +172,7 @@ class FireStore {
             throw Exception("Error updating user data: ${e.message}")
         }
     }
+
     /**
      * Function updates admin data in Firestore.
      * Only non-null and non-blank values are updated in the admins document.
@@ -189,6 +200,7 @@ class FireStore {
             throw Exception("Error updating admin data: ${e.message}")
         }
     }
+
     suspend fun checkIfUserExists(email: String): Boolean {
         return try {
             val querySnapshot = mFireStore.collection("users")
@@ -201,4 +213,13 @@ class FireStore {
         }
     }
 
+     suspend fun getAllDoctors(): List<Doctor> {
+        val doctorsList = mutableListOf<Doctor>()
+        val result = mFireStore.collection("doctors").get().await()
+        for (document in result) {
+            val doctor = document.toObject(Doctor::class.java)
+            doctorsList.add(doctor)
+        }
+        return doctorsList
+    }
 }

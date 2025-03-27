@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -17,6 +18,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.medimate.firebase.*
 import com.example.medimate.navigation.Screen
+import com.example.medimate.ui.theme.MediMateTheme
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -39,46 +41,96 @@ fun RegisterScreen(navController: NavHostController) {
     Column(modifier = Modifier.padding(16.dp).fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
-        Text("Register", style = MaterialTheme.typography.headlineLarge)
+        Text("Register", style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.secondary)
+        Spacer(modifier = Modifier.height(18.dp))
 
-        OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name") })
-        OutlinedTextField(value = surname, onValueChange = { surname = it }, label = { Text("Surname") })
+        OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name")},
+            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(id = android.R.drawable.star_off),
+                    contentDescription =null
+                )
+            }
+        )
+        Spacer(modifier = Modifier.height(18.dp))
+        OutlinedTextField(value = surname, onValueChange = { surname = it }, label = { Text("Surname") },
+            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(id = android.R.drawable.star_off),
+                    contentDescription =null
+                )
+            }
+        )
+        Spacer(modifier = Modifier.height(18.dp))
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
             label = { Text("Email") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(id = android.R.drawable.ic_dialog_email),
+                    contentDescription =null
+                )
+            }
         )
+
+        Spacer(modifier = Modifier.height(18.dp))
         OutlinedTextField(
             value = dateOfBirth?.let { convertMillisToDate(it) } ?: "",
             onValueChange = {},
             label = { Text("Date of Birth") },
             readOnly = true,
-            modifier = Modifier.clickable { showDatePicker = true }
+            modifier = Modifier.clickable { showDatePicker = true }.fillMaxWidth(),
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(id = android.R.drawable.ic_menu_my_calendar),
+                    contentDescription =null
+                )
+            }
         )
+        Spacer(modifier = Modifier.height(18.dp))
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
             label = { Text("Password") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(id = android.R.drawable.ic_secure),
+                    contentDescription =null
+                )
+            }
         )
+        Spacer(modifier = Modifier.height(18.dp))
         OutlinedTextField(
             value = repeatPassword,
             onValueChange = { repeatPassword = it },
             label = { Text("Repeat Password") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(id = android.R.drawable.ic_secure),
+                    contentDescription =null
+                )
+            }
         )
-
+        Spacer(modifier = Modifier.height(18.dp))
         Button(onClick = {
             coroutineScope.launch {
                 registerUser(name, surname, email, dateOfBirth?.let { convertMillisToDate(it) } ?: "", password, repeatPassword, fireStore, context)
             }
-        }) {
-            Text("Create an Account")
+        },colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary), modifier = Modifier.fillMaxWidth(),shape = MaterialTheme.shapes.large,enabled = name.isNotBlank() && surname.isNotBlank() && email.isNotBlank() && dateOfBirth != null && password.isNotBlank() && repeatPassword.isNotBlank()) {
+            Text("Create an Account", color = MaterialTheme.colorScheme.onSecondary)
         }
-
-        Button(onClick = {navController.navigate(Screen.Login.route)}) {
-            Text("Already have an account? Login")
+        Spacer(modifier = Modifier.height(18.dp))
+        TextButton(onClick = { navController.navigate(Screen.Login.route) }) {
+            Text("Already have an account? Login here",color= MaterialTheme.colorScheme.secondary)
         }
     }
 
@@ -178,5 +230,7 @@ fun convertMillisToDate(millis: Long): String {
 @Preview(showSystemUi = true)
 @Composable
 fun RegisterScreenPreview() {
-    RegisterScreen(navController = rememberNavController())
+    MediMateTheme {
+        RegisterScreen(navController = rememberNavController())
+    }
 }

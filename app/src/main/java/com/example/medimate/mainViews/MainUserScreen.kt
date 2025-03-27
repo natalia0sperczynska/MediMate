@@ -25,6 +25,7 @@ import com.example.medimate.ui.theme.PurpleGrey2
 import com.example.medimate.ui.theme.PurpleMain
 import com.example.medimate.ui.theme.White
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -50,7 +51,11 @@ fun MainUserScreen(navController: NavController) {
             }
         }
     }
+    ScreenModel(navController, userId.toString(), userName, drawerState, scope)
+}
 
+@Composable
+fun ScreenModel(navController: NavController, userId: String, userName: String, drawerState: DrawerState, scope: CoroutineScope) {
     ModalNavigationDrawer(
         drawerState = drawerState,
         scrimColor = PurpleGrey.copy(alpha = 0.3f),
@@ -87,7 +92,7 @@ fun MainUserScreen(navController: NavController) {
                 IconButton(
                     onClick = { scope.launch { drawerState.open() } },
                     modifier = Modifier.background(PurpleMain, shape = MaterialTheme.shapes.small)
-//                        .offset(y = (-10).dp)
+//                      
                 ) {
                     Icon(Icons.Default.Menu, contentDescription = "Open Menu", tint = White)
                 }
@@ -102,7 +107,6 @@ fun MainUserScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(onClick = {
-                auth.signOut()
                 navController.navigate(Screen.Login.route) {
                     popUpTo(Screen.Main.route) { inclusive = true }
                 }
@@ -128,7 +132,7 @@ fun MainUserScreen(navController: NavController) {
 @Composable
 fun MainUserScreenPreview() {
     MediMateTheme {
-        MainUserScreen(navController = rememberNavController())
+       ScreenModel(navController = rememberNavController(), userId = "123", userName = "John", drawerState = rememberDrawerState(DrawerValue.Closed), scope = rememberCoroutineScope())
     }
 }
 
