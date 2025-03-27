@@ -13,6 +13,8 @@ import com.example.medimate.mainViews.MainScreen
 import com.example.medimate.mainViews.MainUserScreen
 import com.example.medimate.register.RegisterScreen
 import com.example.medimate.updateData.UpdateDataScreen
+import com.example.medimate.user.DoctorList
+import com.example.medimate.user.DoctorScreen
 
 //import com.example.medimate.auth.LoginScreen
 //import com.example.medimate.auth.RegisterScreen
@@ -25,6 +27,8 @@ sealed class Screen(val route: String) {
     object Login : Screen("login")
     object Register : Screen("register")
     object UpdateData : Screen("update_data")
+    object Appointments : Screen("appointments")
+    object Doctors : Screen("doctors")
 }
 
 @SuppressLint("ViewModelConstructorInComposable")
@@ -52,6 +56,13 @@ fun AppNavHost(navController: NavHostController) {
         composable(Screen.MainUser.route) {
             MainUserScreen(navController)
         }
+        composable(Screen.Appointments.route) {
+            // AppointmentsScreen()
+        }
+        composable(Screen.Doctors.route) {
+            DoctorScreen(navController)
 
+        }
     }
+
 }

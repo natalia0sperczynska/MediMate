@@ -68,36 +68,35 @@ fun ScreenModel(navController: NavController, userId: String, userName: String, 
                 NavigationDrawerItem(
                     label = { Text(text = "Appointments", color = Black) },
                     selected = false,
-                    onClick = { /*TODO*/ }
+                    onClick = { navController.navigate(Screen.Appointments.route) }
                 )
                 NavigationDrawerItem(
                     label = { Text(text = "Doctors", color = Black) },
                     selected = false,
-                    onClick = { /*TODO*/ }
+                    onClick = { navController.navigate(Screen.Doctors.route) }
                 )
             }
         }
     ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
+            IconButton(
+                onClick = { scope.launch { drawerState.open() } },
+                modifier = Modifier.background(PurpleMain, shape = MaterialTheme.shapes.small)
+
+            ) {
+                Icon(Icons.Default.Menu, contentDescription = "Open Menu", tint = White)
+            }
+        }
         Column(
             modifier = Modifier.fillMaxSize().padding(16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                IconButton(
-                    onClick = { scope.launch { drawerState.open() } },
-                    modifier = Modifier.background(PurpleMain, shape = MaterialTheme.shapes.small)
-//                      
-                ) {
-                    Icon(Icons.Default.Menu, contentDescription = "Open Menu", tint = White)
-                }
-            }
-
             Text(text = "Good to see you again, $userName!", style = MaterialTheme.typography.headlineMedium, color = Black)
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -126,7 +125,6 @@ fun ScreenModel(navController: NavController, userId: String, userName: String, 
 
     }
 }
-
 
 @Preview(showSystemUi = true)
 @Composable

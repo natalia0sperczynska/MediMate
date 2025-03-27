@@ -213,7 +213,7 @@ class FireStore {
         }
     }
 
-     suspend fun getAllDoctors(): List<Doctor> {
+suspend fun getAllDoctors(): List<Doctor> {
         val doctorsList = mutableListOf<Doctor>()
         val result = mFireStore.collection("doctors").get().await()
         for (document in result) {
