@@ -1,5 +1,7 @@
 package com.example.medimate.login
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -32,6 +34,7 @@ fun LoginScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        //Image(painter = painterResource(id = R.drawable.medimate_logo), contentDescription = null, modifier = Modifier.size(200.dp))
         Text(text = "MediMate", style = MaterialTheme.typography.headlineLarge,color = MaterialTheme.colorScheme.secondary)
 
         Spacer(modifier = Modifier.height(18.dp))
@@ -109,7 +112,7 @@ fun LoginScreen(navController: NavController) {
         }
     }
 }
-@Preview(showSystemUi = true)
+@Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun LoginScreenPreview() {
     MediMateTheme {
