@@ -2,18 +2,17 @@ package com.example.medimate.navigation
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.medimate.appointments.AppointmentsScreen
 import com.example.medimate.login.LoginScreen
-import com.example.medimate.mainViews.MainAdminScreen
-import com.example.medimate.mainViews.MainDoctorScreen
+import com.example.medimate.mainViews.admin.MainAdminScreen
+import com.example.medimate.mainViews.doctor.MainDoctorScreen
 import com.example.medimate.mainViews.MainScreen
-import com.example.medimate.mainViews.MainUserScreen
+import com.example.medimate.mainViews.user.MainUserScreen
 import com.example.medimate.register.RegisterScreen
-import com.example.medimate.updateData.UpdateDataScreen
-import com.example.medimate.user.DoctorList
+import com.example.medimate.user.UpdateDataScreen
 import com.example.medimate.user.DoctorScreen
 
 //import com.example.medimate.auth.LoginScreen
@@ -57,7 +56,7 @@ fun AppNavHost(navController: NavHostController) {
             MainUserScreen(navController)
         }
         composable(Screen.Appointments.route) {
-            // AppointmentsScreen()
+            AppointmentsScreen(navController)
         }
         composable(Screen.Doctors.route) {
             DoctorScreen(navController)

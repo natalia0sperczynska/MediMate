@@ -1,9 +1,11 @@
 package com.example.medimate.user
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
@@ -13,15 +15,12 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -35,18 +34,16 @@ import com.example.healme.R
 import com.example.medimate.firebase.Availability
 import com.example.medimate.firebase.Doctor
 import com.example.medimate.firebase.Doctor.Companion.generateTimeSlots
-import com.example.medimate.firebase.FireStore
 import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.MediMateTheme
-import kotlinx.coroutines.launch
 
 @Composable
 fun SingleDoctor(doctor: Doctor, isSelected: Boolean, onDoctorSelected: (Doctor) -> Unit) {
     var expand by remember { mutableStateOf(false) }
     val extraPadding by animateDpAsState(targetValue = if(expand) 40.dp else 0.dp, label = "")
-    Surface(color = MaterialTheme.colorScheme.secondary,
-    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
-    Row (modifier = Modifier.padding(24.dp)) {
+    Surface(border = BorderStroke(1.dp,MaterialTheme.colorScheme.onPrimary), color = MaterialTheme.colorScheme.secondary,
+        shape= MaterialTheme.shapes.medium){
+    Row (modifier = Modifier.padding(16.dp).fillMaxWidth()) {
         Column(modifier = Modifier.weight(1f).padding(bottom = extraPadding)) {
             Image(painter = painterResource(id = R.drawable.profile_pic), contentDescription = null, modifier = Modifier. requiredSize(50.dp))
             Text(text = "${doctor.name}  ${doctor.surname}")

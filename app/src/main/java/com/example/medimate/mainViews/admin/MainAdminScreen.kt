@@ -1,4 +1,4 @@
-package com.example.medimate.mainViews
+package com.example.medimate.mainViews.admin
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
@@ -11,29 +11,28 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.medimate.firebase.FireStore
+import com.example.medimate.firebase.FireStoreUser
 import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.MediMateTheme
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
-
 @Composable
-fun MainDoctorScreen(navController: NavController) {
+fun MainAdminScreen(navController: NavController) {
     val auth = FirebaseAuth.getInstance()
     val context = LocalContext.current
-    val doctorId = auth.currentUser?.uid
-    val firestoreClass = FireStore()
-    var doctorName by remember { mutableStateOf("") }
+    val adminId = auth.currentUser?.uid
+    val firestoreClass = FireStoreUser()
+    var adminName by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(doctorId) {
-        if (doctorId != null) {
+    LaunchedEffect(adminId) {
+        if (adminId != null) {
             coroutineScope.launch {
                 try {
-                    val data = firestoreClass.loadDoctorData(doctorId)
-                    doctorName = (data?.getValue("name") ?: "Doctor").toString()
+                    val data = firestoreClass.loadAdminData(adminId)
+                    adminName = (data?.getValue("name") ?: "Admin").toString()
                 } catch (e: Exception) {
-                    Toast.makeText(context, "Failed to load doctor data: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Failed to load admin data: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -44,7 +43,7 @@ fun MainDoctorScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Welcome back, Dr. $doctorName!", style = MaterialTheme.typography.headlineMedium)
+        Text(text = "Welcome back, Admin $adminName!", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = { navController.navigate(Screen.UpdateData.route) }) {
@@ -65,8 +64,8 @@ fun MainDoctorScreen(navController: NavController) {
 
 @Preview(showBackground = true)
 @Composable
-fun MainDoctorScreenPreview() {
+fun MainAdminScreenPreview() {
     MediMateTheme {
-        MainDoctorScreen(navController = rememberNavController())
+        MainAdminScreen(navController = rememberNavController())
     }
 }

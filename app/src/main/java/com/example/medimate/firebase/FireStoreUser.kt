@@ -1,14 +1,13 @@
 package com.example.medimate.firebase
 
-import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
 /**
  * Class for interacting with Firebase Firestore for user data management.
  */
-class FireStore {
-    private val mFireStore = FirebaseFirestore.getInstance()
+class FireStoreUser {
+    private val mFireStore = FirebaseFirestore.getInstance()//w kazdej metodzie
 
     /**
      * Function registers or updates a user in the Firestore database.

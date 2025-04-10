@@ -1,4 +1,4 @@
-package com.example.medimate.mainViews
+package com.example.medimate.mainViews.user
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -10,20 +10,19 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.medimate.firebase.FireStore
+import com.example.medimate.firebase.FireStoreUser
 import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.Black
 import com.example.medimate.ui.theme.LightGrey
 import com.example.medimate.ui.theme.MediMateTheme
 import com.example.medimate.ui.theme.PurpleGrey
 import com.example.medimate.ui.theme.PurpleGrey2
-import com.example.medimate.ui.theme.PurpleMain
-import com.example.medimate.ui.theme.White
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -33,7 +32,7 @@ fun MainUserScreen(navController: NavController) {
     val auth = FirebaseAuth.getInstance()
     val context = LocalContext.current
     val userId = auth.currentUser?.uid
-    val firestoreClass = FireStore()
+    val firestoreClass = FireStoreUser()
     var userName by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -86,10 +85,10 @@ fun ScreenModel(navController: NavController, userId: String, userName: String, 
         ) {
             IconButton(
                 onClick = { scope.launch { drawerState.open() } },
-                modifier = Modifier.background(PurpleMain, shape = MaterialTheme.shapes.small)
+                modifier = Modifier.background(Color.White, shape = MaterialTheme.shapes.small)
 
             ) {
-                Icon(Icons.Default.Menu, contentDescription = "Open Menu", tint = White)
+                Icon(Icons.Default.Menu, contentDescription = "Open Menu", tint = Black)
             }
         }
         Column(

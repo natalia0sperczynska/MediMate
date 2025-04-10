@@ -51,14 +51,14 @@ fun MainScreen(navController: NavController) {
 
         Button(onClick = { navController.navigate(Screen.Login.route)}, shape = MaterialTheme.shapes.large,
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) {
-            Text("Login", color= MaterialTheme.colorScheme.onPrimary)
+            Text(stringResource(R.string.Login), color= MaterialTheme.colorScheme.onPrimary)
         }
 
         Spacer(modifier = Modifier.height(15.dp))
 
         Button(onClick = { navController.navigate(Screen.Register.route)}, shape = MaterialTheme.shapes.large,
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) {
-            Text("Register",color=MaterialTheme.colorScheme.onSecondary)
+            Text(stringResource(R.string.Register),color=MaterialTheme.colorScheme.onSecondary)
         }
 
 //        if (!hasPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

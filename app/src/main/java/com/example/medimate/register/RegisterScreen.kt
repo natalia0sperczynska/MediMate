@@ -1,6 +1,5 @@
 package com.example.medimate.register
 
-import android.app.DatePickerDialog
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -36,7 +35,7 @@ fun RegisterScreen(navController: NavHostController) {
     var showDatePicker by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    val fireStore = FireStore()
+    val fireStore = FireStoreUser()
 
     Column(modifier = Modifier.padding(16.dp).fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -177,7 +176,7 @@ private suspend fun registerUser(
     dateOfBirth: String,
     password: String,
     repeatPassword: String,
-    fireStore: FireStore,
+    fireStore: FireStoreUser,
     context: android.content.Context
 ) {
     if (name.isBlank() || surname.isBlank() || email.isBlank() || dateOfBirth.isBlank() || password.isBlank()) {

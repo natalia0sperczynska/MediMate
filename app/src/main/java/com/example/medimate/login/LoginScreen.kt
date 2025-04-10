@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,7 +36,7 @@ fun LoginScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         //Image(painter = painterResource(id = R.drawable.medimate_logo), contentDescription = null, modifier = Modifier.size(200.dp))
-        Text(text = "MediMate", style = MaterialTheme.typography.headlineLarge,color = MaterialTheme.colorScheme.secondary)
+        Text(text = stringResource(R.string.app_name), style = MaterialTheme.typography.headlineLarge,color = MaterialTheme.colorScheme.secondary)
 
         Spacer(modifier = Modifier.height(18.dp))
 
