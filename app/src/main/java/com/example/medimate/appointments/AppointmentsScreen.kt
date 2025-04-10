@@ -1,8 +1,8 @@
 package com.example.medimate.appointments
-import androidx.compose.foundation.lazy.items
 
 import android.icu.text.SimpleDateFormat
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
@@ -10,21 +10,26 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
@@ -35,10 +40,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
-
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
@@ -47,8 +51,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.medimate.firebase.Appointment
 import com.example.medimate.firebase.Doctor
 import com.example.medimate.firebase.Status
-import com.example.medimate.firebase.User
+import com.example.medimate.navigation.Screen
 import com.example.medimate.register.DatePickerModal
+import com.example.medimate.tests.getSampleAppointments
+import com.example.medimate.tests.getSampleDoctors
 import com.example.medimate.ui.theme.MediMateTheme
 import java.sql.Date
 import java.util.Locale
@@ -56,12 +62,35 @@ import java.util.Locale
 
 @Composable
 fun AppointmentsScreen(navController: NavController) {
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.Top,horizontalAlignment = Alignment.CenterHorizontally) {
-        DisplayJSpinner()
-        YourAppointments()
+    val appointment by remember { mutableStateOf(Appointment("",null,null,"",Status.EXPECTED,"","","")) }
+    Surface(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // DatePickerDocked()
+            DatePickerFieldToModal()
+            ChoseDoctor()
+            Button(
+                modifier = Modifier.padding(16.dp),
+                shape = MaterialTheme.shapes.medium,
+                onClick = { navController.navigate(Screen.MainUser.route) }) {
+                Text("Cancel")
+            }
+            Button(
+                modifier = Modifier.padding(16.dp),
+                shape = MaterialTheme.shapes.medium,
+                onClick = {confirm(appointment)},
+                enabled = appointment.doctor!=null && appointment.date!="") {
+                Text("Confirm")
+            }
+            YourAppointments()
+        }
+
     }
-    DatePickerDocked()
-    DatePickerFieldToModal()
 
 }
 
@@ -94,8 +123,6 @@ fun DatePickerDocked() {
                 .height(64.dp)
         )
 
-
-
         if (showDatePicker) {
             Popup(
                 onDismissRequest = { showDatePicker = false },
@@ -116,8 +143,6 @@ fun DatePickerDocked() {
                 }
             }
         }
-
-
     }
 }
 
@@ -165,19 +190,56 @@ fun convertMillisToDate(millis: Long): String {
 }
 
 @Composable
-fun DisplayJSpinner(){
-    val parentOptions = listOf("Option 1", "Option 2", "Option 3")
-    var expandedState by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf(parentOptions[0])}
-    var mContex = LocalContext.current
-}
-//DropdownMenu in Jetpack Compose | Spinner Jetpack ...
+fun ChoseDoctor() {
+    val doctors = getSampleDoctors()
+    val expanded = remember { mutableStateOf(false) }
+    val currentValue = remember { mutableStateOf<Doctor?>(null) }
+
+    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Box {
+            Row(
+                modifier = Modifier
+                    .clickable { expanded.value = !expanded.value }
+                    .padding(16.dp)
+                    .background(Color.LightGray)
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
+            ) {
+                Text(text = currentValue.value?.let { "${it.name} ${it.surname}" }
+                    ?: "Choose your doctor",
+                    color = if (currentValue.value == null) Color.Gray else Color.Black)
+                Icon(
+                    imageVector = Icons.Filled.ArrowDropDown,
+                    contentDescription = "You Doctor",
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
+
+            DropdownMenu(
+                expanded = expanded.value,
+                onDismissRequest = { expanded.value = false }
+            ) {
+                Text("Doctors:", color = MaterialTheme.colorScheme.secondary)
+                doctors.forEach { doctor ->
+                    DropdownMenuItem(
+                        text = { Text("${doctor.name} ${doctor.surname}") },
+                        onClick = {
+                            currentValue.value = doctor
+                            expanded.value = false
+                        }
+                    )
+                }
+                }
+            }
+        }
+    }
 
 @Composable
-fun YourAppointments(){
+fun YourAppointments() {
     val appointments = getSampleAppointments()
-    LazyColumn(verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally){
-        //Spacer(20.dp)
+    LazyColumn(
+        verticalArrangement = Arrangement.Bottom,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         item { Text("Your appointments") }
         items(appointments) { appointment ->
             AppointmentCard(appointment = appointment)
@@ -187,12 +249,20 @@ fun YourAppointments(){
 
 @Composable
 fun AppointmentCard(appointment: Appointment) {
-    Row(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .padding(16.dp)) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = "Doctor: ${appointment.doctor.name} ${appointment.doctor.surname}")
+            Text(text = "Doctor: ${appointment.doctor?.name} ${appointment.doctor?.surname}")
             Text(text = "Date: ${appointment.date}")
         }
     }
+}
+
+fun confirm(appointment: Appointment){
+    //val appointment = Appointment(
+   // addAppointment(appointment)
+
 }
 
 @Preview(showSystemUi = true)
@@ -203,66 +273,3 @@ fun AppointmentsViewPreview() {
     }
 }
 
-fun getSampleAppointments(): List<Appointment> {
-    val doctor = Doctor(
-        id = "doc001",
-        name = "Arnold",
-        surname = "Schwarzenegger",
-        email = "arnold@doctor.pl",
-        phoneNumber = "123456789",
-        profilePicture = "https://example.com/arnold.jpg",
-        specialisation = "Cardiology",
-        room = "101"
-    )
-
-    val patient1 = User(
-        id = "pat001",
-        name = "Alice",
-        surname = "Johnson",
-        email = "alice@example.com",
-        phoneNumber = "987654321",
-        dateOfBirth = "1990-04-12",
-        profilePictureUrl = "https://example.com/alice.jpg",
-        address = mapOf("street" to "Main St", "city" to "Warsaw"),
-        allergies = listOf("Penicillin"),
-        diseases = listOf("Hypertension"),
-        medications = listOf("Atenolol")
-    )
-
-    val patient2 = User(
-        id = "pat002",
-        name = "Bob",
-        surname = "Smith",
-        email = "bob@example.com",
-        phoneNumber = "876543210",
-        dateOfBirth = "1985-09-27",
-        profilePictureUrl = "https://example.com/bob.jpg",
-        address = mapOf("street" to "Oak Rd", "city" to "Krakow"),
-        allergies = listOf("None"),
-        diseases = listOf("Asthma"),
-        medications = listOf("Ventolin")
-    )
-
-    return listOf(
-        Appointment(
-            id = "appt001",
-            doctor = doctor,
-            patient = patient1,
-            date = "2025-04-12 10:30",
-            status = Status.EXPECTED,
-            diagnosis = "",
-            notes = "Patient reported chest pain",
-            url = "https://meet.example.com/arnold-alice"
-        ),
-        Appointment(
-            id = "appt002",
-            doctor = doctor,
-            patient = patient2,
-            date = "2025-04-13 14:00",
-            status = Status.COMPLETED,
-            diagnosis = "Asthma attack",
-            notes = "Prescribed new inhaler dosage",
-            url = "https://meet.example.com/arnold-bob"
-        )
-    )
-}
