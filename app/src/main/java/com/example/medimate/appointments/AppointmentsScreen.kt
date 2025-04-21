@@ -1,5 +1,6 @@
 package com.example.medimate.appointments
 
+import android.app.DatePickerDialog
 import android.icu.text.SimpleDateFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +18,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
@@ -29,10 +32,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,6 +48,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
@@ -51,18 +58,34 @@ import androidx.navigation.compose.rememberNavController
 import com.example.medimate.firebase.Appointment
 import com.example.medimate.firebase.Doctor
 import com.example.medimate.firebase.Status
+import com.example.medimate.firebase.Term
 import com.example.medimate.navigation.Screen
 import com.example.medimate.register.DatePickerModal
 import com.example.medimate.tests.getSampleAppointments
 import com.example.medimate.tests.getSampleDoctors
+import com.example.medimate.tests.getSapleAvilableTerms
 import com.example.medimate.ui.theme.MediMateTheme
 import java.sql.Date
+import java.util.Calendar
 import java.util.Locale
 
 
 @Composable
-fun AppointmentsScreen(navController: NavController) {
-    val appointment by remember { mutableStateOf(Appointment("",null,null,"",Status.EXPECTED,"","","")) }
+fun AppointmentsScreen(navController: NavController, selectedDoctor: Doctor? = null) {
+    val appointment = remember {
+        mutableStateOf(
+            Appointment(
+                "",
+                doctor = selectedDoctor,
+                null,
+                "",
+                Status.EXPECTED,
+                "",
+                "",
+                ""
+            )
+        )
+    }
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -71,9 +94,25 @@ fun AppointmentsScreen(navController: NavController) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // DatePickerDocked()
-            DatePickerFieldToModal()
-            ChoseDoctor()
+            ChoseDoctor(
+                doctors = getSampleDoctors(),
+                appointment = appointment
+            )
+
+            DatePickerFieldToModal(
+                label = "Pick a date",
+                onDateSelected = { date ->
+                    appointment.value = appointment.value.copy(date = date)
+                }
+            )
+            if (appointment.value.doctor != null && appointment.value.date.isNotBlank()) {
+                GetAvailableTerms(
+                    doctor = appointment.value.doctor!!,
+                    date = appointment.value.date
+                )
+            } else {
+                Text("No available terms yet")
+            }
             Button(
                 modifier = Modifier.padding(16.dp),
                 shape = MaterialTheme.shapes.medium,
@@ -83,8 +122,9 @@ fun AppointmentsScreen(navController: NavController) {
             Button(
                 modifier = Modifier.padding(16.dp),
                 shape = MaterialTheme.shapes.medium,
-                onClick = {confirm(appointment)},
-                enabled = appointment.doctor!=null && appointment.date!="") {
+                onClick = { confirm(appointment) },
+               // enabled = appointment.doctor != null && appointment.date != ""
+            ) {
                 Text("Confirm")
             }
             YourAppointments()
@@ -147,14 +187,15 @@ fun DatePickerDocked() {
 }
 
 @Composable
-fun DatePickerFieldToModal(modifier: Modifier = Modifier) {
+fun DatePickerFieldToModal( label: String,
+                            onDateSelected: (String) -> Unit,modifier: Modifier = Modifier) {
     var selectedDate by remember { mutableStateOf<Long?>(null) }
     var showModal by remember { mutableStateOf(false) }
 
     OutlinedTextField(
         value = selectedDate?.let { convertMillisToDate(it) } ?: "",
         onValueChange = { },
-        label = { Text("Select date") },
+        label = { Text(label) },
         placeholder = { Text("MM/DD/YYYY") },
         trailingIcon = {
             Icon(Icons.Default.DateRange, contentDescription = "Select date")
@@ -172,12 +213,15 @@ fun DatePickerFieldToModal(modifier: Modifier = Modifier) {
                         showModal = true
                     }
                 }
-            }
+            },
+        readOnly = true
     )
 
     if (showModal) {
         DatePickerModal(
-            onDateSelected = { selectedDate = it },
+            onDateSelected = {
+                selectedDate = it
+                onDateSelected(convertMillisToDate(it!!))},
             onDismiss = { showModal = false }
         )
     }
@@ -190,10 +234,9 @@ fun convertMillisToDate(millis: Long): String {
 }
 
 @Composable
-fun ChoseDoctor() {
-    val doctors = getSampleDoctors()
+fun ChoseDoctor(doctors: List<Doctor>, appointment: MutableState<Appointment>) {
     val expanded = remember { mutableStateOf(false) }
-    val currentValue = remember { mutableStateOf<Doctor?>(null) }
+    val currentValue = remember { mutableStateOf(appointment.value.doctor) }
 
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         Box {
@@ -225,13 +268,47 @@ fun ChoseDoctor() {
                         onClick = {
                             currentValue.value = doctor
                             expanded.value = false
+                            appointment.value = appointment.value.copy(doctor = doctor)
+
                         }
                     )
-                }
                 }
             }
         }
     }
+}
+
+@Composable
+fun GetAvailableTerms(doctor: Doctor, date: String) {
+   // val availableTermsSample = doctor.availability.getTermsForDay(date)
+    println("Selected doctor: ${doctor.name}")
+    println("Selected date: $date")
+    val availableterms = getSapleAvilableTerms(doctor, date)
+    val (selectedOption, onOptionSelected) = remember { mutableStateOf(availableterms[0])}
+    LazyColumn(
+        verticalArrangement = Arrangement.Bottom,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.selectableGroup()
+    ) {
+        item { Text("Available terms for $date:") }
+        items(availableterms) { term ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .selectable(selected =(term == selectedOption),
+                        onClick = {onOptionSelected(term)},
+                        role = Role.RadioButton)
+            ) {
+                RadioButton(
+                    selected = (term == selectedOption)
+                    ,onClick = null
+                )
+                Text(text = "${term.startTime} - ${term.endTime}")
+            }
+        }
+    }
+}
 
 @Composable
 fun YourAppointments() {
@@ -249,9 +326,11 @@ fun YourAppointments() {
 
 @Composable
 fun AppointmentCard(appointment: Appointment) {
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp)) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(text = "Doctor: ${appointment.doctor?.name} ${appointment.doctor?.surname}")
             Text(text = "Date: ${appointment.date}")
@@ -259,9 +338,10 @@ fun AppointmentCard(appointment: Appointment) {
     }
 }
 
-fun confirm(appointment: Appointment){
+
+fun confirm(appointment: MutableState<Appointment>) {
     //val appointment = Appointment(
-   // addAppointment(appointment)
+    // addAppointment(appointment)
 
 }
 

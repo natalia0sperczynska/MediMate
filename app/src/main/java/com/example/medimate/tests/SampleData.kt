@@ -1,10 +1,12 @@
 package com.example.medimate.tests
 
+import android.annotation.SuppressLint
 import com.example.medimate.firebase.Appointment
 import com.example.medimate.firebase.Availability
 import com.example.medimate.firebase.Doctor
 import com.example.medimate.firebase.Doctor.Companion.generateTimeSlots
 import com.example.medimate.firebase.Status
+import com.example.medimate.firebase.Term
 import com.example.medimate.firebase.User
 
 fun getSampleAppointments(): List<Appointment> {
@@ -72,6 +74,45 @@ fun getSampleAppointments(): List<Appointment> {
 }
 fun getSampleDoctors(): List<Doctor> {
     return listOf(
+        Doctor(
+            id = "doc1",
+            name = "Sexy",
+            surname = "Doc",
+            email = "doc@hotclinic.com",
+            phoneNumber = "123456789",
+            profilePicture = "",
+            specialisation = "Cardiologist",
+            room = "69",
+            availability = Availability(
+                monday = listOf(
+                    Term(startTime = "10:00", endTime = "10:30",isAvailable = true),
+                    Term(startTime = "10:30", endTime = "11:00",isAvailable = true)
+                ),
+                tuesday = listOf(
+                    Term(startTime = "12:00", endTime = "12:30",isAvailable = true)
+                ),
+                wednesday = listOf(
+                    Term(startTime = "10:00", endTime = "10:30",isAvailable = true),
+                    Term(startTime = "10:30", endTime = "11:00",isAvailable = true)
+                ),
+                thursday = listOf(
+                    Term(startTime = "10:00", endTime = "10:30",isAvailable = true),
+                    Term(startTime = "10:30", endTime = "11:00",isAvailable = true)
+                ),
+                friday = listOf(
+                    Term(startTime = "10:00", endTime = "10:30",isAvailable = true),
+                    Term(startTime = "10:30", endTime = "11:00",isAvailable = true)
+                ),
+                saturday = listOf(
+                    Term(startTime = "10:00", endTime = "10:30",isAvailable = true),
+                    Term(startTime = "10:30", endTime = "11:00",isAvailable = true)
+                ),
+                sunday = listOf(
+                    Term(startTime = "10:00", endTime = "10:30",isAvailable = true),
+                    Term(startTime = "10:30", endTime = "11:00",isAvailable = true)
+                ),
+            )
+        ),
         Doctor(
             id = "1",
             name = "Anna",
@@ -197,5 +238,23 @@ fun getSampleDoctors(): List<Doctor> {
         )
 
     )
+
 }
 
+fun getSapleAvilableTerms(doctor: Doctor, date: String): List<Term> {
+    val dayOfWeek = java.time.LocalDate.parse(date, java.time.format.DateTimeFormatter.ofPattern("MM/dd/yyyy"))
+        .dayOfWeek
+        .name
+        .lowercase()
+
+    return when (dayOfWeek) {
+        "monday" -> doctor.availability.monday
+        "tuesday" -> doctor.availability.tuesday
+        "wednesday" -> doctor.availability.wednesday
+        "thursday" -> doctor.availability.thursday
+        "friday" -> doctor.availability.friday
+        "saturday" -> doctor.availability.saturday
+        "sunday" -> doctor.availability.sunday
+        else -> listOf()
+    }.filter { it.isAvailable }
+}

@@ -11,6 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.medimate.firebase.FireStoreAdmin
 import com.example.medimate.firebase.FireStoreUser
 import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.MediMateTheme
@@ -21,7 +22,7 @@ fun MainAdminScreen(navController: NavController) {
     val auth = FirebaseAuth.getInstance()
     val context = LocalContext.current
     val adminId = auth.currentUser?.uid
-    val firestoreClass = FireStoreUser()
+    val firestoreClass = FireStoreAdmin()
     var adminName by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
 

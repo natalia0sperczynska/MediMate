@@ -11,6 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.medimate.firebase.FireStoreDoctor
 import com.example.medimate.firebase.FireStoreUser
 import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.MediMateTheme
@@ -22,7 +23,7 @@ fun MainDoctorScreen(navController: NavController) {
     val auth = FirebaseAuth.getInstance()
     val context = LocalContext.current
     val doctorId = auth.currentUser?.uid
-    val firestoreClass = FireStoreUser()
+    val firestoreClass = FireStoreDoctor()
     var doctorName by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
 

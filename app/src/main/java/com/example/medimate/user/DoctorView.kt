@@ -39,7 +39,7 @@ import com.example.medimate.tests.getSampleDoctors
 import com.example.medimate.ui.theme.MediMateTheme
 
 @Composable
-fun SingleDoctor(doctor: Doctor, isSelected: Boolean, onDoctorSelected: (Doctor) -> Unit) {
+fun SingleDoctor(doctor: Doctor, isSelected: Boolean, onDoctorSelected: (Doctor) -> Unit, navController: NavController) {
     var expand by remember { mutableStateOf(false) }
     val extraPadding by animateDpAsState(targetValue = if(expand) 40.dp else 0.dp, label = "")
     Surface(border = BorderStroke(1.dp,MaterialTheme.colorScheme.onPrimary), color = MaterialTheme.colorScheme.secondary,
@@ -62,7 +62,8 @@ fun SingleDoctor(doctor: Doctor, isSelected: Boolean, onDoctorSelected: (Doctor)
                     color = MaterialTheme.colorScheme.onSecondary
                 )
             }
-            OutlinedButton(onClick = {}) {
+            OutlinedButton(onClick = {onDoctorSelected(doctor)
+            navController.navigate(Screen.AppointmentsDoctor.createRoute(doctor.id))}) {
                 Text(text = "Set the appointment",
                     color = MaterialTheme.colorScheme.onSecondary
                 )
@@ -75,7 +76,7 @@ fun SingleDoctor(doctor: Doctor, isSelected: Boolean, onDoctorSelected: (Doctor)
 @Composable
 fun DoctorList(doctors: List<Doctor>,navController: NavController) {
     var selectedDoctor : Doctor? by
-    rememberSaveable { mutableStateOf(null) }
+    remember { mutableStateOf(null) }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         if (doctors.isEmpty()) {
             Text("No doctors available")
@@ -84,7 +85,7 @@ fun DoctorList(doctors: List<Doctor>,navController: NavController) {
                 item{Text("Select a doctor:", color = MaterialTheme.colorScheme.secondary)}
                 items(doctors){ doctor ->
                     SingleDoctor(doctor = doctor, isSelected = (selectedDoctor == doctor),
-                        onDoctorSelected = { doctor -> selectedDoctor = doctor })
+                        onDoctorSelected = { doctor -> selectedDoctor = doctor }, navController = navController)
                 }
             }
         Spacer(modifier = Modifier.height(8.dp))
