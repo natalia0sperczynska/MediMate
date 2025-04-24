@@ -19,7 +19,7 @@ class SetAvailabilityModel : ViewModel() {
             ).map { day ->
                 DayAvailabilityUI(
                     day = day,
-                    slots = Doctor.generateTimeSlots().map { TermUI(it) }
+                    slots = Doctor.generateTimeSlots().map { Term(it.toString()) }
                 )
             }
         )
@@ -32,21 +32,21 @@ class SetAvailabilityModel : ViewModel() {
     }
     fun saveAvailability(doctorId: String){
         val availability =  Availability(
-            monday=getTermsForDay("monday"),
-            tuesday=getTermsForDay("tuesday"),
-            wednesday=getTermsForDay("wednesday"),
-            thursday=getTermsForDay("thursday"),
-            friday=getTermsForDay("friday"),
-            saturday=getTermsForDay("saturday"),
-            sunday=getTermsForDay("sunday")
+//            monday=getTermsForDay("monday"),
+//            tuesday=getTermsForDay("tuesday"),
+//            wednesday=getTermsForDay("wednesday"),
+//            thursday=getTermsForDay("thursday"),
+//            friday=getTermsForDay("friday"),
+//            saturday=getTermsForDay("saturday"),
+//            sunday=getTermsForDay("sunday")
         )
         Firebase.firestore.collection("doctors").document(doctorId).update("availability",availability)
     }
-    private fun getTermsForDay(day: String): List<Term> {
-        return _weekAvailability.find{it.day==day}?.slots?.filter{
-            it.isAvailable
-        }?.map{
-            it.term
-        }?: emptyList()
-        }
+//    private fun getTermsForDay(day: String): List<Term> {
+//        return _weekAvailability.find{it.day==day}?.slots?.filter{
+//            it.isAvailable
+//        }?.map{
+//            it.term
+//        }?: emptyList()
+//        }
 }

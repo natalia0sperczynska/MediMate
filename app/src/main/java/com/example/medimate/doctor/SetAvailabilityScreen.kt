@@ -23,14 +23,9 @@ import com.example.medimate.firebase.Term
 import com.example.medimate.ui.theme.MediMateTheme
 import java.util.Locale
 
-data class TermUI(
-    val term: Term,
-    var isAvailable: Boolean = false
-)
-
 data class DayAvailabilityUI(
     val day: String,
-    val slots: List<TermUI>
+    val slots: List<Term>
 )
 
 @Composable
@@ -45,8 +40,8 @@ fun SetAvailabilityScreen(
                 ) else it.toString()
             }, style = MaterialTheme.typography.titleMedium)
             LazyRow {
-                itemsIndexed(dayAvailability.slots) { index, termUI ->
-                    val bgColor = if (termUI.isAvailable) Color.Green else Color.Gray
+                itemsIndexed(dayAvailability.slots) { index, term ->
+                    val bgColor = if (term.isAvailable) Color.Green else Color.Gray
                     Box(
                         modifier = Modifier
                             .padding(4.dp)
@@ -56,7 +51,7 @@ fun SetAvailabilityScreen(
                             .background(bgColor, RoundedCornerShape(8.dp))
                             .padding(8.dp)
                     ) {
-                        Text("${termUI.term.startTime}-${termUI.term.endTime}", color = Color.White)
+                        Text("${term.startTime}-${term.endTime}", color = Color.White)
                     }
                 }
             }

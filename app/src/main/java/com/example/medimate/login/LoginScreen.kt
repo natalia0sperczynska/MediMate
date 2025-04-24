@@ -13,6 +13,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -29,6 +31,11 @@ fun LoginScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
+    var passwordVisible by remember { mutableStateOf(false) }
+    val icon= if (passwordVisible)
+        painterResource(id = android.R.drawable.ic_secure)
+    else
+        painterResource(id = android.R.drawable.ic_menu_view)
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -67,7 +74,14 @@ fun LoginScreen(navController: NavController) {
                     painter = painterResource(id = android.R.drawable.ic_secure),
                     contentDescription =null
                 )
-            }
+            },
+            trailingIcon = {
+                IconButton(onClick = { passwordVisible=!passwordVisible}){
+                    Icon(painter = icon, contentDescription = null)
+                }
+            },
+            visualTransformation = if(passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+
         )
 
         Spacer(modifier = Modifier.height(16.dp))
