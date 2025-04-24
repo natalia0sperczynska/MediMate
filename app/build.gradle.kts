@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.compose.compiler)
-   // alias(libs.plugins.kotlin.serialization)
+    //alias(libs.plugins.kotlin.serialization)
     kotlin("plugin.serialization") version "2.0.21"
 }
 
@@ -110,5 +110,12 @@ dependencies {
 
     implementation(libs.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
+    
+    //hilt
+    implementation("com.google.dagger:hilt-android:2.51.1")
+    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
 
+}
+    kapt {
+        correctErrorTypes = true
 }

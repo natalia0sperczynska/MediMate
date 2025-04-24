@@ -37,6 +37,9 @@ import com.example.medimate.firebase.Doctor.Companion.generateTimeSlots
 import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.MediMateTheme
 
+/**
+ * Composable function for displaying a single doctor.
+ */
 @Composable
 fun SingleDoctor(doctor: Doctor, isSelected: Boolean, onDoctorSelected: (Doctor) -> Unit) {
     var expand by remember { mutableStateOf(false) }

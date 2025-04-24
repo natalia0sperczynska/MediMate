@@ -30,5 +30,17 @@ fun MediMateApp(modifier: Modifier){
     }
 }
 
+@AndroidEntryPoint
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            val viewModel: ChatViewModel = hiltViewModel()
+            ChatScreen(viewModel, senderType = SenderType.PATIENT)
+        }
+    }
+}
+
+
 
 
