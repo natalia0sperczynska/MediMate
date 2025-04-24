@@ -2,6 +2,7 @@ package com.example.medimate.user
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +17,7 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -104,12 +106,8 @@ fun DoctorList(doctors: List<Doctor>,navController: NavController) {
                         onDoctorSelected = { doctor -> selectedDoctor = doctor }, navController = navController)
                 }
             }
-        Spacer(modifier = Modifier.height(8.dp))
-        Button(onClick = { navController.navigate(Screen.MainUser.route) }) {
-            Text("Go back")
         }
 
-    }
 }
 class MainViewModel: ViewModel(){
     private val _searchText = MutableStateFlow("")
@@ -151,11 +149,16 @@ fun DoctorScreen(navController: NavController) {
 //            doctors = mFireBase.getAllDoctors()
 //        }
 //    }
-    val viewModel = viewModel<MainViewMdeol>()
-    Column(modifier = Modifier.padding(16.dp)) {  SearchBar(modifier = Modifier)
+    //val viewModel = viewModel<MainViewMdeol>()
+    Column(modifier = Modifier.padding(16.dp)) {
+        SearchBar(modifier = Modifier)
+        Button(modifier = Modifier.align(Alignment.CenterHorizontally), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary), onClick = { navController.navigate(Screen.MainUser.route) }) {
+            Text("Go back")
+        }
         Spacer(modifier = Modifier.height(16.dp))
-        DoctorList(doctors = getSampleDoctors(), navController = navController) }
 
+        DoctorList(doctors = getSampleDoctors(), navController = navController)
+    }
 }
 
 @Composable
