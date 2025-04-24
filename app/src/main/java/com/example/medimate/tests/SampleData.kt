@@ -76,13 +76,13 @@ fun getSampleDoctors(): List<Doctor> {
     return listOf(
         Doctor(
             id = "doc1",
-            name = "Sexy",
+            name = "Test",
             surname = "Doc",
-            email = "doc@hotclinic.com",
+            email = "doc@clinic.com",
             phoneNumber = "123456789",
             profilePicture = "",
             specialisation = "Cardiologist",
-            room = "69",
+            room = "6",
             availability = Availability(
                 monday = listOf(
                     Term(startTime = "10:00", endTime = "10:30",isAvailable = true),

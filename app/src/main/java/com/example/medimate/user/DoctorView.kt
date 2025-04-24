@@ -7,16 +7,23 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,8 +33,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.healme.R
@@ -37,6 +48,11 @@ import com.example.medimate.firebase.Doctor.Companion.generateTimeSlots
 import com.example.medimate.navigation.Screen
 import com.example.medimate.tests.getSampleDoctors
 import com.example.medimate.ui.theme.MediMateTheme
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 
 @Composable
 fun SingleDoctor(doctor: Doctor, isSelected: Boolean, onDoctorSelected: (Doctor) -> Unit, navController: NavController) {
@@ -95,6 +111,34 @@ fun DoctorList(doctors: List<Doctor>,navController: NavController) {
 
     }
 }
+class MainViewModel: ViewModel(){
+    private val _searchText = MutableStateFlow("")
+    val searchText = _searchText.asStateFlow()
+
+    private val _isSearching = MutableStateFlow(false)
+    val isSearching = _isSearching.asStateFlow()
+    private val _doctors=MutableStateFlow(getSampleDoctors())
+    val doctors=searchText.combine(_doctors) { text, doctors ->
+        if (text.isBlank()) {
+            doctors
+        } else {
+            doctors.filter {
+                it.doesMatchSearchQuery(text)
+            }
+        }
+    }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            _doctors.value
+        )
+
+
+    fun onSearchTextChange(text: String) {
+        _searchText.value = text
+    }
+
+}
 @Composable
 fun DoctorScreen(navController: NavController) {
     //Pobieranie z firebase dziala zakomentowane zeby dzialal preview
@@ -107,8 +151,26 @@ fun DoctorScreen(navController: NavController) {
 //            doctors = mFireBase.getAllDoctors()
 //        }
 //    }
-    DoctorList(doctors = getSampleDoctors(), navController = navController)
+    val viewModel = viewModel<MainViewMdeol>()
+    Column(modifier = Modifier.padding(16.dp)) {  SearchBar(modifier = Modifier)
+        Spacer(modifier = Modifier.height(16.dp))
+        DoctorList(doctors = getSampleDoctors(), navController = navController) }
+
 }
+
+@Composable
+fun SearchBar(modifier: Modifier = Modifier){
+    TextField(value="", onValueChange = {}, trailingIcon = {
+        Icon(Icons.Default.Search, contentDescription = null)
+    }, placeholder = { Text(stringResource(id=R.string.place_holder_search)) },
+        modifier = modifier
+        .heightIn(min=56.dp)
+        .fillMaxWidth()
+        .padding(horizontal = 8.dp))
+
+}
+
+
 
 @Preview(showSystemUi = true)
 @Composable

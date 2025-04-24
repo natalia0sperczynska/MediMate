@@ -9,4 +9,5 @@
     <string name="Name">Name</string>
     <string name="Login">Login</string>
     <string name="Register">Register</string>
+    <string name="place_holder_search">Search for a doctor...</string>
 </resources>
