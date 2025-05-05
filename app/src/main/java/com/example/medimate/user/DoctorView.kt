@@ -27,10 +27,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,17 +48,20 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.healme.R
 import com.example.medimate.firebase.Doctor
+import com.example.medimate.firebase.DoctorDAO
 import com.example.medimate.navigation.Screen
 import com.example.medimate.tests.getSampleDoctors
 import com.example.medimate.ui.theme.MediMateTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @Composable
 fun SingleDoctor(doctor: Doctor, isSelected: Boolean, onDoctorSelected: (Doctor) -> Unit, navController: NavController) {
@@ -110,53 +116,57 @@ fun DoctorList(doctors: List<Doctor>,navController: NavController) {
         }
 
 }
-class MainViewModel: ViewModel(){
-    private val _searchText = MutableStateFlow("")
-    val searchText = _searchText.asStateFlow()
 
+class MainViewModel: ViewModel(){
+    //sprobowac przekazC TEN sam view model zeby nie podbierac dwa razy z bazy danych
+    private val _searchText = MutableStateFlow("")
     private val _isSearching = MutableStateFlow(false)
+    val searchText = _searchText.asStateFlow()
+    var doctors: StateFlow<List<Doctor>>? = MutableStateFlow(emptyList())
+
     val isSearching = _isSearching.asStateFlow()
-    private val _doctors=MutableStateFlow(getSampleDoctors())
-    val doctors=searchText
-        .debounce(500L)
-        .onEach { _isSearching.update { true } }
-        .combine(_doctors) { text, doctors ->
-        if (text.isBlank()) {
-            doctors
-        } else {
-            doctors.filter {
-                it.doesMatchSearchQuery(text)
-            }
+    init {
+        viewModelScope.launch {
+            val _doctors=MutableStateFlow(getDoctorList())
+
+            doctors=searchText
+                .debounce(500L)
+                .onEach { _isSearching.update { true } }
+                .combine(_doctors) { text, doctors ->
+                    if (text.isBlank()) {
+                        doctors
+                    } else {
+                        doctors.filter {
+                            it.doesMatchSearchQuery(text)
+                        }
+                    }
+                }
+                .onEach { _isSearching.update { false } }
+                .stateIn(
+                    viewModelScope,
+                    SharingStarted.WhileSubscribed(5000),
+                    _doctors.value
+                )
         }
     }
-        .onEach { _isSearching.update { false } }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            _doctors.value
-        )
-
 
     fun onSearchTextChange(text: String) {
         _searchText.value = text
     }
 
 }
+
+suspend fun getDoctorList():List<Doctor>{
+    val mFireBase = DoctorDAO()
+    val doctors = mFireBase.getAllDoctors()
+    return doctors
+}
+
 @Composable
 fun DoctorScreen(navController: NavController) {
-    //Pobieranie z firebase dziala zakomentowane zeby dzialal preview
-//    val mFireBase = FireStore()
-//    var doctors by rememberSaveable { mutableStateOf<List<Doctor>>(emptyList()) }
-//    val coroutineScope = rememberCoroutineScope()
-//
-//    LaunchedEffect(Unit) {
-//        coroutineScope.launch {
-//            doctors = mFireBase.getAllDoctors()
-//        }
-//    }
     val viewModel = viewModel<MainViewModel>()
     val searchText by viewModel.searchText.collectAsState()
-    val person by viewModel.doctors.collectAsState()
+    val person by viewModel.doctors!!.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()
 
     Column(modifier = Modifier.padding(16.dp)) {

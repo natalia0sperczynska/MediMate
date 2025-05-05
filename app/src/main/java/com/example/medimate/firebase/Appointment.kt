@@ -1,6 +1,6 @@
 package com.example.medimate.firebase
 data class Appointment(
-    val id: String = "",
+    var id: String = "",
     var doctor: Doctor?,
     val patient: User?,
     val date: String = "",

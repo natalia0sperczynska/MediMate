@@ -5,7 +5,7 @@ import kotlinx.coroutines.tasks.await
 /**
  * Class for interacting with Firebase Firestore for user data management.
  */
-class FireStoreDoctor {
+class DoctorDAO {
     /**
      * Function registers or updates a user in the Firestore database.
      * If a user with the same ID already exists, their document will be overwritten.
@@ -92,6 +92,11 @@ class FireStoreDoctor {
         }
         return appointmentsList
 
+    }
+    suspend fun addAvailabilityChanGE(doctorId: String, newDate:String){
+        val mFireStore = FirebaseFirestore.getInstance()
+        val doc = mFireStore.collection("doctors").document(doctorId)
+        //doc.update()
     }
 
 
