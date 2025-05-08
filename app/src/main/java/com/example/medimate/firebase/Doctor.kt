@@ -29,7 +29,8 @@ data class Doctor(
         friday = generateTimeSlots(),
         saturday = generateTimeSlots(),
         sunday = generateTimeSlots()
-    )
+    ),
+    var availabilityChanges : List<String> = emptyList()
 
 ){
     fun doesMatchSearchQuery(query: String):Boolean{

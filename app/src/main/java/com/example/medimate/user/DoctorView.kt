@@ -2,9 +2,11 @@ package com.example.medimate.user
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -16,18 +18,21 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,17 +47,21 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.healme.R
-import com.example.medimate.firebase.Availability
 import com.example.medimate.firebase.Doctor
-import com.example.medimate.firebase.Doctor.Companion.generateTimeSlots
+import com.example.medimate.firebase.DoctorDAO
 import com.example.medimate.navigation.Screen
 import com.example.medimate.tests.getSampleDoctors
 import com.example.medimate.ui.theme.MediMateTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 /**
  * Composable function for displaying a single doctor.
@@ -107,63 +116,91 @@ fun DoctorList(doctors: List<Doctor>,navController: NavController) {
                         onDoctorSelected = { doctor -> selectedDoctor = doctor }, navController = navController)
                 }
             }
-        Spacer(modifier = Modifier.height(8.dp))
-        Button(onClick = { navController.navigate(Screen.MainUser.route) }) {
-            Text("Go back")
         }
 
-    }
 }
-class MainViewModel: ViewModel(){
-    private val _searchText = MutableStateFlow("")
-    val searchText = _searchText.asStateFlow()
 
+class MainViewModel: ViewModel(){
+    //sprobowac przekazC TEN sam view model zeby nie podbierac dwa razy z bazy danych
+    private val _searchText = MutableStateFlow("")
     private val _isSearching = MutableStateFlow(false)
+    val searchText = _searchText.asStateFlow()
+    var doctors: StateFlow<List<Doctor>>? = MutableStateFlow(emptyList())
+
     val isSearching = _isSearching.asStateFlow()
-    private val _doctors=MutableStateFlow(getSampleDoctors())
-    val doctors=searchText.combine(_doctors) { text, doctors ->
-        if (text.isBlank()) {
-            doctors
-        } else {
-            doctors.filter {
-                it.doesMatchSearchQuery(text)
-            }
+    init {
+        viewModelScope.launch {
+            val _doctors=MutableStateFlow(getDoctorList())
+
+            doctors=searchText
+                .debounce(500L)
+                .onEach { _isSearching.update { true } }
+                .combine(_doctors) { text, doctors ->
+                    if (text.isBlank()) {
+                        doctors
+                    } else {
+                        doctors.filter {
+                            it.doesMatchSearchQuery(text)
+                        }
+                    }
+                }
+                .onEach { _isSearching.update { false } }
+                .stateIn(
+                    viewModelScope,
+                    SharingStarted.WhileSubscribed(5000),
+                    _doctors.value
+                )
         }
     }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            _doctors.value
-        )
-
 
     fun onSearchTextChange(text: String) {
         _searchText.value = text
     }
 
 }
-@Composable
-fun DoctorScreen(navController: NavController) {
-    //Pobieranie z firebase dziala zakomentowane zeby dzialal preview
-//    val mFireBase = FireStore()
-//    var doctors by rememberSaveable { mutableStateOf<List<Doctor>>(emptyList()) }
-//    val coroutineScope = rememberCoroutineScope()
-//
-//    LaunchedEffect(Unit) {
-//        coroutineScope.launch {
-//            doctors = mFireBase.getAllDoctors()
-//        }
-//    }
-    val viewModel = viewModel<MainViewMdeol>()
-    Column(modifier = Modifier.padding(16.dp)) {  SearchBar(modifier = Modifier)
-        Spacer(modifier = Modifier.height(16.dp))
-        DoctorList(doctors = getSampleDoctors(), navController = navController) }
 
+suspend fun getDoctorList():List<Doctor>{
+    val mFireBase = DoctorDAO()
+    val doctors = mFireBase.getAllDoctors()
+    return doctors
 }
 
 @Composable
-fun SearchBar(modifier: Modifier = Modifier){
-    TextField(value="", onValueChange = {}, trailingIcon = {
+fun DoctorScreen(navController: NavController) {
+    val viewModel = viewModel<MainViewModel>()
+    val searchText by viewModel.searchText.collectAsState()
+    val person by viewModel.doctors!!.collectAsState()
+    val isSearching by viewModel.isSearching.collectAsState()
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        SearchBar(modifier = Modifier.fillMaxWidth(), viewModel = viewModel, searchText)
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+            onClick = { navController.navigate(Screen.MainUser.route) }) {
+            Text("Go back")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        if (isSearching) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+        } else {
+            DoctorList(doctors = person, navController = navController)
+        }
+    }
+}
+
+@Composable
+fun SearchBar(
+    modifier: Modifier = Modifier,
+    viewModel: MainViewModel = viewModel(),
+    searchText: String
+){
+    TextField( value=searchText, onValueChange = viewModel::onSearchTextChange, trailingIcon = {
         Icon(Icons.Default.Search, contentDescription = null)
     }, placeholder = { Text(stringResource(id=R.string.place_holder_search)) },
         modifier = modifier

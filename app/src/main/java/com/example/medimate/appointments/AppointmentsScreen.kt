@@ -1,6 +1,4 @@
 package com.example.medimate.appointments
-
-import android.app.DatePickerDialog
 import android.icu.text.SimpleDateFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -65,6 +63,7 @@ import com.example.medimate.tests.getSampleAppointments
 import com.example.medimate.tests.getSampleDoctors
 import com.example.medimate.tests.getSapleAvilableTerms
 import com.example.medimate.ui.theme.MediMateTheme
+import com.google.firebase.firestore.FirebaseFirestore
 import java.sql.Date
 import java.util.Calendar
 import java.util.Locale
@@ -340,8 +339,7 @@ fun AppointmentCard(appointment: Appointment) {
 
 
 fun confirm(appointment: MutableState<Appointment>) {
-    //val appointment = Appointment(
-    // addAppointment(appointment)
+
 
 }
 
