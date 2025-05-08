@@ -8,11 +8,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.rememberNavController
 import com.example.medimate.navigation.AppNavHost
 import com.example.medimate.ui.theme.MediMateTheme
+import com.zegocloud.zimkit.services.ZIMKit
+import com.zegocloud.zimkit.services.ZIMKitConfig
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -30,15 +33,11 @@ fun MediMateApp(modifier: Modifier){
     }
 }
 
-@AndroidEntryPoint
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            val viewModel: ChatViewModel = hiltViewModel()
-            ChatScreen(viewModel, senderType = SenderType.PATIENT)
-        }
-    }
+private fun init() {
+    val appID = 0L
+    val appSign = "xxx"
+    ZIMKit.initWith(application, appID, appSign, ZIMKitConfig())
+    ZIMKit.initNotifications()
 }
 
 

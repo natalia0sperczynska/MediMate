@@ -12,6 +12,7 @@ android {
     compileSdk = 35
 
     buildFeatures {
+        dataBinding = true
         compose = true
     }
 
@@ -110,12 +111,8 @@ dependencies {
 
     implementation(libs.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
-    
-    //hilt
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
 
-}
-    kapt {
-        correctErrorTypes = true
+    implementation("com.github.ZEGOCLOUD:zego_inapp_chat_uikit_android:+")  {
+        exclude(group = "com.android.support", module = "support-compat")
+    }
 }
