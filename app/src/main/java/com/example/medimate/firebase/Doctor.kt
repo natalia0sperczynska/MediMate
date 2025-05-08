@@ -13,54 +13,26 @@ package com.example.medimate.firebase
  */
 
 data class Doctor(
-    val id: String = "",
-    val name: String = "",
-    val surname: String = "",
-    val email: String = "",
-    val phoneNumber: String = "",
-    val profilePicture: String = "",
-    val specialisation:String = "",
-    val room:String = "",
-    val availability:Availability = Availability(
-        monday = generateTimeSlots(),
-        tuesday = generateTimeSlots(),
-        wednesday = generateTimeSlots(),
-        thursday = generateTimeSlots(),
-        friday = generateTimeSlots(),
-        saturday = generateTimeSlots(),
-        sunday = generateTimeSlots()
-    ),
-    var availabilityChanges : List<String> = emptyList()
+    var id: String = "",
+    var name: String = "",
+    var surname: String = "",
+    var email: String = "",
+    var phoneNumber: String = "",
+    var profilePicture: String = "",
+    var specialisation:String = "",
+    var room:String = "",
+    var availability:Availability = Availability(),
+    var availabilityChanges: Map<String, List<Term>> = emptyMap()
 
-){
-    fun doesMatchSearchQuery(query: String):Boolean{
+) {
+    fun doesMatchSearchQuery(query: String): Boolean {
         val matchingCombinations = listOf(
             "$name$surname",
             "$name $surname",
             "${name.first()}${surname.first()}"
         )
-        return matchingCombinations.any{
+        return matchingCombinations.any {
             it.contains(query, ignoreCase = true)
-        }
-    }
-    companion object{
-
-        fun generateTimeSlots(): List<Term> {
-            val timeSlots = mutableListOf<Term>()
-            var hour=10
-            var minute=0
-
-            while (hour < 18) {
-                val startTime = String.format("%02d:%02d", hour, minute)
-                minute += 30
-                if (minute == 60) {
-                    hour ++
-                    minute = 0
-                }
-                val endTime = String.format("%02d:%02d", hour, minute)
-                timeSlots.add(Term(startTime, endTime))
-            }
-            return timeSlots
         }
     }
 }

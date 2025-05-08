@@ -27,13 +27,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,7 +47,6 @@ import com.example.healme.R
 import com.example.medimate.firebase.Doctor
 import com.example.medimate.firebase.DoctorDAO
 import com.example.medimate.navigation.Screen
-import com.example.medimate.tests.getSampleDoctors
 import com.example.medimate.ui.theme.MediMateTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -118,7 +114,6 @@ fun DoctorList(doctors: List<Doctor>,navController: NavController) {
 }
 
 class MainViewModel: ViewModel(){
-    //sprobowac przekazC TEN sam view model zeby nie podbierac dwa razy z bazy danych
     private val _searchText = MutableStateFlow("")
     private val _isSearching = MutableStateFlow(false)
     val searchText = _searchText.asStateFlow()

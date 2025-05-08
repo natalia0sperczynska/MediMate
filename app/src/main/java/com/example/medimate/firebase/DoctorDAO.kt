@@ -98,6 +98,24 @@ class DoctorDAO {
         val doc = mFireStore.collection("doctors").document(doctorId)
         //doc.update()
     }
+    suspend fun getDoctorById(id: String?): Doctor? {
+        if (id.isNullOrBlank()) return null
+
+        return try {
+            val documentSnapshot = FirebaseFirestore.getInstance()
+                .collection("doctors")
+                .document(id)
+                .get()
+                .await()
+
+            documentSnapshot.toObject(Doctor::class.java)?.apply {
+                this.id = documentSnapshot.id
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
 
 
 }

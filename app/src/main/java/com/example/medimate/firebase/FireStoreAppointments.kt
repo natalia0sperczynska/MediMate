@@ -30,6 +30,7 @@ class FireStoreAppointments {
     suspend fun updateAppointment(appointmentId: String, updatedData: Map<String, Any?>) {
 
     }
+
 ////simuntanious update przyklad z docs
 //private fun writeNewPost(userId: String, username: String, title: String, body: String) {
 //    // Create new post at /user-posts/$userid/$postid and at

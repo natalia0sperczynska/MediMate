@@ -1,5 +1,6 @@
 package com.example.medimate.appointments
 import android.icu.text.SimpleDateFormat
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -35,7 +36,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,26 +54,30 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.medimate.firebase.Appointment
 import com.example.medimate.firebase.Doctor
+import com.example.medimate.firebase.FireStoreAppointments
 import com.example.medimate.firebase.Status
 import com.example.medimate.firebase.Term
 import com.example.medimate.navigation.Screen
 import com.example.medimate.register.DatePickerModal
-import com.example.medimate.tests.getSampleAppointments
-import com.example.medimate.tests.getSampleDoctors
-import com.example.medimate.tests.getSapleAvilableTerms
 import com.example.medimate.ui.theme.MediMateTheme
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.sql.Date
 import java.util.Calendar
 import java.util.Locale
 
-
 @Composable
 fun AppointmentsScreen(navController: NavController, selectedDoctor: Doctor? = null) {
+    val viewModel = viewModel<AppointmentsModel>()
+    val doctors by viewModel.doctors.collectAsState()
+    val appointments by viewModel.appointments.collectAsState()
     val appointment = remember {
         mutableStateOf(
             Appointment(
@@ -93,8 +100,9 @@ fun AppointmentsScreen(navController: NavController, selectedDoctor: Doctor? = n
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             ChoseDoctor(
-                doctors = getSampleDoctors(),
+                doctors = doctors,
                 appointment = appointment
             )
 
@@ -126,7 +134,7 @@ fun AppointmentsScreen(navController: NavController, selectedDoctor: Doctor? = n
             ) {
                 Text("Confirm")
             }
-            YourAppointments()
+            YourAppointments(appointments)
         }
 
     }
@@ -279,46 +287,57 @@ fun ChoseDoctor(doctors: List<Doctor>, appointment: MutableState<Appointment>) {
 
 @Composable
 fun GetAvailableTerms(doctor: Doctor, date: String) {
-   // val availableTermsSample = doctor.availability.getTermsForDay(date)
     println("Selected doctor: ${doctor.name}")
     println("Selected date: $date")
-    val availableterms = getSapleAvilableTerms(doctor, date)
-    val (selectedOption, onOptionSelected) = remember { mutableStateOf(availableterms[0])}
-    LazyColumn(
-        verticalArrangement = Arrangement.Bottom,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.selectableGroup()
-    ) {
-        item { Text("Available terms for $date:") }
-        items(availableterms) { term ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .selectable(selected =(term == selectedOption),
-                        onClick = {onOptionSelected(term)},
-                        role = Role.RadioButton)
-            ) {
-                RadioButton(
-                    selected = (term == selectedOption)
-                    ,onClick = null
-                )
-                Text(text = "${term.startTime} - ${term.endTime}")
+    val availableterms =  getAvailableTermsForDate(doctor, date)
+    val (selectedOption, onOptionSelected) = remember {
+        mutableStateOf(if (availableterms.isNotEmpty()) availableterms[0] else null)
+    }
+    if (availableterms.isNotEmpty() && selectedOption != null) {
+        LazyColumn(
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.selectableGroup()
+        ) {
+            item { Text("Available terms for $date:") }
+            items(availableterms) { term ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .selectable(
+                            selected = (term == selectedOption),
+                            onClick = { onOptionSelected(term) },
+                            role = Role.RadioButton
+                        )
+                ) {
+                    RadioButton(
+                        selected = (term == selectedOption), onClick = null
+                    )
+                    Text(text = "${term.startTime} - ${term.endTime}")
+                }
             }
         }
+    } else {
+        Text("No available terms")
     }
 }
 
 @Composable
-fun YourAppointments() {
-    val appointments = getSampleAppointments()
-    LazyColumn(
-        verticalArrangement = Arrangement.Bottom,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        item { Text("Your appointments") }
-        items(appointments) { appointment ->
-            AppointmentCard(appointment = appointment)
+fun YourAppointments(appointments: List<Appointment>?) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        if (appointments!!.isEmpty()) {
+            Text("No future appointments")
+        } else {
+            LazyColumn(
+                verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                item { Text("Your appointments") }
+                items(appointments) { appointment ->
+                    AppointmentCard(appointment = appointment)
+                }
+            }
         }
     }
 }
@@ -336,12 +355,38 @@ fun AppointmentCard(appointment: Appointment) {
         }
     }
 }
+fun getAvailableTermsForDate(doctor: Doctor, dateString: String): List<Term> {
+    doctor.availabilityChanges[dateString]?.let { return it }
+    val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+    val date = formatter.parse(dateString) ?: return emptyList()
 
+    val calendar = Calendar.getInstance().apply { time = date }
+    return when (calendar.get(Calendar.DAY_OF_WEEK)) {
+        Calendar.MONDAY -> doctor.availability.monday
+        Calendar.TUESDAY -> doctor.availability.tuesday
+        Calendar.WEDNESDAY -> doctor.availability.wednesday
+        Calendar.THURSDAY -> doctor.availability.thursday
+        Calendar.FRIDAY -> doctor.availability.friday
+        Calendar.SATURDAY -> doctor.availability.saturday
+        Calendar.SUNDAY -> doctor.availability.sunday
+        else -> emptyList()
+    }
+}
 
 fun confirm(appointment: MutableState<Appointment>) {
-
-
+    val appointmentToSave = appointment.value.copy(
+        id=FirebaseFirestore.getInstance().collection("appointments").document().id
+    )
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val fireStoreAppointments = FireStoreAppointments()
+            fireStoreAppointments.addAppointment(appointmentToSave)
+        } catch (e: Exception) {
+            Log.e("Confirm", "Error confirming appointment: ${e.message}")
+        }
+    }
 }
+
 
 @Preview(showSystemUi = true)
 @Composable

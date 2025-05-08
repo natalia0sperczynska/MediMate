@@ -1,18 +1,17 @@
 package com.example.medimate.firebase
-
 import java.util.Locale
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 data class Availability (
-    val monday: List<Term> = listOf(),
-    val tuesday: List<Term> = listOf(),
-    val wednesday: List<Term> = listOf(),
-    val thursday: List<Term> = listOf(),
-    val friday: List<Term> = listOf(),
-    val saturday:List<Term> = listOf(),
-    val sunday: List<Term> = listOf()
+    val monday: List<Term> = generateTimeSlots(),
+    val tuesday: List<Term> = generateTimeSlots(),
+    val wednesday: List<Term> = generateTimeSlots(),
+    val thursday: List<Term> = generateTimeSlots(),
+    val friday: List<Term> = generateTimeSlots(),
+    val saturday:List<Term> = generateTimeSlots(),
+    val sunday: List<Term> = generateTimeSlots()
 ) {
     fun getTermsForDay(date: String):List<Term> {
         val formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy", Locale.getDefault())
@@ -27,6 +26,24 @@ data class Availability (
             DayOfWeek.SUNDAY -> sunday
         }
     }
+    companion object{
+        fun generateTimeSlots(): List<Term> {
+            val timeSlots = mutableListOf<Term>()
+            var hour=10
+            var minute=0
 
+            while (hour < 18) {
+                val startTime = String.format("%02d:%02d", hour, minute)
+                minute += 30
+                if (minute == 60) {
+                    hour ++
+                    minute = 0
+                }
+                val endTime = String.format("%02d:%02d", hour, minute)
+                timeSlots.add(Term(startTime, endTime))
+            }
+            return timeSlots
+        }
+    }
 
 }

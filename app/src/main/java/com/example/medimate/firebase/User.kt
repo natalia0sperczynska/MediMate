@@ -17,19 +17,19 @@ package com.example.medimate.firebase
  * @property medications A list of the user's prescribed medications.
  */
 data class User (
-    val id: String = "",
-    val name: String? = null,
-    val surname: String?=null,
-    val email: String = "",
-    val dateOfBirth: String = "",
-    val phoneNumber: String = "",
-    val profilePictureUrl: String = "",
-    val address:Map<String,String> = mapOf(),
-    val allergies:List<String> = listOf(),
-    val diseases:List<String> = listOf(),
-    val medications:List<String> = listOf(),
-    val documents:List<String> = listOf(),
-    val medicalHistory:List<Appointment> = listOf(),
+    var id: String = "",
+    var name: String? = null,
+    var surname: String?=null,
+    var email: String = "",
+    var dateOfBirth: String = "",
+    var phoneNumber: String = "",
+    var profilePictureUrl: String = "",
+    var address:Map<String,String> = mapOf(),
+    var allergies:List<String> = listOf(),
+    var diseases:List<String> = listOf(),
+    var medications:List<String> = listOf(),
+    var documents:List<String> = listOf(),
+    var medicalHistory:List<Appointment> = listOf(),
 ){
 
     companion object {
