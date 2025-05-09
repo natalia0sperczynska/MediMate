@@ -3,9 +3,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.medimate.firebase.Appointment
 import com.example.medimate.firebase.Doctor
-import com.example.medimate.firebase.DoctorDAO
-import com.example.medimate.firebase.FireStoreAppointments
-import com.example.medimate.firebase.FireStoreUser
+import com.example.medimate.firebase.UserDAO
 import com.example.medimate.user.getDoctorList
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +12,7 @@ import kotlinx.coroutines.launch
 
 suspend fun getAppointments(): List<Appointment>? {
     val userId = FirebaseAuth.getInstance().currentUser?.uid
-    val mFireBase = FireStoreUser()
+    val mFireBase = UserDAO()
     return if (userId != null) mFireBase.loadAppointments(userId) else emptyList()
 }
 class AppointmentsModel: ViewModel(){

@@ -6,7 +6,7 @@ import kotlinx.coroutines.tasks.await
 /**
  * Class for interacting with Firebase Firestore for appointment data management.
  */
-class FireStoreAppointments {
+class AppointmentDAO {
 
     suspend fun addAppointment(appointment: Appointment) {
         //transaction

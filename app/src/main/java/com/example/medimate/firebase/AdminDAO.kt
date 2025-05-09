@@ -6,7 +6,7 @@ import kotlinx.coroutines.tasks.await
 /**
  * Class for interacting with Firebase Firestore for user data management.
  */
-class FireStoreAdmin {
+class AdminDAO {
     /**
      * Function registers or updates an admin in the Firestore database.
      * If an admin with the same ID already exists, their document will be overwritten.
@@ -72,6 +72,49 @@ class FireStoreAdmin {
         } catch (e: Exception) {
             throw Exception("Error updating admin data: ${e.message}")
         }
+    }
+    suspend fun addDoctor(adminId: String, doctor: Doctor) {
+        val mFireStore = FirebaseFirestore.getInstance()
+        try {
+            mFireStore.collection("doctors").document(doctor.id).set(doctor).await()
+        } catch (e: Exception) {
+            throw Exception("Error adding doctor: ${e.message}")
+        }
+    }
+    suspend fun deleteDoctor(adminId: String, doctor: Doctor) {
+        val mFireStore = FirebaseFirestore.getInstance()
+        try {
+            mFireStore.collection("doctors").document(doctor.id).delete().await()
+        } catch (e: Exception) {
+            throw Exception("Error deleting doctor: ${e.message}")
+        }
+    }
+    suspend fun addUser(adminId: String, user: User) {
+        val mFireStore = FirebaseFirestore.getInstance()
+        try {
+            mFireStore.collection("users").document(user.id).set(user).await()
+        } catch (e: Exception) {
+            throw Exception("Error adding user: ${e.message}")
+        }
+    }
+    suspend fun deleteUser(adminId: String, user: User) {
+        val mFireStore = FirebaseFirestore.getInstance()
+        try {
+            mFireStore.collection("users").document(user.id).delete().await()
+        } catch (e: Exception) {
+            throw Exception("Error deleting user: ${e.message}")
+        }
+    }
+    suspend fun getAllAdmins(): List<Admin> {
+        val mFireStore = FirebaseFirestore.getInstance()
+        return mFireStore.collection("admins").get().await().toObjects(Admin::class.java)
+    }
+    suspend fun getAllDoctors(): List<Doctor> {
+        val mFireStore = FirebaseFirestore.getInstance()
+        return mFireStore.collection("doctors").get().await().toObjects(Doctor::class.java)
+    }
+    fun generateDoctorId(): String {
+        return FirebaseFirestore.getInstance().collection("doctors").document().id
     }
 
 }

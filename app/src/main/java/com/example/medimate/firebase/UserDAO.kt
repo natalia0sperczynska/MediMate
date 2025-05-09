@@ -6,7 +6,7 @@ import kotlinx.coroutines.tasks.await
 /**
  * Class for interacting with Firebase Firestore for user data management.
  */
-class FireStoreUser {
+class UserDAO {
 
     /**
      * Function registers or updates a user in the Firestore database.

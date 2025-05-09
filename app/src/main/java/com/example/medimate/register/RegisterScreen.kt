@@ -35,7 +35,7 @@ fun RegisterScreen(navController: NavHostController) {
     var showDatePicker by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    val fireStore = FireStoreUser()
+    val fireStore = UserDAO()
 
     Column(modifier = Modifier.padding(16.dp).fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -176,7 +176,7 @@ private suspend fun registerUser(
     dateOfBirth: String,
     password: String,
     repeatPassword: String,
-    fireStore: FireStoreUser,
+    fireStore: UserDAO,
     context: android.content.Context
 ) {
     if (name.isBlank() || surname.isBlank() || email.isBlank() || dateOfBirth.isBlank() || password.isBlank()) {

@@ -1,5 +1,4 @@
 package com.example.medimate.mainViews.user
-
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.medimate.firebase.FireStoreUser
+import com.example.medimate.firebase.UserDAO
 import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.Black
 import com.example.medimate.ui.theme.LightGrey
@@ -32,7 +31,7 @@ fun MainUserScreen(navController: NavController) {
     val auth = FirebaseAuth.getInstance()
     val context = LocalContext.current
     val userId = auth.currentUser?.uid
-    val firestoreClass = FireStoreUser()
+    val firestoreClass = UserDAO()
     var userName by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)

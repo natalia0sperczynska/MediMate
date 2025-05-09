@@ -36,7 +36,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -49,7 +48,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -59,7 +57,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.medimate.firebase.Appointment
 import com.example.medimate.firebase.Doctor
-import com.example.medimate.firebase.FireStoreAppointments
+import com.example.medimate.firebase.AppointmentDAO
 import com.example.medimate.firebase.Status
 import com.example.medimate.firebase.Term
 import com.example.medimate.navigation.Screen
@@ -293,7 +291,7 @@ fun GetAvailableTerms(doctor: Doctor, date: String) {
     val (selectedOption, onOptionSelected) = remember {
         mutableStateOf(if (availableterms.isNotEmpty()) availableterms[0] else null)
     }
-    if (availableterms.isNotEmpty() && selectedOption != null) {
+    if (selectedOption != null) {
         LazyColumn(
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -370,7 +368,7 @@ fun getAvailableTermsForDate(doctor: Doctor, dateString: String): List<Term> {
         Calendar.SATURDAY -> doctor.availability.saturday
         Calendar.SUNDAY -> doctor.availability.sunday
         else -> emptyList()
-    }
+    }.filter { it.isAvailable }
 }
 
 fun confirm(appointment: MutableState<Appointment>) {
@@ -379,7 +377,7 @@ fun confirm(appointment: MutableState<Appointment>) {
     )
     CoroutineScope(Dispatchers.IO).launch {
         try {
-            val fireStoreAppointments = FireStoreAppointments()
+            val fireStoreAppointments = AppointmentDAO()
             fireStoreAppointments.addAppointment(appointmentToSave)
         } catch (e: Exception) {
             Log.e("Confirm", "Error confirming appointment: ${e.message}")

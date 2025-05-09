@@ -17,18 +17,20 @@ import com.example.medimate.login.LoginScreen
 import com.example.medimate.mainViews.admin.MainAdminScreen
 import com.example.medimate.mainViews.doctor.MainDoctorScreen
 import com.example.medimate.mainViews.MainScreen
+import com.example.medimate.admin.ManageUsers
+import com.example.medimate.admin.ManageDoctors
 import com.example.medimate.mainViews.user.MainUserScreen
 import com.example.medimate.register.RegisterScreen
 import com.example.medimate.user.UpdateDataScreen
 import com.example.medimate.user.DoctorScreen
 
-//import com.example.medimate.auth.LoginScreen
-//import com.example.medimate.auth.RegisterScreen
 
 sealed class Screen(val route: String) {
     object Main : Screen("main")
     object MainDoctor : Screen("main_doctor")
     object MainAdmin : Screen("main_admin")
+    object ManageDoctors : Screen("manage_doctors")
+    object ManageUsers : Screen("manage_users")
     object MainUser : Screen("main_user")
     object Login : Screen("login")
     object Register : Screen("register")
@@ -50,6 +52,9 @@ fun AppNavHost(navController: NavHostController) {
         composable(Screen.Login.route) {
             LoginScreen(navController)
         }
+        composable(Screen.MainUser.route) {
+            MainUserScreen(navController)
+        }
         composable(Screen.Register.route) {
             RegisterScreen(navController)
         }
@@ -62,8 +67,14 @@ fun AppNavHost(navController: NavHostController) {
         composable(Screen.MainAdmin.route) {
             MainAdminScreen(navController)
         }
-        composable(Screen.MainUser.route) {
-            MainUserScreen(navController)
+        composable(Screen.ManageDoctors.route) {
+            ManageDoctors(navController)
+        }
+        composable(Screen.ManageUsers.route) {
+            ManageUsers(navController)
+        }
+        composable(Screen.Doctors.route) {
+           DoctorScreen(navController)
         }
         composable(Screen.Appointments.route) {
             AppointmentsScreen(navController)
@@ -89,7 +100,6 @@ fun AppNavHost(navController: NavHostController) {
                     selectedDoctor = doctorState.value
                 )
             } else {
-                // You can show a loading spinner or a fallback UI
                 androidx.compose.material3.Text("Loading doctor info...")
             }
         }

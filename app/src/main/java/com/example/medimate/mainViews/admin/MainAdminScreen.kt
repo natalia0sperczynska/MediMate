@@ -1,30 +1,41 @@
 package com.example.medimate.mainViews.admin
 
 import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.medimate.firebase.FireStoreAdmin
-import com.example.medimate.firebase.FireStoreUser
+import com.example.medimate.firebase.AdminDAO
 import com.example.medimate.navigation.Screen
+import com.example.medimate.ui.theme.Black
+import com.example.medimate.ui.theme.LightGrey
 import com.example.medimate.ui.theme.MediMateTheme
+import com.example.medimate.ui.theme.PurpleGrey
+import com.example.medimate.ui.theme.PurpleGrey2
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 @Composable
 fun MainAdminScreen(navController: NavController) {
     val auth = FirebaseAuth.getInstance()
     val context = LocalContext.current
     val adminId = auth.currentUser?.uid
-    val firestoreClass = FireStoreAdmin()
+    val firestoreClass = AdminDAO()
     var adminName by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(adminId) {
         if (adminId != null) {
@@ -38,28 +49,82 @@ fun MainAdminScreen(navController: NavController) {
             }
         }
     }
+    AdminScreenContent(navController,adminName,drawerState,scope)
 
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = "Welcome back, Admin $adminName!", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(onClick = { navController.navigate(Screen.UpdateData.route) }) {
-            Text("Update Data")
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(onClick = {
-            auth.signOut()
-            navController.navigate(Screen.Login.route) {
-                popUpTo(Screen.Main.route) { inclusive = true }
+}
+@Composable
+fun AdminScreenContent(navController: NavController,
+                       userName: String,
+                       drawerState: DrawerState,
+                       scope: CoroutineScope
+){
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        scrimColor = PurpleGrey.copy(alpha = 0.3f),
+        drawerContent = {
+            ModalDrawerSheet(
+                modifier = Modifier.background(PurpleGrey2)
+            ) {
+                Text("Menu", modifier = Modifier.padding(16.dp), color = Black)
+                HorizontalDivider(color = LightGrey)
+                NavigationDrawerItem(
+                    label = { Text(text = "Manage Doctors", color = Black) },
+                    selected = false,
+                    onClick = { navController.navigate(Screen.ManageDoctors.route) }
+                )
+                NavigationDrawerItem(
+                    label = { Text(text = "Manage Users", color = Black) },
+                    selected = false,
+                    onClick = { navController.navigate(Screen.ManageUsers.route) }
+                )
             }
-        }) {
-            Text("Logout")
         }
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
+            IconButton(
+                onClick = { scope.launch { drawerState.open() } },
+                modifier = Modifier.background(Color.White, shape = MaterialTheme.shapes.small)
+
+            ) {
+                Icon(Icons.Default.Menu, contentDescription = "Open Menu", tint = Black)
+            }
+        }
+        Column(
+            modifier = Modifier.fillMaxSize().padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = "Good to see you again, $userName!", style = MaterialTheme.typography.headlineMedium, color = Black)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(onClick = { navController.navigate(Screen.UpdateData.route) }) {
+                Text("Update Data")
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(onClick = {
+                navController.navigate(Screen.Login.route) {
+                    popUpTo(Screen.Main.route) { inclusive = true }
+                }
+            }) {
+                Text("Logout")
+            }
+        }
+
+
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .width(20.dp)
+                .background(LightGrey.copy(alpha = 0.5f))
+                .clickable { scope.launch { drawerState.open() } }
+        )
+
     }
 }
 

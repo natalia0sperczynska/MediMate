@@ -27,6 +27,7 @@ navigationCompose = "2.8.9"
 composeNavigation = "2.8.9"
 serialization="1.7.3"
 uiTestAndroid = "1.7.8"
+coreI18n = "1.0.0"
 
 [libraries]
 androidx-activity = { module = "androidx.activity:activity", version.ref = "activity" }
@@ -69,6 +70,7 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization"}
 androidx-ui-test-android = { group = "androidx.compose.ui", name = "ui-test-android", version.ref = "uiTestAndroid" }
+androidx-core-i18n = { group = "androidx.core", name = "core-i18n", version.ref = "coreI18n" }
 
 
 [plugins]

@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.healme.R
-import com.example.medimate.firebase.FireStoreUser
+import com.example.medimate.firebase.UserDAO
 import com.example.medimate.firebase.User
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun UpdateDataScreen(navController: NavController) {
     val auth = FirebaseAuth.getInstance()
-    val firestoreClass = FireStoreUser()
+    val firestoreClass = UserDAO()
     val context = LocalContext.current
     val userId = auth.currentUser?.uid
     val coroutineScope = rememberCoroutineScope()

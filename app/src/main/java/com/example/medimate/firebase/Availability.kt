@@ -13,10 +13,9 @@ data class Availability (
     val saturday:List<Term> = generateTimeSlots(),
     val sunday: List<Term> = generateTimeSlots()
 ) {
-    fun getTermsForDay(date: String):List<Term> {
-        val formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy", Locale.getDefault())
-        val localDate = LocalDate.parse(date, formatter)
-        return when (localDate.dayOfWeek) {
+
+    fun getDefaultTermsForDay(dayOfWeek: DayOfWeek): List<Term> {
+        return when (dayOfWeek) {
             DayOfWeek.MONDAY -> monday
             DayOfWeek.TUESDAY -> tuesday
             DayOfWeek.WEDNESDAY -> wednesday
@@ -29,10 +28,10 @@ data class Availability (
     companion object{
         fun generateTimeSlots(): List<Term> {
             val timeSlots = mutableListOf<Term>()
-            var hour=10
+            var hour=8
             var minute=0
 
-            while (hour < 18) {
+            while (hour in 8..12 || hour in 14..16) {
                 val startTime = String.format("%02d:%02d", hour, minute)
                 minute += 30
                 if (minute == 60) {

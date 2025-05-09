@@ -1,5 +1,9 @@
 package com.example.medimate.firebase
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+//ciekawostki
 /**
  * Data class representing a Doctor.
  *
@@ -25,6 +29,14 @@ data class Doctor(
     var availabilityChanges: Map<String, List<Term>> = emptyMap()
 
 ) {
+    fun getAvailableTermsForDate(date: String): List<Term> {
+        val formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy", Locale.getDefault())
+        val localDate = LocalDate.parse(date, formatter)
+
+        availabilityChanges[date]?.let { return it }
+
+        return availability.getDefaultTermsForDay(localDate.dayOfWeek)
+    }
     fun doesMatchSearchQuery(query: String): Boolean {
         val matchingCombinations = listOf(
             "$name$surname",
