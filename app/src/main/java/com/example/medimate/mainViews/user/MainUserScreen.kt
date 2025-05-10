@@ -22,6 +22,7 @@ import com.example.medimate.ui.theme.LightGrey
 import com.example.medimate.ui.theme.MediMateTheme
 import com.example.medimate.ui.theme.PurpleGrey
 import com.example.medimate.ui.theme.PurpleGrey2
+import com.example.medimate.user.ModelNavDrawerUser
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -49,47 +50,14 @@ fun MainUserScreen(navController: NavController) {
             }
         }
     }
-    ScreenModel(navController, userId.toString(), userName, drawerState, scope)
+    ModelNavDrawerUser(navController,drawerState,scope) {
+        ScreenModel(navController, userId.toString(), userName, drawerState, scope)
+    }
 }
 
 @Composable
 fun ScreenModel(navController: NavController, userId: String, userName: String, drawerState: DrawerState, scope: CoroutineScope) {
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        scrimColor = PurpleGrey.copy(alpha = 0.3f),
-        drawerContent = {
-            ModalDrawerSheet(
-                modifier = Modifier.background(PurpleGrey2)
-            ) {
-                Text("Menu", modifier = Modifier.padding(16.dp), color = Black)
-                HorizontalDivider(color = LightGrey)
-                NavigationDrawerItem(
-                    label = { Text(text = "Appointments", color = Black) },
-                    selected = false,
-                    onClick = { navController.navigate(Screen.Appointments.route) }
-                )
-                NavigationDrawerItem(
-                    label = { Text(text = "Doctors", color = Black) },
-                    selected = false,
-                    onClick = { navController.navigate(Screen.Doctors.route) }
-                )
-            }
-        }
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.Start
-        ) {
-            IconButton(
-                onClick = { scope.launch { drawerState.open() } },
-                modifier = Modifier.background(Color.White, shape = MaterialTheme.shapes.small)
 
-            ) {
-                Icon(Icons.Default.Menu, contentDescription = "Open Menu", tint = Black)
-            }
-        }
         Column(
             modifier = Modifier.fillMaxSize().padding(16.dp),
             verticalArrangement = Arrangement.Center,
@@ -112,16 +80,6 @@ fun ScreenModel(navController: NavController, userId: String, userName: String, 
             }
         }
 
-
-        Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .width(20.dp)
-                .background(LightGrey.copy(alpha = 0.5f))
-                .clickable { scope.launch { drawerState.open() } }
-        )
-
-    }
 }
 
 @Preview(showSystemUi = true)

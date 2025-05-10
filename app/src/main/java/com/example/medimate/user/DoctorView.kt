@@ -20,17 +20,20 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -163,25 +166,29 @@ fun DoctorScreen(navController: NavController) {
     val searchText by viewModel.searchText.collectAsState()
     val person by viewModel.doctors!!.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        SearchBar(modifier = Modifier.fillMaxWidth(), viewModel = viewModel, searchText)
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-            onClick = { navController.navigate(Screen.MainUser.route) }) {
-            Text("Go back")
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        if (isSearching) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
+    ModelNavDrawerUser(navController,drawerState,scope) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            SearchBar(modifier = Modifier.fillMaxWidth(), viewModel = viewModel, searchText)
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                onClick = { navController.navigate(Screen.MainUser.route) }) {
+                Text("Go back")
             }
-        } else {
-            DoctorList(doctors = person, navController = navController)
+            Spacer(modifier = Modifier.height(16.dp))
+            if (isSearching) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+            } else {
+                DoctorList(doctors = person, navController = navController)
+            }
         }
     }
 }

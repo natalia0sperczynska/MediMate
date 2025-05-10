@@ -101,5 +101,4 @@ class UserDAO {
         return appointmentsList
 
     }
-
 }

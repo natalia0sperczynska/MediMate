@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,12 +36,14 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,6 +66,7 @@ import com.example.medimate.firebase.Term
 import com.example.medimate.navigation.Screen
 import com.example.medimate.register.DatePickerModal
 import com.example.medimate.ui.theme.MediMateTheme
+import com.example.medimate.user.ModelNavDrawerUser
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -76,6 +80,7 @@ fun AppointmentsScreen(navController: NavController, selectedDoctor: Doctor? = n
     val viewModel = viewModel<AppointmentsModel>()
     val doctors by viewModel.doctors.collectAsState()
     val appointments by viewModel.appointments.collectAsState()
+
     val appointment = remember {
         mutableStateOf(
             Appointment(
@@ -90,51 +95,56 @@ fun AppointmentsScreen(navController: NavController, selectedDoctor: Doctor? = n
             )
         )
     }
-    Surface(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
-            ChoseDoctor(
-                doctors = doctors,
-                appointment = appointment
-            )
-
-            DatePickerFieldToModal(
-                label = "Pick a date",
-                onDateSelected = { date ->
-                    appointment.value = appointment.value.copy(date = date)
-                }
-            )
-            if (appointment.value.doctor != null && appointment.value.date.isNotBlank()) {
-                GetAvailableTerms(
-                    doctor = appointment.value.doctor!!,
-                    date = appointment.value.date
-                )
-            } else {
-                Text("No available terms yet")
-            }
-            Button(
-                modifier = Modifier.padding(16.dp),
-                shape = MaterialTheme.shapes.medium,
-                onClick = { navController.navigate(Screen.MainUser.route) }) {
-                Text("Cancel")
-            }
-            Button(
-                modifier = Modifier.padding(16.dp),
-                shape = MaterialTheme.shapes.medium,
-                onClick = { confirm(appointment) },
-               // enabled = appointment.doctor != null && appointment.date != ""
+    ModelNavDrawerUser(navController,drawerState,scope) {
+        Surface(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Confirm")
-            }
-            YourAppointments(appointments)
-        }
 
+                ChoseDoctor(
+                    doctors = doctors,
+                    appointment = appointment
+                )
+
+                DatePickerFieldToModal(
+                    label = "Pick a date",
+                    onDateSelected = { date ->
+                        appointment.value = appointment.value.copy(date = date)
+                    }
+                )
+                if (appointment.value.doctor != null && appointment.value.date.isNotBlank()) {
+                    GetAvailableTerms(
+                        doctor = appointment.value.doctor!!,
+                        date = appointment.value.date
+                    )
+                } else {
+                    Text("No available terms yet")
+                }
+                Button(
+                    modifier = Modifier.padding(16.dp),
+                    shape = MaterialTheme.shapes.medium,
+                    onClick = { navController.navigate(Screen.MainUser.route) }) {
+                    Text("Cancel")
+                }
+                Button(
+                    modifier = Modifier.padding(16.dp),
+                    shape = MaterialTheme.shapes.medium,
+                    onClick = { confirm(appointment) },
+                    // enabled = appointment.doctor != null && appointment.date != ""
+                ) {
+                    Text("Confirm")
+                }
+                YourAppointments(appointments)
+            }
+
+        }
     }
 
 }
