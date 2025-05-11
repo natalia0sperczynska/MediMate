@@ -113,7 +113,7 @@ fun AppointmentsScreen(navController: NavController, selectedDoctorId: String? =
 
     }
 
-    ModelNavDrawerUser(navController,drawerState,scope) {
+    ModelNavDrawerUser(navController,drawerState) {
         Surface(modifier = Modifier.fillMaxSize()) {
             Scaffold(
                 snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
@@ -166,7 +166,7 @@ fun AppointmentsScreen(navController: NavController, selectedDoctorId: String? =
                         Text("Select doctor and date to see available terms")
                     }
 
-                    displayButtons(navController, appointment, snackbarHostState, scope)
+                    displayButtons(navController, appointment, snackbarHostState)
                     YourAppointments(appointments)
                 }
             }
@@ -176,7 +176,8 @@ fun AppointmentsScreen(navController: NavController, selectedDoctorId: String? =
 
 }
 @Composable
-fun displayButtons(navController: NavController, appointment: MutableState<Appointment?>, snackbarHostState: SnackbarHostState, scope: CoroutineScope){
+fun displayButtons(navController: NavController, appointment: MutableState<Appointment?>, snackbarHostState: SnackbarHostState){
+    val scope = rememberCoroutineScope()
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
@@ -391,19 +392,22 @@ fun GetAvailableTerms(
 @Composable
 fun YourAppointments(appointments: List<Appointment>?) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        if (appointments!!.isEmpty()) {
-            Text("No future appointments")
-        } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.Bottom,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                item { Text("Your appointments") }
-                items(appointments) { appointment ->
-                    AppointmentCard(appointment = appointment)
+        appointments?.let{
+            if(it.isEmpty()) {
+                Text("No future appointments")
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.Bottom,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    item { Text("Your appointments") }
+                    items(appointments) { appointment ->
+                        AppointmentCard(appointment = appointment)
+                    }
                 }
             }
         }
+            ?: Text("Loading appointments..")
     }
 }
 
@@ -479,9 +483,14 @@ fun confirm(appointment: MutableState<Appointment?>, scope: CoroutineScope,
     }
 }
 fun cancel(appointment: MutableState<Appointment?>, scope: CoroutineScope, snackbarHostState: SnackbarHostState){
-    appointment.value?.doctorId=""
-    appointment.value?.time=""
-    appointment.value?.date=""
+    appointment.value?.let { current ->
+        appointment.value=current.copy(
+            doctorId = "",
+            date = "",
+            time = ""
+        )
+
+    }
     scope.launch {
         snackbarHostState.showSnackbar(
             message = "Appointment choice canceled",

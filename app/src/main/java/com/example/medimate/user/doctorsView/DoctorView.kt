@@ -169,9 +169,8 @@ fun DoctorScreen(navController: NavController) {
     val person by viewModel.doctors!!.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
 
-    ModelNavDrawerUser(navController,drawerState,scope) {
+    ModelNavDrawerUser(navController,drawerState) {
         Column(modifier = Modifier.padding(16.dp)) {
             SearchBar(modifier = Modifier.fillMaxWidth(), viewModel = viewModel, searchText)
             Spacer(modifier = Modifier.height(16.dp))

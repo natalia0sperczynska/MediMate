@@ -42,13 +42,13 @@ fun MainUserScreen(navController: NavController) {
             }
         }
     }
-    ModelNavDrawerUser(navController,drawerState,scope) {
-        ScreenModel(navController, userId.toString(), userName, drawerState, scope)
+    ModelNavDrawerUser(navController,drawerState) {
+        ScreenModel(navController, userId.toString(), userName, drawerState)
     }
 }
 
 @Composable
-fun ScreenModel(navController: NavController, userId: String, userName: String, drawerState: DrawerState, scope: CoroutineScope) {
+fun ScreenModel(navController: NavController, userId: String, userName: String, drawerState: DrawerState) {
 
         Column(
             modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -78,7 +78,7 @@ fun ScreenModel(navController: NavController, userId: String, userName: String, 
 @Composable
 fun MainUserScreenPreview() {
     MediMateTheme {
-       ScreenModel(navController = rememberNavController(), userId = "123", userName = "John", drawerState = rememberDrawerState(DrawerValue.Closed), scope = rememberCoroutineScope())
+       ScreenModel(navController = rememberNavController(), userId = "123", userName = "John", drawerState = rememberDrawerState(DrawerValue.Closed))
     }
 }
 

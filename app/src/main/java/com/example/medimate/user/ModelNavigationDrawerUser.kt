@@ -32,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -98,8 +99,8 @@ fun DrawerHeader(){
 @Composable
 fun ModelNavDrawerUser(navController: NavController,
                        drawerState: DrawerState,
-                       scope: CoroutineScope,
                        content: @Composable () -> Unit){
+    val scope = rememberCoroutineScope()
     val drawerAnimatable = remember { Animatable(0f)}
 
     LaunchedEffect(drawerState.isOpen) {
