@@ -4,9 +4,10 @@ import androidx.annotation.Keep
 @Keep
 data class Appointment(
     var id: String = "",
-    var doctor: Doctor?=Doctor(),
-    val patient: User? =User(),
+    var doctorId: String="",
+    val patientId: String ="",
     val date: String = "",
+    val time : String ="",
     val status: Status = Status.EXPECTED,
     val diagnosis: String = "",
     val notes: String = "",

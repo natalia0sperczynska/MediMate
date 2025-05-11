@@ -42,6 +42,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -61,6 +62,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.medimate.firebase.Appointment
 import com.example.medimate.firebase.Doctor
 import com.example.medimate.firebase.AppointmentDAO
+import com.example.medimate.firebase.AuthManager
+import com.example.medimate.firebase.DoctorDAO
 import com.example.medimate.firebase.Status
 import com.example.medimate.firebase.Term
 import com.example.medimate.navigation.Screen
@@ -76,24 +79,29 @@ import java.util.Calendar
 import java.util.Locale
 
 @Composable
-fun AppointmentsScreen(navController: NavController, selectedDoctor: Doctor? = null) {
+fun AppointmentsScreen(navController: NavController, selectedDoctorId: String? = null) {
     val viewModel = viewModel<AppointmentsModel>()
     val doctors by viewModel.doctors.collectAsState()
     val appointments by viewModel.appointments.collectAsState()
+    val auth = AuthManager
 
     val appointment = remember {
         mutableStateOf(
-            Appointment(
-                "",
-                doctor = selectedDoctor,
-                null,
-                "",
-                Status.EXPECTED,
-                "",
-                "",
-                ""
-            )
+            auth.getCurrentUser()?.let {user->
+                Appointment(
+                    "",
+                    doctorId = selectedDoctorId ?: "",
+                    user.id,
+                    "",
+                    "",
+                    Status.EXPECTED,
+                    "",
+                    "",
+                    ""
+                )
+            }
         )
+
     }
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -110,19 +118,23 @@ fun AppointmentsScreen(navController: NavController, selectedDoctor: Doctor? = n
 
                 ChoseDoctor(
                     doctors = doctors,
-                    appointment = appointment
+                    selectedDoctorId = appointment.value?.doctorId?:"",
+                    onDoctorSelected = {
+                        doctorId -> appointment.value = appointment.value?.copy(doctorId=doctorId)
+                    }
                 )
 
                 DatePickerFieldToModal(
                     label = "Pick a date",
                     onDateSelected = { date ->
-                        appointment.value = appointment.value.copy(date = date)
+                        appointment.value = appointment.value?.copy(date = date)
                     }
                 )
-                if (appointment.value.doctor != null && appointment.value.date.isNotBlank()) {
+                val selectedDoctor = doctors.find { it.id == appointment.value?.doctorId }
+                if (selectedDoctor != null && !appointment.value?.date.isNullOrBlank()) {
                     GetAvailableTerms(
-                        doctor = appointment.value.doctor!!,
-                        date = appointment.value.date
+                        doctor = selectedDoctor,
+                        date = appointment.value?.date?:""
                     )
                 } else {
                     Text("No available terms yet")
@@ -136,8 +148,13 @@ fun AppointmentsScreen(navController: NavController, selectedDoctor: Doctor? = n
                 Button(
                     modifier = Modifier.padding(16.dp),
                     shape = MaterialTheme.shapes.medium,
-                    onClick = { confirm(appointment) },
-                    // enabled = appointment.doctor != null && appointment.date != ""
+                    onClick = {
+                        confirm(appointment) {
+                            navController.navigate(Screen.MainUser.route)
+                        }
+                    },
+                    enabled = !appointment.value?.doctorId.isNullOrBlank() &&
+                            !appointment.value?.date.isNullOrBlank()
                 ) {
                     Text("Confirm")
                 }
@@ -249,9 +266,10 @@ fun convertMillisToDate(millis: Long): String {
 }
 
 @Composable
-fun ChoseDoctor(doctors: List<Doctor>, appointment: MutableState<Appointment>) {
+fun ChoseDoctor(doctors: List<Doctor>, selectedDoctorId: String,
+                onDoctorSelected: (String) -> Unit) {
     val expanded = remember { mutableStateOf(false) }
-    val currentValue = remember { mutableStateOf(appointment.value.doctor) }
+    val selectedDoctor = doctors.find { it.id == selectedDoctorId }
 
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         Box {
@@ -262,12 +280,14 @@ fun ChoseDoctor(doctors: List<Doctor>, appointment: MutableState<Appointment>) {
                     .background(Color.LightGray)
                     .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
-                Text(text = currentValue.value?.let { "${it.name} ${it.surname}" }
-                    ?: "Choose your doctor",
-                    color = if (currentValue.value == null) Color.Gray else Color.Black)
+                Text(
+                    text = selectedDoctor?.let { "${it.name} ${it.surname}" }
+                        ?: "Choose your doctor",
+                    color = if (selectedDoctor == null) Color.Gray else Color.Black
+                )
                 Icon(
                     imageVector = Icons.Filled.ArrowDropDown,
-                    contentDescription = "You Doctor",
+                    contentDescription = "Your Doctor",
                     modifier = Modifier.padding(start = 8.dp)
                 )
             }
@@ -276,15 +296,12 @@ fun ChoseDoctor(doctors: List<Doctor>, appointment: MutableState<Appointment>) {
                 expanded = expanded.value,
                 onDismissRequest = { expanded.value = false }
             ) {
-                Text("Doctors:", color = MaterialTheme.colorScheme.secondary)
                 doctors.forEach { doctor ->
                     DropdownMenuItem(
                         text = { Text("${doctor.name} ${doctor.surname}") },
                         onClick = {
-                            currentValue.value = doctor
+                            onDoctorSelected(doctor.id)
                             expanded.value = false
-                            appointment.value = appointment.value.copy(doctor = doctor)
-
                         }
                     )
                 }
@@ -292,6 +309,7 @@ fun ChoseDoctor(doctors: List<Doctor>, appointment: MutableState<Appointment>) {
         }
     }
 }
+
 
 @Composable
 fun GetAvailableTerms(doctor: Doctor, date: String) {
@@ -352,17 +370,24 @@ fun YourAppointments(appointments: List<Appointment>?) {
 
 @Composable
 fun AppointmentCard(appointment: Appointment) {
+    val doctorDao = remember { DoctorDAO() }
+
+    val doctor by produceState<Doctor?>(initialValue = null, key1 = appointment.doctorId) {
+        value = doctorDao.getDoctorById(appointment.doctorId)
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = "Doctor: ${appointment.doctor?.name} ${appointment.doctor?.surname}")
+            Text(text = "Doctor: ${doctor?.name ?: "Loading..."} ${doctor?.surname.orEmpty()}")
             Text(text = "Date: ${appointment.date}")
         }
     }
 }
+
 fun getAvailableTermsForDate(doctor: Doctor, dateString: String): List<Term> {
     doctor.availabilityChanges[dateString]?.let { return it }
     val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
@@ -381,16 +406,19 @@ fun getAvailableTermsForDate(doctor: Doctor, dateString: String): List<Term> {
     }.filter { it.isAvailable }
 }
 
-fun confirm(appointment: MutableState<Appointment>) {
-    val appointmentToSave = appointment.value.copy(
-        id=FirebaseFirestore.getInstance().collection("appointments").document().id
-    )
-    CoroutineScope(Dispatchers.IO).launch {
-        try {
-            val fireStoreAppointments = AppointmentDAO()
-            fireStoreAppointments.addAppointment(appointmentToSave)
-        } catch (e: Exception) {
-            Log.e("Confirm", "Error confirming appointment: ${e.message}")
+fun confirm(appointment: MutableState<Appointment?>,onSuccess: () -> Unit = {}) {
+    appointment.value?.let { appt ->
+        val appointmentToSave = appt.copy(
+            id = FirebaseFirestore.getInstance().collection("appointments").document().id
+        )
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val fireStoreAppointments = AppointmentDAO()
+                fireStoreAppointments.addAppointment(appointmentToSave)
+                onSuccess()
+            } catch (e: Exception) {
+                Log.e("Confirm", "Error confirming appointment: ${e.message}")
+            }
         }
     }
 }

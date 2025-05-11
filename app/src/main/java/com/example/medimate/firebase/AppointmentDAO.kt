@@ -28,8 +28,19 @@ class AppointmentDAO {
     }
 
     suspend fun updateAppointment(appointmentId: String, updatedData: Map<String, Any?>) {
-
+        val mFireStore = FirebaseFirestore.getInstance()
+        try {
+            val filteredData = updatedData.filterValues { it != null && !(it is String && it.isBlank()) }
+            if (filteredData.isEmpty()) return
+            mFireStore.collection("appointments")
+                .document(appointmentId)
+                .update(filteredData)
+                .await()
+        } catch (e: Exception) {
+            throw Exception("Error updating appointment data: ${e.message}")
+        }
     }
+
 
 ////simuntanious update przyklad z docs
 //private fun writeNewPost(userId: String, username: String, title: String, body: String) {

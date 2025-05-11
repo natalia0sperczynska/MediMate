@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -19,6 +20,7 @@ import com.example.medimate.mainViews.doctor.MainDoctorScreen
 import com.example.medimate.mainViews.MainScreen
 import com.example.medimate.admin.ManageUsers
 import com.example.medimate.admin.ManageDoctors
+import com.example.medimate.appointments.AppointmentsModel
 import com.example.medimate.mainViews.user.MainUserScreen
 import com.example.medimate.register.RegisterScreen
 import com.example.medimate.user.UpdateDataScreen
@@ -84,24 +86,18 @@ fun AppNavHost(navController: NavHostController) {
             arguments = listOf(navArgument("doctorId") { type = NavType.StringType })
         ) { backStackEntry ->
             val doctorId = backStackEntry.arguments?.getString("doctorId")
-            val doctorState = remember { mutableStateOf<Doctor?>(null) }
+            val viewModel = viewModel<AppointmentsModel>()
 
             LaunchedEffect(doctorId) {
                 if (doctorId != null) {
-                    val doctorDAO = DoctorDAO()
-                    val doctor = doctorDAO.getDoctorById(doctorId)
-                    doctorState.value = doctor
+                    viewModel.loadDoctorById(doctorId)
                 }
             }
 
-            if (doctorState.value != null) {
-                AppointmentsScreen(
-                    navController = navController,
-                    selectedDoctor = doctorState.value
-                )
-            } else {
-                androidx.compose.material3.Text("Loading doctor info...")
-            }
+            AppointmentsScreen(
+                navController = navController,
+                selectedDoctorId = doctorId
+            )
         }
     }
 }

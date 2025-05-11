@@ -87,7 +87,7 @@ class DoctorDAO {
         val result = mFireStore.collection("appointments").get().await()
         for (document in result) {
             val appointment = document.toObject(Appointment::class.java)
-            if (appointment.doctor?.id == doctorId)
+            if (appointment.doctorId == doctorId)
                 appointmentsList.add(appointment)
         }
         return appointmentsList

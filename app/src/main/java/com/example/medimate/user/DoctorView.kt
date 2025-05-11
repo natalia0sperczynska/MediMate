@@ -63,7 +63,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @Composable
-fun SingleDoctor(doctor: Doctor, isSelected: Boolean, onDoctorSelected: (Doctor) -> Unit, navController: NavController) {
+fun SingleDoctor(doctor: Doctor, isSelected: Boolean, onDoctorSelected: (String) -> Unit, navController: NavController) {
     var expand by remember { mutableStateOf(false) }
     val extraPadding by animateDpAsState(targetValue = if(expand) 40.dp else 0.dp, label = "")
     Surface(border = BorderStroke(1.dp,MaterialTheme.colorScheme.onPrimary), color = MaterialTheme.colorScheme.secondary,
@@ -86,7 +86,7 @@ fun SingleDoctor(doctor: Doctor, isSelected: Boolean, onDoctorSelected: (Doctor)
                     color = MaterialTheme.colorScheme.onSecondary
                 )
             }
-            OutlinedButton(onClick = {onDoctorSelected(doctor)
+            OutlinedButton(onClick = {onDoctorSelected(doctor.id)
             navController.navigate(Screen.AppointmentsDoctor.createRoute(doctor.id))}) {
                 Text(text = "Set the appointment",
                     color = MaterialTheme.colorScheme.onSecondary
@@ -99,6 +99,7 @@ fun SingleDoctor(doctor: Doctor, isSelected: Boolean, onDoctorSelected: (Doctor)
 
 @Composable
 fun DoctorList(doctors: List<Doctor>,navController: NavController) {
+    var selectedDoctorId: String? by remember { mutableStateOf(null) }
     var selectedDoctor : Doctor? by
     remember { mutableStateOf(null) }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -108,8 +109,8 @@ fun DoctorList(doctors: List<Doctor>,navController: NavController) {
             LazyColumn {
                 item{Text("Select a doctor:", color = MaterialTheme.colorScheme.secondary)}
                 items(doctors){ doctor ->
-                    SingleDoctor(doctor = doctor, isSelected = (selectedDoctor == doctor),
-                        onDoctorSelected = { doctor -> selectedDoctor = doctor }, navController = navController)
+                    SingleDoctor(doctor = doctor, isSelected = (selectedDoctorId == doctor.id),
+                        onDoctorSelected = { id -> selectedDoctorId = id }, navController = navController)
                 }
             }
         }

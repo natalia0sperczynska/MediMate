@@ -95,7 +95,7 @@ class UserDAO {
         val result = mFireStore.collection("appointments").get().await()
         for (document in result) {
             val appointment = document.toObject(Appointment::class.java)
-            if (appointment.patient?.id == userid)
+            if (appointment.patientId== userid)
                 appointmentsList.add(appointment)
         }
         return appointmentsList
