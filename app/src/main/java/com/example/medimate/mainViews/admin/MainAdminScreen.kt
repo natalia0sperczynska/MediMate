@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.medimate.admin.ModelNavDrawerAdmin
 import com.example.medimate.firebase.AdminDAO
 import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.Black
@@ -50,82 +51,49 @@ fun MainAdminScreen(navController: NavController) {
         }
     }
     AdminScreenContent(navController,adminName,drawerState,scope)
-
 }
 @Composable
 fun AdminScreenContent(navController: NavController,
                        userName: String,
                        drawerState: DrawerState,
                        scope: CoroutineScope
-){
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        scrimColor = PurpleGrey.copy(alpha = 0.3f),
-        drawerContent = {
-            ModalDrawerSheet(
-                modifier = Modifier.background(PurpleGrey2)
-            ) {
-                Text("Menu", modifier = Modifier.padding(16.dp), color = Black)
-                HorizontalDivider(color = LightGrey)
-                NavigationDrawerItem(
-                    label = { Text(text = "Manage Doctors", color = Black) },
-                    selected = false,
-                    onClick = { navController.navigate(Screen.ManageDoctors.route) }
-                )
-                NavigationDrawerItem(
-                    label = { Text(text = "Manage Users", color = Black) },
-                    selected = false,
-                    onClick = { navController.navigate(Screen.ManageUsers.route) }
-                )
-            }
-        }
+){  ModelNavDrawerAdmin(navController,drawerState,scope) {
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.Start
-        ) {
-            IconButton(
-                onClick = { scope.launch { drawerState.open() } },
-                modifier = Modifier.background(Color.White, shape = MaterialTheme.shapes.small)
-
-            ) {
-                Icon(Icons.Default.Menu, contentDescription = "Open Menu", tint = Black)
-            }
-        }
-        Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = "Good to see you again, $userName!", style = MaterialTheme.typography.headlineMedium, color = Black)
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(onClick = { navController.navigate(Screen.UpdateData.route) }) {
-                Text("Update Data")
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Button(onClick = {
-                navController.navigate(Screen.Login.route) {
-                    popUpTo(Screen.Main.route) { inclusive = true }
-                }
-            }) {
-                Text("Logout")
-            }
-        }
-
-
-        Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .width(20.dp)
-                .background(LightGrey.copy(alpha = 0.5f))
-                .clickable { scope.launch { drawerState.open() } }
+        Text(
+            text = "Good to see you again, $userName!",
+            style = MaterialTheme.typography.headlineMedium,
+            color = Black
         )
+        Spacer(modifier = Modifier.height(16.dp))
 
+        Button(onClick = { navController.navigate(Screen.UpdateData.route) }) {
+            Text("Update Data")
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(onClick = {
+            navController.navigate(Screen.Login.route) {
+                popUpTo(Screen.Main.route) { inclusive = true }
+            }
+        }) {
+            Text("Logout")
+        }
     }
+
+
+    Box(
+        modifier = Modifier
+            .fillMaxHeight()
+            .width(20.dp)
+            .background(LightGrey.copy(alpha = 0.5f))
+            .clickable { scope.launch { drawerState.open() } }
+    )
+}
+
 }
 
 @Preview(showBackground = true)
