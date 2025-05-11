@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,7 +18,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
@@ -37,6 +35,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
@@ -82,6 +84,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.sql.Date
 import java.util.Calendar
 import java.util.Locale
@@ -93,7 +96,10 @@ fun AppointmentsScreen(navController: NavController, selectedDoctorId: String? =
     val appointments by viewModel.appointments.collectAsState()
     var selectedTime by remember { mutableStateOf<Term?>(null) }
     val auth = AuthManager
-    //val scrollState = rememberScrollState()
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
 
     val appointment = remember {
         mutableStateOf(
@@ -113,60 +119,63 @@ fun AppointmentsScreen(navController: NavController, selectedDoctorId: String? =
         )
 
     }
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
 
     ModelNavDrawerUser(navController,drawerState,scope) {
         Surface(modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier
-                    .padding(16.dp),
-                //.verticalScroll(scrollState),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                ChoseDoctor(
-                    doctors = doctors,
-                    selectedDoctorId = appointment.value?.doctorId?:"",
-                    onDoctorSelected = {
-                        doctorId -> appointment.value = appointment.value?.copy(doctorId=doctorId)
-                    }
-                )
+            Scaffold(
+                snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+            ) { innerPadding ->
+                Column(
+                    modifier = Modifier
+                        .padding(innerPadding).padding(16.dp),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    ChoseDoctor(
+                        doctors = doctors,
+                        selectedDoctorId = appointment.value?.doctorId ?: "",
+                        onDoctorSelected = { doctorId ->
+                            appointment.value = appointment.value?.copy(doctorId = doctorId)
+                        }
+                    )
 
-                DatePickerFieldToModal(
-                    label = "Pick a date",
-                    onDateSelected = { date ->
-                        appointment.value = appointment.value?.copy(date = date)
+                    DatePickerFieldToModal(
+                        label = "Pick a date",
+                        onDateSelected = { date ->
+                            appointment.value = appointment.value?.copy(date = date)
+                        }
+                    )
+                    val selectedDoctor = doctors.find { it.id == appointment.value?.doctorId }
+                    if (selectedDoctor != null && !appointment.value?.date.isNullOrBlank()) {
+                        Box(
+                            modifier = Modifier
+                                .heightIn(max = 300.dp)
+                        ) {
+                            GetAvailableTerms(
+                                doctor = selectedDoctor,
+                                date = appointment.value?.date ?: "",
+                                onTimeSelected = { term ->
+                                    selectedTime = term
+                                    appointment.value = appointment.value?.copy(
+                                        time = "${term.startTime}-${term.endTime}"
+                                    )
+                                }
+                            )
+                        }
+                        if (appointment.value?.time.isNullOrBlank()) {
+                            Text(
+                                "Please select a term",
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                        }
+                    } else {
+                        Text("Select doctor and date to see available terms")
                     }
-                )
-                val selectedDoctor = doctors.find { it.id == appointment.value?.doctorId }
-                if (selectedDoctor != null && !appointment.value?.date.isNullOrBlank()) {
-                    Box( modifier = Modifier
-                        .heightIn(max = 300.dp)) {
-                        GetAvailableTerms(
-                            doctor = selectedDoctor,
-                            date = appointment.value?.date ?: "",
-                            onTimeSelected = { term ->
-                                selectedTime = term
-                                appointment.value = appointment.value?.copy(
-                                    time = "${term.startTime}-${term.endTime}"
-                                )
-                            }
-                        )
-                    }
-                    if (appointment.value?.time.isNullOrBlank()) {
-                        Text(
-                            "Please select a term",
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
-                    }
-                } else {
-                    Text("Select doctor and date to see available terms")
+
+                    displayButtons(navController, appointment, snackbarHostState, scope)
+                    YourAppointments(appointments)
                 }
-
-                displayButtons(navController,appointment)
-                YourAppointments(appointments)
             }
 
         }
@@ -174,7 +183,7 @@ fun AppointmentsScreen(navController: NavController, selectedDoctorId: String? =
 
 }
 @Composable
-fun displayButtons(navController: NavController, appointment: MutableState<Appointment?>){
+fun displayButtons(navController: NavController, appointment: MutableState<Appointment?>,snackbarHostState: SnackbarHostState,scope: CoroutineScope){
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
@@ -189,9 +198,7 @@ fun displayButtons(navController: NavController, appointment: MutableState<Appoi
             modifier = Modifier.padding(16.dp),
             shape = MaterialTheme.shapes.medium,
             onClick = {
-                confirm(appointment) {
-                    navController.navigate(Screen.MainUser.route)
-                }
+                confirm(appointment,scope,snackbarHostState)
             },
             enabled = !appointment.value?.doctorId.isNullOrBlank() &&
                     !appointment.value?.date.isNullOrBlank() && !appointment.value?.time.isNullOrBlank()
@@ -446,7 +453,8 @@ fun getAvailableTermsForDate(doctor: Doctor, dateString: String): List<Term> {
     }.filter { it.isAvailable }
 }
 
-fun confirm(appointment: MutableState<Appointment?>,onSuccess: () -> Unit = {}) {
+fun confirm(appointment: MutableState<Appointment?>, scope: CoroutineScope,
+            snackbarHostState: SnackbarHostState,onSuccess: () -> Unit = {}) {
     if(appointment.value?.time.isNullOrBlank()){
         return
     }
@@ -458,9 +466,21 @@ fun confirm(appointment: MutableState<Appointment?>,onSuccess: () -> Unit = {}) 
             try {
                 val fireStoreAppointments = AppointmentDAO()
                 fireStoreAppointments.addAppointment(appointmentToSave)
-                onSuccess()
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = "Appointment set successfully!",
+                        duration = SnackbarDuration.Short
+                    )
+                    onSuccess()
+                }
             } catch (e: Exception) {
                 Log.e("Confirm", "Error confirming appointment: ${e.message}")
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = "Error: ${e.message}",
+                        duration = SnackbarDuration.Long
+                    )
+                }
             }
         }
     }
