@@ -16,16 +16,16 @@ suspend fun getAppointments(): List<Appointment>? {
     val mFireBase = UserDAO()
     return if (userId != null) mFireBase.loadAppointments(userId) else emptyList()
 }
-class AppointmentsModel: ViewModel(){
+open class AppointmentsModel: ViewModel(){
     private val _doctors = MutableStateFlow<List<Doctor>>(emptyList())
     private val _appointments = MutableStateFlow<List<Appointment>?>(emptyList())
     private val _selectedDoctor = MutableStateFlow<Doctor?>(null)
 
-    val doctors: StateFlow<List<Doctor>> get() = _doctors
-    val appointments: MutableStateFlow<List<Appointment>?> get() = _appointments
+    open val doctors: StateFlow<List<Doctor>> get() = _doctors
+    open val appointments: MutableStateFlow<List<Appointment>?> get() = _appointments
     val selectedDoctor: StateFlow<Doctor?> get() = _selectedDoctor
 
-    fun loadDoctorById(doctorId: String) {
+    open fun loadDoctorById(doctorId: String) {
         viewModelScope.launch {
             _selectedDoctor.value = DoctorDAO().getDoctorById(doctorId)
         }

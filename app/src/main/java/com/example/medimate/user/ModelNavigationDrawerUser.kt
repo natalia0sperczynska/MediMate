@@ -1,5 +1,4 @@
 package com.example.medimate.user
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,7 +45,11 @@ fun ModelNavDrawerUser(navController: NavController,
             ModalDrawerSheet(
                 modifier = Modifier.background(PurpleGrey2)
             ) {
-                Text("Menu", modifier = Modifier.padding(16.dp), color = Black)
+                NavigationDrawerItem(
+                    label = {Text(text="Menu", modifier = Modifier.padding(16.dp), color = Black)},
+                    selected = false,
+                    onClick = { navController.navigate(Screen.MainUser.route) }
+                )
                 HorizontalDivider(color = LightGrey)
                 NavigationDrawerItem(
                     label = { Text(text = "Appointments", color = Black) },
