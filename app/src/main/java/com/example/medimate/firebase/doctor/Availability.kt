@@ -1,8 +1,6 @@
-package com.example.medimate.firebase
-import java.util.Locale
+package com.example.medimate.firebase.doctor
+import com.example.medimate.firebase.appointment.Term
 import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 data class Availability (
     val monday: List<Term> = generateTimeSlots(),

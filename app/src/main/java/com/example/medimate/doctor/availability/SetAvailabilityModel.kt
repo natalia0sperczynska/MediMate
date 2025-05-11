@@ -1,7 +1,7 @@
-package com.example.medimate.doctor
+package com.example.medimate.doctor.availability
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
-import com.example.medimate.firebase.Availability
+import com.example.medimate.firebase.doctor.Availability
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 

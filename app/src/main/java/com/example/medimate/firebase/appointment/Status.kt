@@ -1,4 +1,4 @@
-package com.example.medimate.firebase
+package com.example.medimate.firebase.appointment
 
 enum class Status {
     EXPECTED,

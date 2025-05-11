@@ -1,4 +1,4 @@
-package com.example.medimate.firebase
+package com.example.medimate.firebase.appointment
 
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await

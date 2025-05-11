@@ -1,4 +1,4 @@
-package com.example.medimate.appointments
+package com.example.medimate.user.appointments
 import android.icu.text.SimpleDateFormat
 import android.util.Log
 import androidx.compose.foundation.background
@@ -20,7 +20,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
@@ -44,7 +43,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -63,28 +61,23 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.medimate.firebase.Appointment
-import com.example.medimate.firebase.Doctor
-import com.example.medimate.firebase.AppointmentDAO
+import com.example.medimate.firebase.appointment.Appointment
+import com.example.medimate.firebase.doctor.Doctor
+import com.example.medimate.firebase.appointment.AppointmentDAO
 import com.example.medimate.firebase.AuthManager
-import com.example.medimate.firebase.DoctorDAO
-import com.example.medimate.firebase.Status
-import com.example.medimate.firebase.Term
-import com.example.medimate.navigation.Screen
+import com.example.medimate.firebase.doctor.DoctorDAO
+import com.example.medimate.firebase.appointment.Status
+import com.example.medimate.firebase.appointment.Term
 import com.example.medimate.register.DatePickerModal
 import com.example.medimate.ui.theme.MediMateTheme
 import com.example.medimate.user.ModelNavDrawerUser
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.sql.Date
 import java.util.Calendar
 import java.util.Locale
@@ -183,7 +176,7 @@ fun AppointmentsScreen(navController: NavController, selectedDoctorId: String? =
 
 }
 @Composable
-fun displayButtons(navController: NavController, appointment: MutableState<Appointment?>,snackbarHostState: SnackbarHostState,scope: CoroutineScope){
+fun displayButtons(navController: NavController, appointment: MutableState<Appointment?>, snackbarHostState: SnackbarHostState, scope: CoroutineScope){
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
@@ -191,7 +184,7 @@ fun displayButtons(navController: NavController, appointment: MutableState<Appoi
         Button(
             modifier = Modifier.padding(16.dp),
             shape = MaterialTheme.shapes.medium,
-            onClick = { navController.navigate(Screen.MainUser.route) }) {
+            onClick = { cancel(appointment,scope,snackbarHostState) }) {
             Text("Cancel")
         }
         Button(
@@ -454,7 +447,7 @@ fun getAvailableTermsForDate(doctor: Doctor, dateString: String): List<Term> {
 }
 
 fun confirm(appointment: MutableState<Appointment?>, scope: CoroutineScope,
-            snackbarHostState: SnackbarHostState,onSuccess: () -> Unit = {}) {
+            snackbarHostState: SnackbarHostState, onSuccess: () -> Unit = {}) {
     if(appointment.value?.time.isNullOrBlank()){
         return
     }
@@ -483,6 +476,17 @@ fun confirm(appointment: MutableState<Appointment?>, scope: CoroutineScope,
                 }
             }
         }
+    }
+}
+fun cancel(appointment: MutableState<Appointment?>, scope: CoroutineScope, snackbarHostState: SnackbarHostState){
+    appointment.value?.doctorId=""
+    appointment.value?.time=""
+    appointment.value?.date=""
+    scope.launch {
+        snackbarHostState.showSnackbar(
+            message = "Appointment choice canceled",
+            duration = SnackbarDuration.Short
+        )
     }
 }
 

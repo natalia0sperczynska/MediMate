@@ -1,4 +1,4 @@
-package com.example.medimate.user
+package com.example.medimate.user.updateData
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -13,8 +13,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.healme.R
-import com.example.medimate.firebase.UserDAO
-import com.example.medimate.firebase.User
+import com.example.medimate.firebase.user.UserDAO
+import com.example.medimate.firebase.user.User
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 

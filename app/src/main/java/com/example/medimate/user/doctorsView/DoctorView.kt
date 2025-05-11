@@ -1,4 +1,4 @@
-package com.example.medimate.user
+package com.example.medimate.user.doctorsView
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -47,10 +47,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.healme.R
-import com.example.medimate.firebase.Doctor
-import com.example.medimate.firebase.DoctorDAO
+import com.example.medimate.firebase.doctor.Doctor
+import com.example.medimate.firebase.doctor.DoctorDAO
 import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.MediMateTheme
+import com.example.medimate.user.ModelNavDrawerUser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -98,7 +99,7 @@ fun SingleDoctor(doctor: Doctor, isSelected: Boolean, onDoctorSelected: (String)
 }
 
 @Composable
-fun DoctorList(doctors: List<Doctor>,navController: NavController) {
+fun DoctorList(doctors: List<Doctor>, navController: NavController) {
     var selectedDoctorId: String? by remember { mutableStateOf(null) }
     var selectedDoctor : Doctor? by
     remember { mutableStateOf(null) }

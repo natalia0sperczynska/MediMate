@@ -115,7 +115,7 @@ fun ModelNavDrawerUser(navController: NavController,
         scrimColor = PurpleGrey.copy(alpha = 0.3f),
         drawerContent = {
             ModalDrawerSheet(
-                modifier = Modifier.background(PurpleGrey2).offset(x = (1 - drawerAnimatable.value) * (-300.dp))
+                modifier = Modifier.background(PurpleGrey).offset(x = (1 - drawerAnimatable.value) * (-300.dp))
             ) {
                 DrawerHeader()
                 NavigationDrawerItem(

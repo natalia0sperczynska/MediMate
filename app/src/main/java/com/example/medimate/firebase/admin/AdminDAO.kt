@@ -1,5 +1,7 @@
-package com.example.medimate.firebase
+package com.example.medimate.firebase.admin
 
+import com.example.medimate.firebase.doctor.Doctor
+import com.example.medimate.firebase.user.User
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 

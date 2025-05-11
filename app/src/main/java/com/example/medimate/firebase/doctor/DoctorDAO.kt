@@ -1,5 +1,6 @@
-package com.example.medimate.firebase
+package com.example.medimate.firebase.doctor
 
+import com.example.medimate.firebase.appointment.Appointment
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 /**

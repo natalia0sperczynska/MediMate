@@ -1,4 +1,4 @@
-package com.example.medimate.mainViews.doctor
+package com.example.medimate.doctor.main
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
@@ -11,7 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.medimate.firebase.DoctorDAO
+import com.example.medimate.firebase.doctor.DoctorDAO
 import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.MediMateTheme
 import com.google.firebase.auth.FirebaseAuth

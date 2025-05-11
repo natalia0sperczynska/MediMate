@@ -1,4 +1,5 @@
-package com.example.medimate.admin
+package com.example.medimate.admin.doctorsManagement
+import android.R
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -28,10 +29,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.medimate.firebase.AdminDAO
-import com.example.medimate.firebase.Doctor
+import com.example.medimate.admin.ModelNavDrawerAdmin
+import com.example.medimate.firebase.admin.AdminDAO
+import com.example.medimate.firebase.doctor.Doctor
 import com.example.medimate.ui.theme.MediMateTheme
-import com.example.medimate.user.DoctorList
+import com.example.medimate.user.doctorsView.DoctorList
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
@@ -169,7 +171,7 @@ fun ManageDoctors(navController: NavController) {
             ) {
                 Spacer(modifier = Modifier.width(8.dp))
                 Image(
-                    painter = painterResource(id = android.R.drawable.ic_menu_add),
+                    painter = painterResource(id = R.drawable.ic_menu_add),
                     contentDescription = null
                 )
                 Text("Add Doctor")

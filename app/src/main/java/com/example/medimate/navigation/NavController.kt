@@ -3,28 +3,24 @@ package com.example.medimate.navigation
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.medimate.appointments.AppointmentsScreen
-import com.example.medimate.firebase.Doctor
-import com.example.medimate.firebase.DoctorDAO
+import com.example.medimate.user.appointments.AppointmentsScreen
 import com.example.medimate.login.LoginScreen
-import com.example.medimate.mainViews.admin.MainAdminScreen
-import com.example.medimate.mainViews.doctor.MainDoctorScreen
+import com.example.medimate.admin.main.MainAdminScreen
+import com.example.medimate.doctor.main.MainDoctorScreen
 import com.example.medimate.mainViews.MainScreen
-import com.example.medimate.admin.ManageUsers
-import com.example.medimate.admin.ManageDoctors
-import com.example.medimate.appointments.AppointmentsModel
-import com.example.medimate.mainViews.user.MainUserScreen
+import com.example.medimate.admin.usersManagement.ManageUsers
+import com.example.medimate.admin.doctorsManagement.ManageDoctors
+import com.example.medimate.user.appointments.AppointmentsModel
+import com.example.medimate.user.main.MainUserScreen
 import com.example.medimate.register.RegisterScreen
-import com.example.medimate.user.UpdateDataScreen
-import com.example.medimate.user.DoctorScreen
+import com.example.medimate.user.updateData.UpdateDataScreen
+import com.example.medimate.user.doctorsView.DoctorScreen
 
 
 sealed class Screen(val route: String) {

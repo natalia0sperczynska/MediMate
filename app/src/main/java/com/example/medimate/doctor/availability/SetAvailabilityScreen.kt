@@ -1,4 +1,4 @@
-package com.example.medimate.doctor
+package com.example.medimate.doctor.availability
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -19,7 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.medimate.firebase.Term
+import com.example.medimate.firebase.appointment.Term
 import com.example.medimate.ui.theme.MediMateTheme
 import java.util.Locale
 
@@ -31,7 +31,8 @@ data class DayAvailabilityUI(
 @Composable
 fun SetAvailabilityScreen(
     navController: NavController,
-    viewModel: SetAvailabilityModel = SetAvailabilityModel()) {
+    viewModel: SetAvailabilityModel = SetAvailabilityModel()
+) {
     Column(modifier = Modifier.padding(16.dp)) {
         viewModel.weekAvailability.forEach { dayAvailability ->
             Text(text = dayAvailability.day.replaceFirstChar {

@@ -1,4 +1,6 @@
-package com.example.medimate.firebase
+package com.example.medimate.firebase.user
+
+import com.example.medimate.firebase.appointment.Appointment
 
 /**
  * Data class representing a User.

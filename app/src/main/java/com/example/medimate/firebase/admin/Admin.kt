@@ -1,4 +1,4 @@
-package com.example.medimate.firebase
+package com.example.medimate.firebase.admin
 
 class Admin (
     val id: String = "",

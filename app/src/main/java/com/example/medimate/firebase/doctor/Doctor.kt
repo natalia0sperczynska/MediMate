@@ -1,5 +1,6 @@
-package com.example.medimate.firebase
+package com.example.medimate.firebase.doctor
 
+import com.example.medimate.firebase.appointment.Term
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -25,7 +26,7 @@ data class Doctor(
     var profilePicture: String = "",
     var specialisation:String = "",
     var room:String = "",
-    var availability:Availability = Availability(),
+    var availability: Availability = Availability(),
     var availabilityChanges: Map<String, List<Term>> = emptyMap()
 
 ) {

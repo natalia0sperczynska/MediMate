@@ -1,12 +1,12 @@
 //package com.example.medimate.tests
 //
 //import android.annotation.SuppressLint
-//import com.example.medimate.firebase.Appointment
-//import com.example.medimate.firebase.Availability
-//import com.example.medimate.firebase.Doctor
-//import com.example.medimate.firebase.Status
-//import com.example.medimate.firebase.Term
-//import com.example.medimate.firebase.User
+//import com.example.medimate.firebase.appointment.Appointment
+//import com.example.medimate.firebase.doctor.Availability
+//import com.example.medimate.firebase.doctor.Doctor
+//import com.example.medimate.firebase.appointment.Status
+//import com.example.medimate.firebase.appointment.Term
+//import com.example.medimate.firebase.user.User
 //
 //fun getSampleAppointments(): List<Appointment> {
 //    val doctor = Doctor(

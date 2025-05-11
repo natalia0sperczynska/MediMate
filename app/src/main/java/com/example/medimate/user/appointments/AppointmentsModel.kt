@@ -1,11 +1,11 @@
-package com.example.medimate.appointments
+package com.example.medimate.user.appointments
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.medimate.firebase.Appointment
-import com.example.medimate.firebase.Doctor
-import com.example.medimate.firebase.DoctorDAO
-import com.example.medimate.firebase.UserDAO
-import com.example.medimate.user.getDoctorList
+import com.example.medimate.firebase.appointment.Appointment
+import com.example.medimate.firebase.doctor.Doctor
+import com.example.medimate.firebase.doctor.DoctorDAO
+import com.example.medimate.firebase.user.UserDAO
+import com.example.medimate.user.doctorsView.getDoctorList
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,7 +34,7 @@ open class AppointmentsModel: ViewModel(){
     init {
         viewModelScope.launch {
             _doctors.value = getDoctorList()
-            _appointments.value=getAppointments()
+            _appointments.value= getAppointments()
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.example.medimate.firebase
+package com.example.medimate.firebase.appointment
 
 data class Term(
     val startTime: String = "",
