@@ -1,20 +1,24 @@
 package com.example.medimate.admin.main
 
+import android.util.Log
 import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.background
+import com.example.medimate.mail.NetworkUtils
 import androidx.compose.foundation.clickable
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.medimate.admin.ModelNavDrawerAdmin
 import com.example.medimate.firebase.admin.AdminDAO
+import com.example.medimate.mail.sendMail
 import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.Black
 import com.example.medimate.ui.theme.LightGrey
@@ -22,7 +26,10 @@ import com.example.medimate.ui.theme.MediMateButton
 import com.example.medimate.ui.theme.MediMateTheme
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
 @Composable
 fun MainAdminScreen(navController: NavController) {
     val auth = FirebaseAuth.getInstance()
@@ -53,7 +60,9 @@ fun AdminScreenContent(navController: NavController,
                        userName: String,
                        drawerState: DrawerState,
                        scope: CoroutineScope
-){  ModelNavDrawerAdmin(navController,drawerState,scope) {
+){  val context = LocalContext.current
+    var isLoading by remember { mutableStateOf(false) }
+    ModelNavDrawerAdmin(navController,drawerState,scope) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.Center,
@@ -75,6 +84,29 @@ fun AdminScreenContent(navController: NavController,
                 popUpTo(Screen.Main.route) { inclusive = true }
             }
         })
+        if (isLoading) {
+            CircularProgressIndicator()
+        } else {
+            MediMateButton(text = "Send Email", onClick = {
+                scope.launch {
+                    isLoading = true
+                    val result = try {
+                        sendMail(context)
+                    } finally {
+                        isLoading = false
+                    }
+
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            context,
+                            if (result) "Email sent successfully" else "Failed to send email",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            })
+        }
+
     }
 
 

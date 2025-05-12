@@ -43,6 +43,7 @@ import com.example.medimate.ui.theme.MediMateTheme
 import com.example.medimate.user.doctorsView.DoctorList
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 @Composable
 fun ManageDoctors(navController: NavController) {
@@ -61,6 +62,7 @@ fun ManageDoctors(navController: NavController) {
     var phoneNumber by remember { mutableStateOf("") }
     var specialisation by remember { mutableStateOf("") }
     var room by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
 
     ModelNavDrawerAdmin(navController, drawerState, scope) {
         Scaffold(
@@ -114,6 +116,12 @@ fun ManageDoctors(navController: NavController) {
                     label = { Text("Room Number") },
                     modifier = Modifier.fillMaxWidth()
                 )
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Password") },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
                 LaunchedEffect(Unit) {
                     doctors = adminDAO.getAllDoctors()
@@ -133,6 +141,7 @@ fun ManageDoctors(navController: NavController) {
                             try {
                                 adminDAO.addDoctor(adminId, doctor)
                                 doctors = adminDAO.getAllDoctors()
+                                val authResult = FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password).await()
                                 snackbarHostState.showSnackbar(
                                     message = "Doctor added successfully!",
                                     duration = SnackbarDuration.Short

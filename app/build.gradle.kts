@@ -15,6 +15,16 @@ android {
         compose = true
     }
 
+    packagingOptions {
+        resources {
+            excludes += setOf(
+                "META-INF/LICENSE.md",
+                "META-INF/NOTICE.md"
+            )
+        }
+    }
+
+
     defaultConfig {
         applicationId = "com.example.medimate"
         minSdk = 26
@@ -114,5 +124,9 @@ dependencies {
     //material 3
     implementation("androidx.compose.material3:material3:1.3.2")
     implementation("androidx.compose.material3:material3-window-size-class-android:1.3.2")
+
+    //mail
+    implementation ("com.sun.mail:android-mail:1.6.7")
+    implementation ("com.sun.mail:android-activation:1.6.7")
 
 }
