@@ -13,7 +13,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.medimate.firebase.user.UserDAO
 import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.Black
+import com.example.medimate.ui.theme.MediMateButton
 import com.example.medimate.ui.theme.MediMateTheme
+import com.example.medimate.ui.theme.PurpleMain
+import com.example.medimate.ui.theme.White
 import com.example.medimate.user.ModelNavDrawerUser
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
@@ -49,26 +52,27 @@ fun MainUserScreen(navController: NavController) {
 
 @Composable
 fun ScreenModel(navController: NavController, userId: String, userName: String, drawerState: DrawerState) {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Good to see you again, $userName!",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Black
+                )
+                Spacer(modifier = Modifier.height(16.dp))
 
-        Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = "Good to see you again, $userName!", style = MaterialTheme.typography.headlineMedium, color = Black)
-            Spacer(modifier = Modifier.height(16.dp))
+                MediMateButton(text = "Update Data",onClick = { navController.navigate(Screen.UpdateData.route) })
+                Spacer(modifier = Modifier.height(8.dp))
 
-            Button(onClick = { navController.navigate(Screen.UpdateData.route) }) {
-                Text("Update Data")
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Button(onClick = {
-                navController.navigate(Screen.Login.route) {
-                    popUpTo(Screen.Main.route) { inclusive = true }
-                }
-            }) {
-                Text("Logout")
+                MediMateButton(text="Logout",onClick = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.Main.route) { inclusive = true }
+                    }
+                })
             }
         }
 

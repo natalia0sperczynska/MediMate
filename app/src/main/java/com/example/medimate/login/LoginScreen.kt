@@ -22,7 +22,11 @@ import androidx.navigation.compose.rememberNavController
 import com.example.healme.R
 import com.example.medimate.navigation.Screen
 import com.example.medimate.register.RegisterScreen
+import com.example.medimate.ui.theme.Grey2
 import com.example.medimate.ui.theme.MediMateTheme
+import com.example.medimate.ui.theme.PurpleGrey2
+import com.example.medimate.ui.theme.PurpleMain
+import com.example.medimate.ui.theme.White
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
@@ -111,12 +115,18 @@ fun LoginScreen(navController: NavController) {
                     }
             },
             modifier = Modifier.fillMaxWidth(),
-            enabled = email.isNotBlank() && password.isNotBlank()
+            enabled = email.isNotBlank() && password.isNotBlank(),
+            colors=ButtonDefaults.buttonColors(
+                containerColor = PurpleMain,
+                contentColor = White,
+                disabledContainerColor = PurpleGrey2,
+                disabledContentColor = White
+            )
         ) {
             if (isLoading) {
-                CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary)
+                CircularProgressIndicator(color = White)
             } else {
-                Text("Login",color= MaterialTheme.colorScheme.background)
+                Text("Login",color= White)
             }
         }
 

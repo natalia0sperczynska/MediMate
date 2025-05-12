@@ -1,5 +1,7 @@
 package com.example.medimate.firebase.appointment
 
+import com.example.medimate.firebase.user.UserDAO
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
@@ -25,6 +27,21 @@ class AppointmentDAO {
         } catch (e: Exception) {
             throw Exception("Error deleting appointment data: ${e.message}")
     }
+    }
+    suspend fun getAppointments(): List<Appointment>? {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        val mFireBase = UserDAO()
+        return if (userId != null) mFireBase.loadAppointments(userId) else emptyList()
+    }
+    suspend fun getPastAppointments(): List<Appointment>? {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        val mFireBase = UserDAO()
+        return if (userId != null) mFireBase.loadPastAppointments(userId) else emptyList()
+    }
+    suspend fun getFutureAppointments(): List<Appointment>? {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        val mFireBase = UserDAO()
+        return if (userId != null) mFireBase.loadFutureAppointments(userId) else emptyList()
     }
 
     suspend fun updateAppointment(appointmentId: String, updatedData: Map<String, Any?>) {
@@ -62,3 +79,4 @@ class AppointmentDAO {
 //
 //    database.updateChildren(childUpdates)
 }
+

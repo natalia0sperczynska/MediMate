@@ -1,8 +1,15 @@
 package com.example.medimate.firebase.user
 
 import com.example.medimate.firebase.appointment.Appointment
+import com.example.medimate.firebase.appointment.Status
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.Date
+import java.util.Locale
+
 
 /**
  * Class for interacting with Firebase Firestore for user data management.
@@ -90,16 +97,74 @@ class UserDAO {
             throw Exception("Error checking user existence: ${e.message}")
         }
     }
+
     suspend fun loadAppointments(userid: String): List<Appointment> {
         val mFireStore = FirebaseFirestore.getInstance()
         val appointmentsList = mutableListOf<Appointment>()
         val result = mFireStore.collection("appointments").get().await()
         for (document in result) {
             val appointment = document.toObject(Appointment::class.java)
-            if (appointment.patientId== userid)
+            if (appointment.patientId == userid)
                 appointmentsList.add(appointment)
         }
         return appointmentsList
 
     }
+
+    suspend fun loadPastAppointments(userid: String): List<Appointment> {
+        val mFireStore = FirebaseFirestore.getInstance()
+        val appointmentsList = mutableListOf<Appointment>()
+        val result = mFireStore.collection("appointments").get().await()
+        for (document in result) {
+            val appointment = document.toObject(Appointment::class.java)
+            println("Checking appointment: ${appointment.id}")
+            println("Patient ID: ${appointment.patientId}, Current user: $userid")
+            println("Status: ${appointment.status}, Date: ${appointment.date}")
+            println("Is in past: ${isInPast(appointment.date)}")
+            if (appointment.patientId == userid && appointment.status == Status.COMPLETED && isInPast(
+                    appointment.date
+                )) {
+                    appointmentsList.add(appointment)
+                }
+        }
+        return appointmentsList
+
+    }
+
+    suspend fun loadFutureAppointments(userid: String): List<Appointment> {
+        val mFireStore = FirebaseFirestore.getInstance()
+        val appointmentsList = mutableListOf<Appointment>()
+        val result = mFireStore.collection("appointments").get().await()
+        for (document in result) {
+            val appointment = document.toObject(Appointment::class.java)
+            if (appointment.patientId == userid && appointment.status == Status.EXPECTED && isInFuture(
+                    appointment.date
+                )
+            ) {
+                appointmentsList.add(appointment)
+            }
+        }
+        return appointmentsList
+
+    }
+}
+
+fun isInPast(date: String?): Boolean {
+    if (date.isNullOrBlank()) return false
+    val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+    val parsedDate: Date? = formatter.parse(date)
+    val today = Date()
+    parsedDate?.before(today)
+    return parsedDate?.before(today) ?: false
+
+}
+
+fun isInFuture(date: String?): Boolean {
+    if (date.isNullOrBlank()) return false
+    val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+    val parsedDate: Date? = formatter.parse(date)
+    val today = Date()
+    parsedDate?.after(today)
+    return parsedDate?.after(today) ?: false
+
 }

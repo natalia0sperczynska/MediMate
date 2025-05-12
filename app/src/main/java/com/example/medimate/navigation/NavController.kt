@@ -19,6 +19,8 @@ import com.example.medimate.admin.doctorsManagement.ManageDoctors
 import com.example.medimate.user.appointments.AppointmentsModel
 import com.example.medimate.user.main.MainUserScreen
 import com.example.medimate.register.RegisterScreen
+import com.example.medimate.user.appointments.HistoryAppointmentsScreen
+import com.example.medimate.user.appointments.YourFutureAppointmentsScreen
 import com.example.medimate.user.updateData.UpdateDataScreen
 import com.example.medimate.user.doctorsView.DoctorScreen
 
@@ -38,6 +40,8 @@ sealed class Screen(val route: String) {
         fun createRoute(doctorId: String) = "appointments_doctor/$doctorId"
     }
     object Doctors : Screen("doctors")
+    object FutureAppointments : Screen("future_appointments")
+    object AppointmentsHistory : Screen("past_appointments")
 }
 
 @SuppressLint("ViewModelConstructorInComposable")
@@ -76,6 +80,12 @@ fun AppNavHost(navController: NavHostController) {
         }
         composable(Screen.Appointments.route) {
             AppointmentsScreen(navController)
+        }
+        composable(Screen.FutureAppointments.route) {
+            YourFutureAppointmentsScreen(navController)
+        }
+        composable(Screen.AppointmentsHistory.route) {
+            HistoryAppointmentsScreen(navController)
         }
         composable(
             route = Screen.AppointmentsDoctor.route,

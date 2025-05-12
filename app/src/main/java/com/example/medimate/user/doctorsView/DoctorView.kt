@@ -50,7 +50,11 @@ import com.example.healme.R
 import com.example.medimate.firebase.doctor.Doctor
 import com.example.medimate.firebase.doctor.DoctorDAO
 import com.example.medimate.navigation.Screen
+import com.example.medimate.ui.theme.MediMateButton
 import com.example.medimate.ui.theme.MediMateTheme
+import com.example.medimate.ui.theme.PurpleDark
+import com.example.medimate.ui.theme.PurpleGrey
+import com.example.medimate.ui.theme.White
 import com.example.medimate.user.ModelNavDrawerUser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -67,30 +71,30 @@ import kotlinx.coroutines.launch
 fun SingleDoctor(doctor: Doctor, isSelected: Boolean, onDoctorSelected: (String) -> Unit, navController: NavController) {
     var expand by remember { mutableStateOf(false) }
     val extraPadding by animateDpAsState(targetValue = if(expand) 40.dp else 0.dp, label = "")
-    Surface(border = BorderStroke(1.dp,MaterialTheme.colorScheme.onPrimary), color = MaterialTheme.colorScheme.secondary,
+    Surface(border = BorderStroke(1.dp, White), color = PurpleDark,
         shape= MaterialTheme.shapes.medium){
     Row (modifier = Modifier.padding(16.dp).fillMaxWidth()) {
         Column(modifier = Modifier.weight(1f).padding(bottom = extraPadding)) {
             Image(painter = painterResource(id = R.drawable.profile_pic), contentDescription = null, modifier = Modifier. requiredSize(50.dp))
-            Text(text = "${doctor.name}  ${doctor.surname}")
-            Text(doctor.specialisation)
+            Text(text = "${doctor.name}  ${doctor.surname}",color=White)
+            Text(doctor.specialisation,color=White)
             if (expand) {
-                Text("e-mail: ${doctor.email}")
-                Text("phone number: ${doctor.phoneNumber}")
-                Text("room: ${doctor.room}")
+                Text("e-mail: ${doctor.email}",color=White)
+                Text("phone number: ${doctor.phoneNumber}",color=White)
+                Text("room: ${doctor.room}",color=White)
             }
         }
         Column(modifier = Modifier.selectableGroup()) {
             OutlinedButton(onClick = { expand = !expand }) {
                 Text(
                     if (expand) "Show less" else "Show more",
-                    color = MaterialTheme.colorScheme.onSecondary
+                    color = White
                 )
             }
             OutlinedButton(onClick = {onDoctorSelected(doctor.id)
             navController.navigate(Screen.AppointmentsDoctor.createRoute(doctor.id))}) {
                 Text(text = "Set the appointment",
-                    color = MaterialTheme.colorScheme.onSecondary
+                    color = White
                 )
             }
         }
@@ -108,7 +112,7 @@ fun DoctorList(doctors: List<Doctor>, navController: NavController) {
             Text("No doctors available")
         } else
             LazyColumn {
-                item{Text("Select a doctor:", color = MaterialTheme.colorScheme.secondary)}
+                item{Text("Select a doctor:", color = White)}
                 items(doctors){ doctor ->
                     SingleDoctor(doctor = doctor, isSelected = (selectedDoctorId == doctor.id),
                         onDoctorSelected = { id -> selectedDoctorId = id }, navController = navController)
@@ -174,12 +178,10 @@ fun DoctorScreen(navController: NavController) {
         Column(modifier = Modifier.padding(16.dp)) {
             SearchBar(modifier = Modifier.fillMaxWidth(), viewModel = viewModel, searchText)
             Spacer(modifier = Modifier.height(16.dp))
-            Button(
+            MediMateButton(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-                onClick = { navController.navigate(Screen.MainUser.route) }) {
-                Text("Go back")
-            }
+                onClick = { navController.navigate(Screen.MainUser.route)},
+                text="Go back")
             Spacer(modifier = Modifier.height(16.dp))
             if (isSearching) {
                 Box(modifier = Modifier.fillMaxSize()) {

@@ -11,5 +11,5 @@ data class Appointment(
     var status: Status = Status.EXPECTED,
     var diagnosis: String = "",
     var notes: String = "",
-    val url: String = ""
+    var url: String = ""
 )

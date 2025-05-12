@@ -72,6 +72,7 @@ import com.example.medimate.firebase.doctor.DoctorDAO
 import com.example.medimate.firebase.appointment.Status
 import com.example.medimate.firebase.appointment.Term
 import com.example.medimate.register.DatePickerModal
+import com.example.medimate.ui.theme.MediMateButton
 import com.example.medimate.ui.theme.MediMateTheme
 import com.example.medimate.user.ModelNavDrawerUser
 import com.google.firebase.firestore.FirebaseFirestore
@@ -82,6 +83,7 @@ import java.sql.Date
 import java.util.Calendar
 import java.util.Locale
 
+
 @Composable
 fun AppointmentsScreen(navController: NavController, selectedDoctorId: String? = null) {
     val viewModel = viewModel<AppointmentsModel>()
@@ -90,7 +92,6 @@ fun AppointmentsScreen(navController: NavController, selectedDoctorId: String? =
     var selectedTime by remember { mutableStateOf<Term?>(null) }
     val auth = AuthManager
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
 
@@ -182,23 +183,23 @@ fun displayButtons(navController: NavController, appointment: MutableState<Appoi
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ){
-        Button(
+        MediMateButton(
+            text="Cancel",
+            onClick = { cancel(appointment,scope,snackbarHostState) },
             modifier = Modifier.padding(16.dp),
-            shape = MaterialTheme.shapes.medium,
-            onClick = { cancel(appointment,scope,snackbarHostState) }) {
-            Text("Cancel")
-        }
-        Button(
+            //shape = MaterialTheme.shapes.medium,
+            )
+
+        MediMateButton(
+            text="Confirm",
             modifier = Modifier.padding(16.dp),
-            shape = MaterialTheme.shapes.medium,
+            //shape = MaterialTheme.shapes.medium,
             onClick = {
                 confirm(appointment,scope,snackbarHostState)
             },
             enabled = !appointment.value?.doctorId.isNullOrBlank() &&
                     !appointment.value?.date.isNullOrBlank() && !appointment.value?.time.isNullOrBlank()
-        ) {
-            Text("Confirm")
-        }
+        )
     }
 
 }
@@ -387,48 +388,6 @@ fun GetAvailableTerms(
             }
         }
     }
-    }
-}
-@Composable
-fun YourAppointments(appointments: List<Appointment>?) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        appointments?.let{
-            if(it.isEmpty()) {
-                Text("No future appointments")
-            } else {
-                LazyColumn(
-                    verticalArrangement = Arrangement.Bottom,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    item { Text("Your appointments") }
-                    items(appointments) { appointment ->
-                        AppointmentCard(appointment = appointment)
-                    }
-                }
-            }
-        }
-            ?: Text("Loading appointments..")
-    }
-}
-
-@Composable
-fun AppointmentCard(appointment: Appointment) {
-    val doctorDao = remember { DoctorDAO() }
-
-    val doctor by produceState<Doctor?>(initialValue = null, key1 = appointment.doctorId) {
-        value = doctorDao.getDoctorById(appointment.doctorId)
-    }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(text = "Doctor: ${doctor?.name ?: "Loading..."} ${doctor?.surname.orEmpty()}")
-            Text(text = "Date: ${appointment.date}")
-            Text(text="Time: ${appointment.time}")
-        }
     }
 }
 

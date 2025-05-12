@@ -138,12 +138,12 @@ fun ModelNavDrawerUser(navController: NavController,
                 NavigationDrawerItem(
                     label = { Text(text = "My Appointments", color = Black) },
                     selected = false,
-                    onClick = { navController.navigate(Screen.Doctors.route) }
+                    onClick = { navController.navigate(Screen.FutureAppointments.route) }
                 )
                 NavigationDrawerItem(
                     label = { Text(text = "Appointments History", color = Black) },
                     selected = false,
-                    onClick = { navController.navigate(Screen.Doctors.route) }
+                    onClick = { navController.navigate(Screen.AppointmentsHistory.route) }
                 )
 
             }
