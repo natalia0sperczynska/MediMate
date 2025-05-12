@@ -18,6 +18,7 @@ import com.example.medimate.firebase.admin.AdminDAO
 import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.Black
 import com.example.medimate.ui.theme.LightGrey
+import com.example.medimate.ui.theme.MediMateButton
 import com.example.medimate.ui.theme.MediMateTheme
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
@@ -65,18 +66,15 @@ fun AdminScreenContent(navController: NavController,
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = { navController.navigate(Screen.UpdateData.route) }) {
-            Text("Update Data")
-        }
+
+        MediMateButton(text = "Update Data",onClick = { navController.navigate(Screen.UpdateData.route) })
         Spacer(modifier = Modifier.height(8.dp))
 
-        Button(onClick = {
+        MediMateButton(text="Logout",onClick = {
             navController.navigate(Screen.Login.route) {
                 popUpTo(Screen.Main.route) { inclusive = true }
             }
-        }) {
-            Text("Logout")
-        }
+        })
     }
 
 
