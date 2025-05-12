@@ -41,13 +41,12 @@ open class AppointmentsModel: ViewModel(){
             _selectedDoctor.value = DoctorDAO().getDoctorById(doctorId)
         }
     }
-
     init {
         viewModelScope.launch {
             _doctors.value = getDoctorList()
-            _appointments.value= mFireBase.getAppointments()
         }
     }
+
 }
 
 class FutureAppointmentsModel : AppointmentsModel() {

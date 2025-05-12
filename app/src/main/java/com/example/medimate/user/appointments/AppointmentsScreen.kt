@@ -86,7 +86,7 @@ import java.util.Locale
 
 @Composable
 fun AppointmentsScreen(navController: NavController, selectedDoctorId: String? = null) {
-    val viewModel = viewModel<AppointmentsModel>()
+    val viewModel = viewModel<FutureAppointmentsModel>()
     val doctors by viewModel.doctors.collectAsState()
     val appointments by viewModel.appointments.collectAsState()
     var selectedTime by remember { mutableStateOf<Term?>(null) }
