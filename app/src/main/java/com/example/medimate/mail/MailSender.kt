@@ -35,7 +35,7 @@ suspend fun sendMail(context: Context): Boolean = withContext(Dispatchers.IO) {
 
             val message = MimeMessage(session).apply {
                 setFrom(InternetAddress("medimate@demomailtrap.co"))
-                setRecipients(Message.RecipientType.TO, InternetAddress.parse("klaudiasperczynska@op.pl"))
+                setRecipients(Message.RecipientType.TO, InternetAddress.parse("sperczynskanatalia@gmail.com"))
                 subject = "Test from MediMate"
                 setText("MediMate is sending greetings ! Register into our app please :(((((")
                 setHeader("Message-ID", "<${UUID.randomUUID()}@android.local>")
