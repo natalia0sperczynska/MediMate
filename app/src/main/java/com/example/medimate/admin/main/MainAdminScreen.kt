@@ -87,23 +87,24 @@ fun AdminScreenContent(navController: NavController,
         if (isLoading) {
             CircularProgressIndicator()
         } else {
-            MediMateButton(text = "Send Email", onClick = {
-                scope.launch {
-                    isLoading = true
-                    val result = try {
-                        sendMail(context)
-                    } finally {
-                        isLoading = false
-                    }
+            MediMateButton(
+                text = "Send Test Email",
+                onClick = {
+                    scope.launch {
+                        val success = sendMail(
+                            context = context,
+                            recipient = "sperczynskanatalia@gmail.com",
+                            subject = "MediMate Test",
+                            body = "Hello join our app please!!:((("
+                        )
 
-                    withContext(Dispatchers.Main) {
                         Toast.makeText(
                             context,
-                            if (result) "Email sent successfully" else "Failed to send email",
+                            if (success) "Sent!" else "Failed - check logs",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
-                }
+
             })
         }
 
