@@ -392,12 +392,18 @@ fun GetAvailableTerms(
 }
 
 fun getAvailableTermsForDate(doctor: Doctor, dateString: String): List<Term> {
-    doctor.availabilityChanges[dateString]?.let { return it }
+    val firestore = FirebaseFirestore.getInstance()
+    doctor.availabilityChanges[dateString]?.let { return it.filter{term->term.isAvailable} }
     val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
     val date = formatter.parse(dateString) ?: return emptyList()
 
     val calendar = Calendar.getInstance().apply { time = date }
-    return when (calendar.get(Calendar.DAY_OF_WEEK)) {
+//    val free=availability.filter{(ts,status)->
+//        status== && ts !in booked
+//
+//        availablityMap[doctos.id]==freeslot
+//    }
+    val defaultTerms = when (calendar.get(Calendar.DAY_OF_WEEK)) {
         Calendar.MONDAY -> doctor.availability.monday
         Calendar.TUESDAY -> doctor.availability.tuesday
         Calendar.WEDNESDAY -> doctor.availability.wednesday
@@ -406,7 +412,8 @@ fun getAvailableTermsForDate(doctor: Doctor, dateString: String): List<Term> {
         Calendar.SATURDAY -> doctor.availability.saturday
         Calendar.SUNDAY -> doctor.availability.sunday
         else -> emptyList()
-    }.filter { it.isAvailable }
+    }
+    return defaultTerms.filter { it.isAvailable }
 }
 
 fun confirm(appointment: MutableState<Appointment?>, scope: CoroutineScope,
@@ -421,7 +428,12 @@ fun confirm(appointment: MutableState<Appointment?>, scope: CoroutineScope,
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val fireStoreAppointments = AppointmentDAO()
+                val doctorDao = DoctorDAO()
                 fireStoreAppointments.addAppointment(appointmentToSave)
+                val doctor = doctorDao.getDoctorById(appointmentToSave.doctorId)
+                if (doctor != null) {
+                    doctorDao.updateDoctorAvailability(doctor, appointmentToSave)
+                }
                 scope.launch {
                     snackbarHostState.showSnackbar(
                         message = "Appointment set successfully!",

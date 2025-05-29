@@ -13,3 +13,20 @@ data class Appointment(
     var notes: String = "",
     var url: String = ""
 )
+{
+
+fun toMap():Map<String,Any> {
+    return mapOf(
+        "id" to id,
+        "doctorId" to doctorId,
+        "patientId" to patientId,
+        "date" to date,
+        "time" to time,
+        "status" to status.name,
+        "diagnosis" to diagnosis,
+        "notes" to notes,
+        "url" to url
+    )
+
+}
+}

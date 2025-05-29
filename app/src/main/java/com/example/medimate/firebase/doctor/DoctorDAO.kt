@@ -1,6 +1,7 @@
 package com.example.medimate.firebase.doctor
 
 import com.example.medimate.firebase.appointment.Appointment
+import com.example.medimate.user.appointments.getAvailableTermsForDate
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 /**
@@ -94,7 +95,41 @@ class DoctorDAO {
         return appointmentsList
 
     }
-    suspend fun addAvailabilityChanGE(doctorId: String, newDate:String){
+
+    suspend fun updateDoctorAvailability(doctor: Doctor?,appointment: Appointment){
+        if (doctor == null) return
+        val mFireStore = FirebaseFirestore.getInstance()
+        try{
+            val date = appointment.date
+            val time = appointment.time
+            val updateChanges = doctor.availabilityChanges.toMutableMap()
+
+            val currentTerms = updateChanges[date] ?:
+            getAvailableTermsForDate(doctor, date).map { it.copy() }
+
+            val updateTerms = currentTerms.map { term ->
+                val termTime = "${term.startTime}-${term.endTime}"
+                if (termTime==time){
+                    term.copy(isAvailable = false)
+                }else{
+                    term
+                }
+            }
+            updateChanges[date] = updateTerms
+
+            mFireStore.collection("doctors").document(doctor.id)
+                .update("availabilityChanges", updateChanges)
+                .await()
+
+            mFireStore.collection("doctors").document(doctor.id).update("availabilityChanges",updateChanges).await()
+        }
+        catch (e:Exception){
+            e.printStackTrace()
+        }
+    }
+
+
+    suspend fun addAvailabilityChanGE(doctorId: String, newDate:String,time:String){
         val mFireStore = FirebaseFirestore.getInstance()
         val doc = mFireStore.collection("doctors").document(doctorId)
         //doc.update()
@@ -111,7 +146,11 @@ class DoctorDAO {
 
             documentSnapshot.toObject(Doctor::class.java)?.apply {
                 this.id = documentSnapshot.id
+                if (this.availabilityChanges == null) {
+                    this.availabilityChanges = emptyMap()
+                }
             }
+
         } catch (e: Exception) {
             e.printStackTrace()
             null
