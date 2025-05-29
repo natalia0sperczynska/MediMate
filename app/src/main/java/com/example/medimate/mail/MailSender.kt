@@ -29,7 +29,7 @@ suspend fun sendMail(
             override fun getPasswordAuthentication(): PasswordAuthentication {
                 return PasswordAuthentication(
                     "medimateeclinic@gmail.com",
-                    "vblvjumjuxtkeihn" // Use app-specific password (not regular one!)
+                    "vblvjumjuxtkeihn"
                 )
             }
         })

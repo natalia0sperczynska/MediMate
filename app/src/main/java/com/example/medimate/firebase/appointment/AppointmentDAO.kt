@@ -8,6 +8,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Transaction
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 /**
  * Class for interacting with Firebase Firestore for appointment data management.
@@ -112,7 +115,44 @@ class AppointmentDAO {
         } catch (e: Exception) {
             throw Exception("Error updating appointment data: ${e.message}")
         }
+
     }
+
+    suspend fun checkAndUpdatePastAppointments(){
+        try {
+            val currentDate = SimpleDateFormat(
+                "MM/dd/yyyy",
+                Locale.getDefault()
+            ).format(Calendar.getInstance().time)
+            val appointments = mFireStore.collection("appointments")
+                .whereEqualTo("status", Status.EXPECTED.name)
+                .get()
+                .await()
+                .toObjects(Appointment::class.java)
+                .filter { appointment ->
+                    val appointmentDate = appointment.date
+                    isDateBeforeToday(appointmentDate, currentDate)
+                }
+
+            appointments.forEach { appointment ->
+                mFireStore.collection("appointments")
+                    .document(appointment.id)
+                    .update("status", Status.COMPLETED.name)
+                    .await()
+        }
+        } catch (e: Exception) {
+            throw Exception("Error updating expired appointments: ${e.message}")
+        }
+    }
+
+    private fun isDateBeforeToday(appointmentDate: String, currentDate: String): Boolean {
+        val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+        val apptDate = dateFormat.parse(appointmentDate)
+        val today = dateFormat.parse(currentDate)
+        return apptDate.before(today)
+    }
+
+
 
 
 ////simuntanious update przyklad z docs
