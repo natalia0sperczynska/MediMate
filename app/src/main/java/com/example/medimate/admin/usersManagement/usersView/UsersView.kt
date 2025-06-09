@@ -119,42 +119,49 @@ fun UserList(users: List<User>, navController: NavController) {
     }
 
 }
-class MainViewModel: ViewModel(){
+class MainUserViewModel: ViewModel() {
     private val _searchText = MutableStateFlow("")
     private val _isSearching = MutableStateFlow(false)
+    private val _users = MutableStateFlow<List<User>>(emptyList())
+
     val searchText = _searchText.asStateFlow()
-    var users: StateFlow<List<User>>? = MutableStateFlow(emptyList())
-
     val isSearching = _isSearching.asStateFlow()
-    init {
-        viewModelScope.launch {
-            val _users=MutableStateFlow(getUserList())
+    val users = _users.asStateFlow()
 
-            users=searchText
+    init {
+        loadUsers()
+        setupSearch()
+    }
+
+    private fun loadUsers() {
+        viewModelScope.launch {
+            _isSearching.value = true
+            _users.value = UserDAO().getAllUsers()
+            _isSearching.value = false
+        }
+    }
+
+    private fun setupSearch() {
+        viewModelScope.launch {
+            searchText
                 .debounce(500L)
-                .onEach { _isSearching.update { true } }
-                .combine(_users) { text, users ->
-                    if (text.isBlank()) {
-                        users
+                .collect { query ->
+                    _isSearching.value = true
+                    val allUsers = UserDAO().getAllUsers() // Get fresh list
+                    val filtered = if (query.isBlank()) {
+                        allUsers
                     } else {
-                        users.filter {
-                            it.doesMatchSearchQuery(text)
-                        }
+                        allUsers.filter { it.doesMatchSearchQuery(query) }
                     }
+                    _users.value = filtered
+                    _isSearching.value = false
                 }
-                .onEach { _isSearching.update { false } }
-                .stateIn(
-                    viewModelScope,
-                    SharingStarted.WhileSubscribed(5000),
-                    _users.value
-                )
         }
     }
 
     fun onSearchTextChange(text: String) {
         _searchText.value = text
     }
-
 }
 
 suspend fun getUserList():List<User>{
@@ -165,7 +172,7 @@ suspend fun getUserList():List<User>{
 
 @Composable
 fun UsersScreen(navController: NavController) {
-    val viewModel = viewModel<MainViewModel>()
+    val viewModel = viewModel<MainUserViewModel>()
     val searchText by viewModel.searchText.collectAsState()
     val person by viewModel.users!!.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()
@@ -174,7 +181,7 @@ fun UsersScreen(navController: NavController) {
 
     ModelNavDrawerAdmin(navController, drawerState, scope = scope) {
         Column(modifier = Modifier.padding(16.dp)) {
-            SearchBar(modifier = Modifier.fillMaxWidth(), viewModel = viewModel, searchText)
+            SearchUserBar(modifier = Modifier.fillMaxWidth(), viewModel = viewModel, searchText)
             Spacer(modifier = Modifier.height(16.dp))
             MediMateButton(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -195,14 +202,14 @@ fun UsersScreen(navController: NavController) {
 }
 
 @Composable
-fun SearchBar(
+fun SearchUserBar(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel = viewModel(),
+    viewModel: MainUserViewModel = viewModel(),
     searchText: String
 ){
     TextField( value=searchText, onValueChange = viewModel::onSearchTextChange, trailingIcon = {
         Icon(Icons.Default.Search, contentDescription = null)
-    }, placeholder = { Text(stringResource(id=R.string.place_holder_search)) },
+    }, placeholder = { Text(stringResource(id=R.string.place_holder_search_user)) },
         modifier = modifier
             .heightIn(min=56.dp)
             .fillMaxWidth()

@@ -17,8 +17,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
@@ -33,7 +31,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,7 +50,6 @@ import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.MediMateButton
 import com.example.medimate.ui.theme.MediMateTheme
 import com.example.medimate.ui.theme.PurpleDark
-import com.example.medimate.ui.theme.PurpleGrey
 import com.example.medimate.ui.theme.White
 import com.example.medimate.user.ModelNavDrawerUser
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -199,7 +195,7 @@ fun DoctorScreen(navController: NavController) {
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel = viewModel(),
+    viewModel: MainViewModel= viewModel(),
     searchText: String
 ){
     TextField( value=searchText, onValueChange = viewModel::onSearchTextChange, trailingIcon = {

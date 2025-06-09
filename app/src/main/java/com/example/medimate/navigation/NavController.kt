@@ -15,7 +15,8 @@ import com.example.medimate.admin.main.MainAdminScreen
 import com.example.medimate.doctor.main.MainDoctorScreen
 import com.example.medimate.mainViews.MainScreen
 import com.example.medimate.admin.usersManagement.ManageUsers
-import com.example.medimate.admin.doctorsManagement.ManageDoctors
+import com.example.medimate.admin.doctorsManagement.AddDoctor
+import com.example.medimate.admin.doctorsManagement.DoctorsAdmin
 import com.example.medimate.admin.usersManagement.userDocumentation.UserDocumentation
 import com.example.medimate.user.appointments.AppointmentsModel
 import com.example.medimate.user.main.MainUserScreen
@@ -30,7 +31,7 @@ sealed class Screen(val route: String) {
     object Main : Screen("main")
     object MainDoctor : Screen("main_doctor")
     object MainAdmin : Screen("main_admin")
-    object ManageDoctors : Screen("manage_doctors")
+    object AddDoctor : Screen("add_doctor")
     object ManageUsers : Screen("manage_users")
     object MainUser : Screen("main_user")
     object Login : Screen("login")
@@ -41,6 +42,7 @@ sealed class Screen(val route: String) {
         fun createRoute(doctorId: String) = "appointments_doctor/$doctorId"
     }
     object Doctors : Screen("doctors")
+    object DoctorsAdmin : Screen("doctors_admin")
     object FutureAppointments : Screen("future_appointments")
     object AppointmentsHistory : Screen("past_appointments")
     object UserDocumentation : Screen("user_documentation/{userId}"){
@@ -73,8 +75,11 @@ fun AppNavHost(navController: NavHostController) {
         composable(Screen.MainAdmin.route) {
             MainAdminScreen(navController)
         }
-        composable(Screen.ManageDoctors.route) {
-            ManageDoctors(navController)
+        composable(Screen.AddDoctor.route) {
+            AddDoctor(navController)
+        }
+        composable(Screen.DoctorsAdmin.route) {
+            DoctorsAdmin(navController)
         }
         composable(Screen.ManageUsers.route) {
             ManageUsers(navController)

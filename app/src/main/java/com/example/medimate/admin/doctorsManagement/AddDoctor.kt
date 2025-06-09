@@ -1,3 +1,5 @@
+@file:JvmName("AddDoctorKt")
+
 package com.example.medimate.admin.doctorsManagement
 
 import android.R
@@ -38,13 +40,12 @@ import com.example.medimate.admin.ModelNavDrawerAdmin
 import com.example.medimate.firebase.admin.AdminDAO
 import com.example.medimate.firebase.doctor.Doctor
 import com.example.medimate.ui.theme.MediMateTheme
-import com.example.medimate.user.doctorsView.DoctorList
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 @Composable
-fun ManageDoctors(navController: NavController) {
+fun AddDoctor(navController: NavController) {
     val adminId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
     val context = LocalContext.current
     val adminDAO = remember { AdminDAO() }
@@ -73,7 +74,7 @@ fun ManageDoctors(navController: NavController) {
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Manage Doctors", style = MaterialTheme.typography.headlineMedium)
+                Text("Add Doctor", style = MaterialTheme.typography.headlineMedium)
 
                 Spacer(modifier = Modifier.height(16.dp))
                 Text("Add New Doctor", style = MaterialTheme.typography.titleMedium)
@@ -165,7 +166,7 @@ fun ManageDoctors(navController: NavController) {
                 }
                 Spacer(modifier = Modifier.height(24.dp))
 
-                DoctorList(doctors = doctors, navController = navController)
+
             }
         }
 
@@ -176,6 +177,6 @@ fun ManageDoctors(navController: NavController) {
 @Composable
 fun ManageDoctorsScreenPreview() {
     MediMateTheme {
-        ManageDoctors(navController = rememberNavController())
+        AddDoctor(navController = rememberNavController())
     }
 }

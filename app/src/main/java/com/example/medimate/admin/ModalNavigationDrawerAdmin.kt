@@ -80,15 +80,21 @@ fun ModelNavDrawerAdmin(navController: NavController,
                 )
                 HorizontalDivider(color = LightGrey)
                 NavigationDrawerItem(
-                    label = { Text(text = "Manage Doctors", color = Black) },
+                    label = { Text(text = "Add Doctors", color = Black) },
                     selected = false,
-                    onClick = { navController.navigate(Screen.ManageDoctors.route) }
+                    onClick = { navController.navigate(Screen.AddDoctor.route) }
                 )
 
                 NavigationDrawerItem(
                     label = { Text(text = "Manage Users", color = Black) },
                     selected = false,
                     onClick = { navController.navigate(Screen.ManageUsers.route) }
+                )
+
+                NavigationDrawerItem(
+                    label = { Text(text = "Manage Doctors", color = Black) },
+                    selected = false,
+                    onClick = { navController.navigate(Screen.DoctorsAdmin.route) }
                 )
 
             }
