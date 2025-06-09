@@ -16,6 +16,7 @@ import com.example.medimate.doctor.main.MainDoctorScreen
 import com.example.medimate.mainViews.MainScreen
 import com.example.medimate.admin.usersManagement.ManageUsers
 import com.example.medimate.admin.doctorsManagement.ManageDoctors
+import com.example.medimate.admin.usersManagement.userDocumentation.UserDocumentation
 import com.example.medimate.user.appointments.AppointmentsModel
 import com.example.medimate.user.main.MainUserScreen
 import com.example.medimate.register.RegisterScreen
@@ -42,6 +43,9 @@ sealed class Screen(val route: String) {
     object Doctors : Screen("doctors")
     object FutureAppointments : Screen("future_appointments")
     object AppointmentsHistory : Screen("past_appointments")
+    object UserDocumentation : Screen("user_documentation/{userId}"){
+        fun createRoute(userId:String) = "user_documentation/$userId"
+    }
 }
 
 @SuppressLint("ViewModelConstructorInComposable")
@@ -86,6 +90,16 @@ fun AppNavHost(navController: NavHostController) {
         }
         composable(Screen.AppointmentsHistory.route) {
             HistoryAppointmentsScreen(navController)
+        }
+
+        composable(
+            route = Screen.UserDocumentation.route,
+            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId")
+            if (userId != null) {
+                UserDocumentation(navController, userId)
+            }
         }
         composable(
             route = Screen.AppointmentsDoctor.route,

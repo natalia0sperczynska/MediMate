@@ -2,11 +2,10 @@ package com.example.medimate.firebase.user
 
 import com.example.medimate.firebase.appointment.Appointment
 import com.example.medimate.firebase.appointment.Status
+import com.example.medimate.firebase.doctor.Doctor
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.Date
 import java.util.Locale
 
@@ -97,6 +96,36 @@ class UserDAO {
             throw Exception("Error checking user existence: ${e.message}")
         }
     }
+    suspend fun getAllUsers(): List<User> {
+        val mFireStore = FirebaseFirestore.getInstance()
+        val usersList = mutableListOf<User>()
+        val result = mFireStore.collection("users").get().await()
+        for (document in result) {
+            val user = document.toObject(User::class.java)
+            usersList.add(user)
+        }
+        return usersList
+    }
+    suspend fun getUserById(id: String?): User? {
+        if (id.isNullOrBlank()) return null
+
+        return try {
+            val documentSnapshot = FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(id)
+                .get()
+                .await()
+
+            documentSnapshot.toObject(User::class.java)?.apply {
+                this.id = documentSnapshot.id
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
 
     suspend fun loadAppointments(userid: String): List<Appointment> {
         val mFireStore = FirebaseFirestore.getInstance()

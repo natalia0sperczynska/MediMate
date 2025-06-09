@@ -9,12 +9,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import com.example.medimate.firebase.appointment.AppointmentWorkScheduler
 import com.example.medimate.navigation.AppNavHost
 import com.example.medimate.ui.theme.MediMateTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppointmentWorkScheduler.scheduleAppointmentCheck(this)
         setContent {
             MediMateTheme {
                     MediMateApp(modifier = Modifier.fillMaxSize())

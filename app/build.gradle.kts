@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.androidx.ui.test.android)
+    implementation(libs.androidx.work.runtime.ktx)
     val composeBom = platform("androidx.compose:compose-bom:2025.02.00")
     implementation(composeBom)
     androidTestImplementation(composeBom)
@@ -97,7 +98,7 @@ dependencies {
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    //androidTestImplementation(libs.androidx.espresso.core)
 
     //nav controller
     val nav_version = "2.8.9"
@@ -128,6 +129,9 @@ dependencies {
     //mail
     implementation ("com.sun.mail:android-mail:1.6.7")
     implementation ("com.sun.mail:android-activation:1.6.7")
+    // workManager
+    implementation (libs.androidx.work.runtime.ktx.v271)
+
 
 
 }

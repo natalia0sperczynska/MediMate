@@ -33,6 +33,16 @@ data class User (
     var documents:List<String> = listOf(),
     var medicalHistory:List<Appointment> = listOf(),
 ){
+    fun doesMatchSearchQuery(query: String): Boolean {
+        val matchingCombinations = listOf(
+            "$name$surname",
+            "$name $surname",
+            "${name!!.first()}${surname!!.first()}"
+        )
+        return matchingCombinations.any {
+            it.contains(query, ignoreCase = true)
+        }
+    }
 
     companion object {
         /**
