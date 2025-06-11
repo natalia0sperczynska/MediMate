@@ -176,6 +176,17 @@ class UserDAO {
         return appointmentsList
 
     }
+    suspend fun getClosestAppointment(userid: String): Appointment?{
+        val all_app=loadAppointments(userid)
+        if (all_app.isEmpty()) {
+            return null
+        }
+        val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+
+        return all_app.minByOrNull {
+            formatter.parse(it.date) ?: Date(Long.MAX_VALUE)
+        }
+    }
 }
 
 fun isInPast(date: String?): Boolean {

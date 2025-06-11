@@ -87,7 +87,7 @@ dependencies {
     // Optional - Integration with RxJava
     implementation("androidx.compose.runtime:runtime-rxjava2")
 
-    implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.14.0"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -131,7 +131,6 @@ dependencies {
     implementation ("com.sun.mail:android-activation:1.6.7")
     // workManager
     implementation (libs.androidx.work.runtime.ktx.v271)
-
-
-
+    //firestore storage
+    implementation("com.google.firebase:firebase-storage")
 }

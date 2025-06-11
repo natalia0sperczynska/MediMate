@@ -1,13 +1,14 @@
-//package com.example.medimate.tests
-//
-//import android.annotation.SuppressLint
-//import com.example.medimate.firebase.appointment.Appointment
-//import com.example.medimate.firebase.doctor.Availability
-//import com.example.medimate.firebase.doctor.Doctor
-//import com.example.medimate.firebase.appointment.Status
-//import com.example.medimate.firebase.appointment.Term
-//import com.example.medimate.firebase.user.User
-//
+package com.example.medimate.tests
+
+import android.annotation.SuppressLint
+import com.example.medimate.firebase.appointment.Appointment
+import com.example.medimate.firebase.doctor.Availability
+import com.example.medimate.firebase.doctor.Doctor
+import com.example.medimate.firebase.appointment.Status
+import com.example.medimate.firebase.appointment.Term
+import com.example.medimate.firebase.doctor.Availability.Companion.generateTimeSlots
+import com.example.medimate.firebase.user.User
+
 //fun getSampleAppointments(): List<Appointment> {
 //    val doctor = Doctor(
 //        id = "doc001",
@@ -71,189 +72,189 @@
 //        )
 //    )
 //}
-//fun getSampleDoctors(): List<Doctor> {
-//    return listOf(
-//        Doctor(
-//            id = "doc1",
-//            name = "Test",
-//            surname = "Doc",
-//            email = "doc@clinic.com",
-//            phoneNumber = "123456789",
-//            profilePicture = "",
-//            specialisation = "Cardiologist",
-//            room = "6",
-//            availability = Availability(
-//                monday = listOf(
-//                    Term(startTime = "10:00", endTime = "10:30",isAvailable = true),
-//                    Term(startTime = "10:30", endTime = "11:00",isAvailable = true)
-//                ),
-//                tuesday = listOf(
-//                    Term(startTime = "12:00", endTime = "12:30",isAvailable = true)
-//                ),
-//                wednesday = listOf(
-//                    Term(startTime = "10:00", endTime = "10:30",isAvailable = true),
-//                    Term(startTime = "10:30", endTime = "11:00",isAvailable = true)
-//                ),
-//                thursday = listOf(
-//                    Term(startTime = "10:00", endTime = "10:30",isAvailable = true),
-//                    Term(startTime = "10:30", endTime = "11:00",isAvailable = true)
-//                ),
-//                friday = listOf(
-//                    Term(startTime = "10:00", endTime = "10:30",isAvailable = true),
-//                    Term(startTime = "10:30", endTime = "11:00",isAvailable = true)
-//                ),
-//                saturday = listOf(
-//                    Term(startTime = "10:00", endTime = "10:30",isAvailable = true),
-//                    Term(startTime = "10:30", endTime = "11:00",isAvailable = true)
-//                ),
-//                sunday = listOf(
-//                    Term(startTime = "10:00", endTime = "10:30",isAvailable = true),
-//                    Term(startTime = "10:30", endTime = "11:00",isAvailable = true)
-//                ),
-//            )
-//        ),
-//        Doctor(
-//            id = "1",
-//            name = "Anna",
-//            surname = "Kowalska",
-//            email = "anna.kowalska@example.com",
-//            phoneNumber = "+48123456789",
-//            profilePicture = "",
-//            specialisation = "Cardiologist",
-//            room = "101",
-//            availability = Availability(
-//                monday = generateTimeSlots(),
-//                tuesday = generateTimeSlots(),
-//                wednesday = generateTimeSlots(),
-//                thursday = generateTimeSlots(),
-//                friday = generateTimeSlots()
-//            )
-//        ),
-//        Doctor(
-//            id = "2",
-//            name = "Jan",
-//            surname = "Nowak",
-//            email = "jan.nowak@example.com",
-//            phoneNumber = "+48987654321",
-//            profilePicture = "",
-//            specialisation = "Neurologist",
-//            room = "202",
-//            availability = Availability(
-//                monday = generateTimeSlots(),
-//                tuesday = generateTimeSlots(),
-//                wednesday = generateTimeSlots(),
-//                friday = generateTimeSlots()
-//            )
-//        ),
-//        Doctor(
-//            id = "3",
-//            name = "Ewa",
-//            surname = "Wiśniewska",
-//            email = "ewa.wisniewska@example.com",
-//            phoneNumber = "+48777777777",
-//            profilePicture = "",
-//            specialisation = "Dermatologist",
-//            room = "303",
-//            availability = Availability(
-//                monday = generateTimeSlots(),
-//                wednesday = generateTimeSlots(),
-//                thursday = generateTimeSlots()
-//            )
-//        ),
-//        Doctor(
-//            id = "3",
-//            name = "Ewa",
-//            surname = "Wiśniewska",
-//            email = "ewa.wisniewska@example.com",
-//            phoneNumber = "+48777777777",
-//            profilePicture = "",
-//            specialisation = "Dermatologist",
-//            room = "303",
-//            availability = Availability(
-//                monday = generateTimeSlots(),
-//                wednesday = generateTimeSlots(),
-//                thursday = generateTimeSlots()
-//            )
-//        ),
-//        Doctor(
-//            id = "3",
-//            name = "Ewa",
-//            surname = "Wiśniewska",
-//            email = "ewa.wisniewska@example.com",
-//            phoneNumber = "+48777777777",
-//            profilePicture = "",
-//            specialisation = "Dermatologist",
-//            room = "303",
-//            availability = Availability(
-//                monday = generateTimeSlots(),
-//                wednesday = generateTimeSlots(),
-//                thursday = generateTimeSlots()
-//            )
-//        ),
-//        Doctor(
-//            id = "3",
-//            name = "Ewa",
-//            surname = "Wiśniewska",
-//            email = "ewa.wisniewska@example.com",
-//            phoneNumber = "+48777777777",
-//            profilePicture = "",
-//            specialisation = "Dermatologist",
-//            room = "303",
-//            availability = Availability(
-//                monday = generateTimeSlots(),
-//                wednesday = generateTimeSlots(),
-//                thursday = generateTimeSlots()
-//            )
-//        ),
-//        Doctor(
-//            id = "3",
-//            name = "Ewa",
-//            surname = "Wiśniewska",
-//            email = "ewa.wisniewska@example.com",
-//            phoneNumber = "+48777777777",
-//            profilePicture = "",
-//            specialisation = "Dermatologist",
-//            room = "303",
-//            availability = Availability(
-//                monday = generateTimeSlots(),
-//                wednesday = generateTimeSlots(),
-//                thursday = generateTimeSlots()
-//            )
-//        ),
-//        Doctor(
-//            id = "3",
-//            name = "Ewa",
-//            surname = "Wiśniewska",
-//            email = "ewa.wisniewska@example.com",
-//            phoneNumber = "+48777777777",
-//            profilePicture = "",
-//            specialisation = "Dermatologist",
-//            room = "303",
-//            availability = Availability(
-//                monday = generateTimeSlots(),
-//                wednesday = generateTimeSlots(),
-//                thursday = generateTimeSlots()
-//            )
-//        )
-//
-//    )
-//
-//}
-//
-//fun getSapleAvilableTerms(doctor: Doctor, date: String): List<Term> {
-//    val dayOfWeek = java.time.LocalDate.parse(date, java.time.format.DateTimeFormatter.ofPattern("MM/dd/yyyy"))
-//        .dayOfWeek
-//        .name
-//        .lowercase()
-//
-//    return when (dayOfWeek) {
-//        "monday" -> doctor.availability.monday
-//        "tuesday" -> doctor.availability.tuesday
-//        "wednesday" -> doctor.availability.wednesday
-//        "thursday" -> doctor.availability.thursday
-//        "friday" -> doctor.availability.friday
-//        "saturday" -> doctor.availability.saturday
-//        "sunday" -> doctor.availability.sunday
-//        else -> listOf()
-//    }.filter { it.isAvailable }
-//}
+fun getSampleDoctors(): List<Doctor> {
+    return listOf(
+        Doctor(
+            id = "doc1",
+            name = "Test",
+            surname = "Doc",
+            email = "doc@clinic.com",
+            phoneNumber = "123456789",
+            profilePicture = "",
+            specialisation = "Cardiologist",
+            room = "6",
+            availability = Availability(
+                monday = listOf(
+                    Term(startTime = "10:00", endTime = "10:30",isAvailable = true),
+                    Term(startTime = "10:30", endTime = "11:00",isAvailable = true)
+                ),
+                tuesday = listOf(
+                    Term(startTime = "12:00", endTime = "12:30",isAvailable = true)
+                ),
+                wednesday = listOf(
+                    Term(startTime = "10:00", endTime = "10:30",isAvailable = true),
+                    Term(startTime = "10:30", endTime = "11:00",isAvailable = true)
+                ),
+                thursday = listOf(
+                    Term(startTime = "10:00", endTime = "10:30",isAvailable = true),
+                    Term(startTime = "10:30", endTime = "11:00",isAvailable = true)
+                ),
+                friday = listOf(
+                    Term(startTime = "10:00", endTime = "10:30",isAvailable = true),
+                    Term(startTime = "10:30", endTime = "11:00",isAvailable = true)
+                ),
+                saturday = listOf(
+                    Term(startTime = "10:00", endTime = "10:30",isAvailable = true),
+                    Term(startTime = "10:30", endTime = "11:00",isAvailable = true)
+                ),
+                sunday = listOf(
+                    Term(startTime = "10:00", endTime = "10:30",isAvailable = true),
+                    Term(startTime = "10:30", endTime = "11:00",isAvailable = true)
+                ),
+            )
+        ),
+        Doctor(
+            id = "1",
+            name = "Anna",
+            surname = "Kowalska",
+            email = "anna.kowalska@example.com",
+            phoneNumber = "+48123456789",
+            profilePicture = "",
+            specialisation = "Cardiologist",
+            room = "101",
+            availability = Availability(
+                monday = generateTimeSlots(),
+                tuesday = generateTimeSlots(),
+                wednesday = generateTimeSlots(),
+                thursday = generateTimeSlots(),
+                friday = generateTimeSlots()
+            )
+        ),
+        Doctor(
+            id = "2",
+            name = "Jan",
+            surname = "Nowak",
+            email = "jan.nowak@example.com",
+            phoneNumber = "+48987654321",
+            profilePicture = "",
+            specialisation = "Neurologist",
+            room = "202",
+            availability = Availability(
+                monday = generateTimeSlots(),
+                tuesday = generateTimeSlots(),
+                wednesday = generateTimeSlots(),
+                friday = generateTimeSlots()
+            )
+        ),
+        Doctor(
+            id = "3",
+            name = "Ewa",
+            surname = "Wiśniewska",
+            email = "ewa.wisniewska@example.com",
+            phoneNumber = "+48777777777",
+            profilePicture = "",
+            specialisation = "Dermatologist",
+            room = "303",
+            availability = Availability(
+                monday = generateTimeSlots(),
+                wednesday = generateTimeSlots(),
+                thursday = generateTimeSlots()
+            )
+        ),
+        Doctor(
+            id = "3",
+            name = "Ewa",
+            surname = "Wiśniewska",
+            email = "ewa.wisniewska@example.com",
+            phoneNumber = "+48777777777",
+            profilePicture = "",
+            specialisation = "Dermatologist",
+            room = "303",
+            availability = Availability(
+                monday = generateTimeSlots(),
+                wednesday = generateTimeSlots(),
+                thursday = generateTimeSlots()
+            )
+        ),
+        Doctor(
+            id = "3",
+            name = "Ewa",
+            surname = "Wiśniewska",
+            email = "ewa.wisniewska@example.com",
+            phoneNumber = "+48777777777",
+            profilePicture = "",
+            specialisation = "Dermatologist",
+            room = "303",
+            availability = Availability(
+                monday = generateTimeSlots(),
+                wednesday = generateTimeSlots(),
+                thursday = generateTimeSlots()
+            )
+        ),
+        Doctor(
+            id = "3",
+            name = "Ewa",
+            surname = "Wiśniewska",
+            email = "ewa.wisniewska@example.com",
+            phoneNumber = "+48777777777",
+            profilePicture = "",
+            specialisation = "Dermatologist",
+            room = "303",
+            availability = Availability(
+                monday = generateTimeSlots(),
+                wednesday = generateTimeSlots(),
+                thursday = generateTimeSlots()
+            )
+        ),
+        Doctor(
+            id = "3",
+            name = "Ewa",
+            surname = "Wiśniewska",
+            email = "ewa.wisniewska@example.com",
+            phoneNumber = "+48777777777",
+            profilePicture = "",
+            specialisation = "Dermatologist",
+            room = "303",
+            availability = Availability(
+                monday = generateTimeSlots(),
+                wednesday = generateTimeSlots(),
+                thursday = generateTimeSlots()
+            )
+        ),
+        Doctor(
+            id = "3",
+            name = "Ewa",
+            surname = "Wiśniewska",
+            email = "ewa.wisniewska@example.com",
+            phoneNumber = "+48777777777",
+            profilePicture = "",
+            specialisation = "Dermatologist",
+            room = "303",
+            availability = Availability(
+                monday = generateTimeSlots(),
+                wednesday = generateTimeSlots(),
+                thursday = generateTimeSlots()
+            )
+        )
+
+    )
+
+}
+
+fun getSapleAvilableTerms(doctor: Doctor, date: String): List<Term> {
+    val dayOfWeek = java.time.LocalDate.parse(date, java.time.format.DateTimeFormatter.ofPattern("MM/dd/yyyy"))
+        .dayOfWeek
+        .name
+        .lowercase()
+
+    return when (dayOfWeek) {
+        "monday" -> doctor.availability.monday
+        "tuesday" -> doctor.availability.tuesday
+        "wednesday" -> doctor.availability.wednesday
+        "thursday" -> doctor.availability.thursday
+        "friday" -> doctor.availability.friday
+        "saturday" -> doctor.availability.saturday
+        "sunday" -> doctor.availability.sunday
+        else -> listOf()
+    }.filter { it.isAvailable }
+}

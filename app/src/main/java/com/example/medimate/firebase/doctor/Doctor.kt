@@ -27,7 +27,9 @@ data class Doctor(
     var specialisation:String = "",
     var room:String = "",
     var availability: Availability = Availability(),
-    var availabilityChanges: Map<String, List<Term>> = emptyMap()
+    var availabilityChanges: Map<String, List<Term>> = emptyMap(),
+    var rating: Double =0.0,
+    var reviews:List<Review> = emptyList()
 
 ) {
     fun getAvailableTermsForDate(date: String): List<Term> {

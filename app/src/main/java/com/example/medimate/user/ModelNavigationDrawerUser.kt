@@ -145,6 +145,16 @@ fun ModelNavDrawerUser(navController: NavController,
                     selected = false,
                     onClick = { navController.navigate(Screen.AppointmentsHistory.route) }
                 )
+                NavigationDrawerItem(
+                    label = { Text(text = "Update Data", color = Black) },
+                    selected = false,
+                    onClick = { navController.navigate(Screen.UpdateData.route) }
+                )
+                NavigationDrawerItem(
+                    label = { Text(text = "Logout", color = Black) },
+                    selected = false,
+                    onClick = { navController.navigate(Screen.Login.route) }
+                )
 
             }
         }
