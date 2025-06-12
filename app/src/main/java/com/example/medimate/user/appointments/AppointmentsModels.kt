@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import com.example.medimate.navigation.Screen
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
@@ -14,8 +15,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.motion.widget.MotionScene.Transition.TransitionOnClick
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.example.medimate.firebase.appointment.Appointment
 import com.example.medimate.firebase.appointment.AppointmentDAO
 import com.example.medimate.firebase.doctor.Doctor
@@ -69,10 +72,10 @@ class PastAppointmentsModel : AppointmentsModel(){
 
 
 @Composable
-fun YourAppointments(appointments: List<Appointment>?) {
+fun YourAppointments(appointments: List<Appointment>?,navController:NavController) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        appointments?.let{
-            if(it.isEmpty()) {
+        appointments?.let {
+            if (it.isEmpty()) {
                 Text("No appointments")
             } else {
                 LazyColumn(
@@ -81,17 +84,22 @@ fun YourAppointments(appointments: List<Appointment>?) {
                 ) {
                     item { Text("Your appointments") }
                     items(appointments) { appointment ->
-                        AppointmentCard(appointment = appointment)
+                        AppointmentCard(
+                            appointment = appointment,
+                            onClick = {
+                                navController.navigate(
+                                    Screen.SingleAppointment.createRoute(appointment.id)
+                                )
+                            })
                     }
                 }
             }
         }
-            ?: Text("Loading appointments..")
     }
 }
 
 @Composable
-fun AppointmentCard(appointment: Appointment) {
+fun AppointmentCard(appointment: Appointment,onClick:()->Unit) {
     val doctorDao = remember { DoctorDAO() }
 
     val doctor by produceState<Doctor?>(initialValue = null, key1 = appointment.doctorId) {

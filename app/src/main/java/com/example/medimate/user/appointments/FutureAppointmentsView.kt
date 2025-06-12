@@ -36,7 +36,7 @@ fun YourFutureAppointmentsScreen(navController: NavController){
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally) {
                 Text("Upcoming Appointments",style = MaterialTheme.typography.headlineSmall, color = Purple)
-                YourAppointments(appointments)
+                YourAppointments(appointments,navController)
             }
         }
     }

@@ -17,4 +17,6 @@ val PurpleGrey2 = Color(0xFF867895)
 val White = Color(0xFFFFFFFF)
 val Black = Color(0xFF000000)
 val PurpleDark = Color(0xFF413C52)
-
+val Green = Color(0xFF4D7948)
+val Red = Color(0xFF940404)
+val Orange = Color(0xFFC96814)

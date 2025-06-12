@@ -1,5 +1,4 @@
 package com.example.medimate.navigation
-
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,6 +21,7 @@ import com.example.medimate.user.appointments.AppointmentsModel
 import com.example.medimate.user.main.MainUserScreen
 import com.example.medimate.register.RegisterScreen
 import com.example.medimate.user.appointments.HistoryAppointmentsScreen
+import com.example.medimate.user.appointments.SingleAppointment
 import com.example.medimate.user.appointments.YourFutureAppointmentsScreen
 import com.example.medimate.user.updateData.UpdateDataScreen
 import com.example.medimate.user.doctorsView.DoctorScreen
@@ -33,6 +33,9 @@ sealed class Screen(val route: String) {
     object MainAdmin : Screen("main_admin")
     object AddDoctor : Screen("add_doctor")
     object ManageUsers : Screen("manage_users")
+    object SingleAppointment : Screen("single_appointment/{appointmentId}"){
+        fun createRoute(appointmentId:String) ="single_appointment/$appointmentId"
+    }
     object MainUser : Screen("main_user")
     object Login : Screen("login")
     object Register : Screen("register")
@@ -105,6 +108,14 @@ fun AppNavHost(navController: NavHostController) {
             if (userId != null) {
                 UserDocumentation(navController, userId)
             }
+        }
+        composable(
+            route = Screen.SingleAppointment.route,
+            arguments = listOf(navArgument("appointmentId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val appointmentId = backStackEntry.arguments?.getString("appointmentId")
+                ?: ""
+            SingleAppointment(appointmentId, navController)
         }
         composable(
             route = Screen.AppointmentsDoctor.route,

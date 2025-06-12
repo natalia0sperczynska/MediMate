@@ -36,7 +36,7 @@ fun HistoryAppointmentsScreen(navController: NavController){
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally) {
                 Text("Past Appointments",style = MaterialTheme.typography.headlineSmall, color = Purple)
-                YourAppointments(appointments)
+                YourAppointments(appointments,navController)
             }
         }
     }

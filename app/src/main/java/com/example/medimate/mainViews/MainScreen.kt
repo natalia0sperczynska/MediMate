@@ -24,6 +24,7 @@ import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.Grey2
 import com.example.medimate.ui.theme.MediMateTheme
 import com.example.medimate.ui.theme.PurpleGrey2
+import com.example.medimate.ui.theme.PurpleMain
 
 
 @Composable
@@ -56,8 +57,12 @@ fun MainScreen(navController: NavController) {
 
         Button(
             onClick = { navController.navigate(Screen.Login.route) },
-            shape = MaterialTheme.shapes.large,
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+            modifier = Modifier.width(180.dp),
+            colors=ButtonDefaults.buttonColors(
+                containerColor = PurpleMain,
+                contentColor = White,
+                disabledContainerColor = PurpleGrey2,
+                disabledContentColor = White)
         ) {
             Text(stringResource(R.string.Login), color = MaterialTheme.colorScheme.onPrimary)
         }
@@ -66,9 +71,13 @@ fun MainScreen(navController: NavController) {
 
         Button(
             onClick = { navController.navigate(Screen.Register.route) },
-            shape = MaterialTheme.shapes.large,
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
-        ) {
+            modifier = Modifier.width(180.dp),
+            colors=ButtonDefaults.buttonColors(
+                containerColor = PurpleMain,
+                contentColor = White,
+                disabledContainerColor = PurpleGrey2,
+                disabledContentColor = White
+        ) ){
             Text(stringResource(R.string.Register), color = MaterialTheme.colorScheme.onSecondary)
         }
     }

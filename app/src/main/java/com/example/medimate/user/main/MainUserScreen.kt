@@ -66,7 +66,11 @@ fun MainUserScreen(navController: NavController) {
                 try {
                     val data = firestoreClass.loadUserData(userId)
                     userName = (data?.getValue("name") ?: "User").toString()
-                    closestAppointment=firestoreClass.getClosestAppointment(userId)
+                    closestAppointment=firestoreClass.getClosestAppointment(userId)?.also{
+                        if(it.id.isEmpty()){
+                            throw Exception("Appointment ID is missing")
+                        }
+                    }
                 } catch (e: Exception) {
                     Toast.makeText(context, "Failed to load user data: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
@@ -89,7 +93,7 @@ fun ScreenModel(navController: NavController, userId: String, userName: String, 
 
                 HeaderCard(userName=userName)
                 Spacer(modifier = Modifier.height(24.dp))
-                UpcomingAppointmentsCard(closestAppointment)
+                UpcomingAppointmentsCard(closestAppointment, navController = navController)
                 Spacer(modifier = Modifier.height(24.dp))
                 MainMenuSection(navController = navController)
                 Spacer(modifier = Modifier.height(24.dp))
@@ -153,12 +157,22 @@ fun HeaderCard(userName: String) {
     }
 }
 @Composable
-fun UpcomingAppointmentsCard(appointment: Appointment?){
+fun UpcomingAppointmentsCard(appointment: Appointment?,navController: NavController){
+    val context = LocalContext.current
     Card(
-        modifier = Modifier.fillMaxWidth().height(180.dp),
+        modifier = Modifier.fillMaxWidth().height(160.dp),
         colors = CardDefaults.cardColors(containerColor = PurpleLight2),
-        shape = RoundedCornerShape(20.dp)
-    ) {
+        shape = RoundedCornerShape(20.dp),
+        onClick = {
+            appointment?.let {
+                navController.navigate(
+                    Screen.SingleAppointment.createRoute(it.id
+                    )
+                )
+            } ?: run{
+                Toast.makeText(context, "No appointment details available", Toast.LENGTH_SHORT).show()
+            }
+        }) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -363,7 +377,7 @@ fun MainMenuItems(): List<MainMenuItem> {
     return listOf(
         MainMenuItem(Icons.Default.Timelapse, "Appointments History"),
         MainMenuItem(Icons.Default.SmartToy, "My Profile"),
-        MainMenuItem(Icons.Default.Settings, "Update Data"),
+        MainMenuItem(Icons.Default.Settings, "Update Data")
     )
 }
 

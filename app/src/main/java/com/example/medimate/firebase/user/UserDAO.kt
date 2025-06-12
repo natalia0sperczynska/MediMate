@@ -6,6 +6,9 @@ import com.example.medimate.firebase.doctor.Doctor
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.Date
 import java.util.Locale
 
@@ -132,7 +135,9 @@ class UserDAO {
         val appointmentsList = mutableListOf<Appointment>()
         val result = mFireStore.collection("appointments").get().await()
         for (document in result) {
-            val appointment = document.toObject(Appointment::class.java)
+            val appointment = document.toObject(Appointment::class.java).apply {
+                this.id=document.id
+            }
             if (appointment.patientId == userid)
                 appointmentsList.add(appointment)
         }
@@ -176,15 +181,45 @@ class UserDAO {
         return appointmentsList
 
     }
-    suspend fun getClosestAppointment(userid: String): Appointment?{
-        val all_app=loadAppointments(userid)
+    suspend fun getClosestAppointment(userid: String): Appointment? {
+        val all_app = loadAppointments(userid)
         if (all_app.isEmpty()) {
             return null
         }
-        val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+        val formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy")
+        val today = LocalDate.now()
 
-        return all_app.minByOrNull {
-            formatter.parse(it.date) ?: Date(Long.MAX_VALUE)
+        return all_app.mapNotNull { app ->
+            try{
+                val appointmentDate=LocalDate.parse(app.date,formatter)
+                if(!appointmentDate.isBefore(today)){
+                    Pair(app,appointmentDate)
+                } else null
+            } catch (e:Exception) {
+                null
+            }
+        }
+            .minByOrNull { (_, date) ->
+                ChronoUnit.DAYS.between(today, date)
+            }
+            ?.first
+    }
+    suspend fun getAppointmentById(appointmentId: String): Appointment?{
+        if (appointmentId.isBlank()) return null
+        return try {
+            val documentSnapshot = FirebaseFirestore.getInstance()
+                .collection("appointments")
+                .document(appointmentId)
+                .get()
+                .await()
+
+            documentSnapshot.toObject(Appointment::class.java)?.apply {
+                this.id = documentSnapshot.id
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
     }
 }

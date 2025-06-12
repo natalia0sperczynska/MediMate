@@ -168,7 +168,7 @@ fun AppointmentsScreen(navController: NavController, selectedDoctorId: String? =
                     }
 
                     displayButtons(navController, appointment, snackbarHostState)
-                    YourAppointments(appointments)
+                    YourAppointments(appointments,navController)
                 }
             }
 
