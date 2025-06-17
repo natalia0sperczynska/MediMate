@@ -3,6 +3,13 @@
 package com.example.medimate.admin.doctorsManagement
 
 import android.R
+import com.example.medimate.mail.NetworkUtils
+import android.util.Log
+import androidx.compose.material3.CircularProgressIndicator
+import com.example.medimate.mail.sendMail
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -39,6 +47,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.medimate.admin.ModelNavDrawerAdmin
 import com.example.medimate.firebase.admin.AdminDAO
 import com.example.medimate.firebase.doctor.Doctor
+import com.example.medimate.mail.sendMail
+import com.example.medimate.ui.theme.MediMateButton
 import com.example.medimate.ui.theme.MediMateTheme
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
@@ -50,6 +60,7 @@ fun AddDoctor(navController: NavController) {
     val context = LocalContext.current
     val adminDAO = remember { AdminDAO() }
     val drawerState = rememberDrawerState(DrawerValue.Closed)
+    var isLoading by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -166,7 +177,29 @@ fun AddDoctor(navController: NavController) {
                 }
                 Spacer(modifier = Modifier.height(24.dp))
 
+                if (isLoading) {
+                    CircularProgressIndicator()
+                } else {
+                    MediMateButton(
+                        text = "Send Test Email",
+                        onClick = {
+                            scope.launch {
+                                val success = sendMail(
+                                    context = context,
+                                    recipient = "sperczynskanatalia@gmail.com",
+                                    subject = "MediMate Test",
+                                    body = "Hello join our app please!!:((("
+                                )
 
+                                Toast.makeText(
+                                    context,
+                                    if (success) "Sent!" else "Failed - check logs",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                        })
+                }
             }
         }
 
