@@ -123,6 +123,10 @@ fun SingleAppointment(appointmentId:String,navController: NavController) {
                             Status.COMPLETED -> Green
                             Status.CANCELLED -> Red
                             null -> MaterialTheme.colorScheme.error
+                            Status.SENDING -> Orange
+                            Status.SENT -> Orange
+                            Status.DELIVERED -> Orange
+                            Status.READ -> Orange
                         }
                         Icon(
                             imageVector = Icons.Default.Circle,

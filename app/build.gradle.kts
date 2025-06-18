@@ -116,10 +116,6 @@ dependencies {
     // Kotlinx Serialization
     implementation(libs.kotlinx.serialization.json)
 
-    // Chat ZEGOCLOUD
-    implementation(libs.zego.uikit.signaling.plugin.android)
-//  implementation(libs.uikit.chat)
-    implementation(libs.zego.inapp.chat.uikit.android)
 
 //    // Fragment & AppCompat (for ZIMKit)
 //    implementation(libs.androidx.fragment.ktx.v162)

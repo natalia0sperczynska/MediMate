@@ -141,6 +141,11 @@ fun ModelNavDrawerUser(navController: NavController,
                     onClick = { navController.navigate(Screen.FutureAppointments.route) }
                 )
                 NavigationDrawerItem(
+                    label = { Text(text = "Chat", color = Black) },
+                    selected = false,
+                    onClick = { navController.navigate(Screen.ChatScreen.route) }
+                )
+                NavigationDrawerItem(
                     label = { Text(text = "Appointments History", color = Black) },
                     selected = false,
                     onClick = { navController.navigate(Screen.AppointmentsHistory.route) }

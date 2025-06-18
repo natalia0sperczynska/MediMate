@@ -1,5 +1,7 @@
 package com.example.medimate.firebase
 
+import com.example.medimate.firebase.appointment.Status
+
 data class Message(
     val id: String = "",
     val senderId: String = "",

@@ -8,25 +8,24 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.medimate.appointments.AppointmentsScreen
+import com.example.medimate.admin.doctorsManagement.AddDoctor
+import com.example.medimate.user.main.MainUserScreen
 import com.example.medimate.chat.ChatScreen
 import com.example.medimate.user.appointments.AppointmentsScreen
 import com.example.medimate.login.LoginScreen
+import com.example.medimate.admin.usersManagement.ManageUsers
 import com.example.medimate.admin.main.MainAdminScreen
+import com.example.medimate.admin.usersManagement.userDocumentation.UserDocumentation
+import com.example.medimate.admin.doctorsManagement.DoctorsAdmin
 import com.example.medimate.doctor.main.MainDoctorScreen
 import com.example.medimate.mainViews.MainScreen
-import com.example.medimate.mainViews.user.MainUserScreen
 import com.example.medimate.register.RegisterScreen
+import com.example.medimate.user.appointments.AppointmentsModel
 import com.example.medimate.user.appointments.HistoryAppointmentsScreen
 import com.example.medimate.user.appointments.SingleAppointment
 import com.example.medimate.user.appointments.YourFutureAppointmentsScreen
 import com.example.medimate.user.updateData.UpdateDataScreen
 import com.example.medimate.user.doctorsView.DoctorScreen
-
-import com.example.medimate.tests.getSampleDoctors
-import com.example.medimate.user.UpdateDataScreen
-import com.example.medimate.user.DoctorScreen
-import com.example.medimate.chat.ChatScreen
 
 sealed class Screen(val route: String) {
     object Main : Screen("main")

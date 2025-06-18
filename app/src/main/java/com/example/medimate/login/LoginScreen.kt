@@ -28,9 +28,6 @@ import com.example.medimate.ui.theme.PurpleGrey2
 import com.example.medimate.ui.theme.PurpleMain
 import com.example.medimate.ui.theme.White
 import com.google.firebase.auth.FirebaseAuth
-import com.zegocloud.zimkit.services.ZIMKit
-import im.zego.zim.enums.ZIMErrorCode
-
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -98,34 +95,25 @@ fun LoginScreen(navController: NavController) {
                 isLoading = true
                 FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->
+                        isLoading = false
                         if (task.isSuccessful) {
-                            // You can use Firebase UID or email as userId.
-                            val firebaseUser = task.result?.user
-                            val userId = firebaseUser?.uid ?: return@addOnCompleteListener
-                            val userName = email.substringBefore("@")
-                            val userAvatar = "https://storage.zego.im/IMKit/avatar/avatar-0.png" // example avatar
-
-                            // Call ZEGOCLOUD SDK
-                            ZIMKit.connectUser(userId, userName, userAvatar) { errorInfo ->
-                                isLoading = false
-                                if (errorInfo.code == ZIMErrorCode.SUCCESS) {
-                                    Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
-                                    when {
-                                        email.contains("@doc") -> navController.navigate(Screen.MainDoctor.route)
-                                        email.contains("@admin") -> navController.navigate(Screen.MainAdmin.route)
-                                        else -> navController.navigate(Screen.MainUser.route)
-                                    }
-                                } else {
-                                    Toast.makeText(context, "Chat login failed: ${errorInfo.message}", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
+                            when {
+                                email.contains("@doc") -> {
+                                    navController.navigate(Screen.MainDoctor.route)
+                                }
+                                email.contains("@admin") -> {
+                                    navController.navigate(Screen.MainAdmin.route)
+                                }
+                                else -> {
+                                    navController.navigate(Screen.MainUser.route)
                                 }
                             }
                         } else {
-                            isLoading = false
-                            Toast.makeText(context, "Firebase login failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, "Login Failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                         }
                     }
-            }
-            ,
+            },
             modifier = Modifier.fillMaxWidth(),
             enabled = email.isNotBlank() && password.isNotBlank(),
             colors=ButtonDefaults.buttonColors(

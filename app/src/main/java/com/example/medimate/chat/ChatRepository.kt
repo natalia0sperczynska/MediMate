@@ -2,7 +2,7 @@ package com.example.medimate.chat
 
 import android.net.Uri
 import com.example.medimate.firebase.Message
-import com.example.medimate.firebase.Status
+import com.example.medimate.firebase.appointment.Status
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
