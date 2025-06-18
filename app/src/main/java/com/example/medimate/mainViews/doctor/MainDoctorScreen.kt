@@ -53,6 +53,12 @@ fun MainDoctorScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Button(onClick = {
+            navController.navigate(Screen.ChatScreen.createRoute(doctorId ?: ""))
+        }) {
+            Text("Message")
+        }
+
+        Button(onClick = {
             auth.signOut()
             navController.navigate(Screen.Login.route) {
                 popUpTo(Screen.Main.route) { inclusive = true }

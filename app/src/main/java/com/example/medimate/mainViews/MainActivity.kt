@@ -12,8 +12,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.rememberNavController
 import com.example.medimate.navigation.AppNavHost
 import com.example.medimate.ui.theme.MediMateTheme
-import com.zegocloud.zimkit.services.ZIMKit
-import com.zegocloud.zimkit.services.ZIMKitConfig
 
 class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,13 +29,6 @@ fun MediMateApp(modifier: Modifier){
         val navController = rememberNavController()
         AppNavHost(navController = navController)
     }
-}
-
-private fun init() {
-    val appID = 0L
-    val appSign = "xxx"
-    ZIMKit.initWith(application, appID, appSign, ZIMKitConfig())
-    ZIMKit.initNotifications()
 }
 
 

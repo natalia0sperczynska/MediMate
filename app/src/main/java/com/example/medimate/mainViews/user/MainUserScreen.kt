@@ -18,13 +18,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.medimate.firebase.FireStoreUser
 import com.example.medimate.navigation.Screen
-import com.example.medimate.ui.theme.Black
-import com.example.medimate.ui.theme.LightGrey
-import com.example.medimate.ui.theme.MediMateTheme
-import com.example.medimate.ui.theme.PurpleGrey
-import com.example.medimate.ui.theme.PurpleGrey2
+import com.example.medimate.ui.theme.*
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -37,6 +32,7 @@ fun MainUserScreen(navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    var selectedDoctorId by remember { mutableStateOf("") }
 
     LaunchedEffect(userId) {
         if (userId != null) {
@@ -50,78 +46,71 @@ fun MainUserScreen(navController: NavController) {
             }
         }
     }
-    ScreenModel(navController, userId.toString(), userName, drawerState, scope)
-}
 
-@Composable
-fun ScreenModel(navController: NavController, userId: String, userName: String, drawerState: DrawerState, scope: CoroutineScope) {
     ModalNavigationDrawer(
         drawerState = drawerState,
         scrimColor = PurpleGrey.copy(alpha = 0.3f),
         drawerContent = {
-            ModalDrawerSheet(
-                modifier = Modifier.background(PurpleGrey2)
-            ) {
+            ModalDrawerSheet(modifier = Modifier.background(PurpleGrey2)) {
                 Text("Menu", modifier = Modifier.padding(16.dp), color = Black)
                 HorizontalDivider(color = LightGrey)
                 NavigationDrawerItem(
-                    label = { Text(text = "Appointments", color = Black) },
+                    label = { Text("Appointments", color = Black) },
                     selected = false,
                     onClick = { navController.navigate(Screen.Appointments.route) }
                 )
                 NavigationDrawerItem(
-                    label = { Text(text = "Doctors", color = Black) },
+                    label = { Text("Doctors", color = Black) },
                     selected = false,
                     onClick = { navController.navigate(Screen.Doctors.route) }
                 )
             }
         }
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.Start
-        ) {
-            IconButton(
-                onClick = { scope.launch { drawerState.open() } },
-                modifier = Modifier.background(Color.White, shape = MaterialTheme.shapes.small)
-
+        Column(modifier = Modifier.fillMaxSize()) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.Start
             ) {
-                Icon(Icons.Default.Menu, contentDescription = "Open Menu", tint = Black)
-            }
-        }
-        Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = "Good to see you again, $userName!", style = MaterialTheme.typography.headlineMedium, color = Black)
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(onClick = { navController.navigate(Screen.UpdateData.route) }) {
-                Text("Update Data")
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Button(onClick = {
-                navController.navigate(Screen.Login.route) {
-                    popUpTo(Screen.Main.route) { inclusive = true }
+                IconButton(
+                    onClick = { scope.launch { drawerState.open() } },
+                    modifier = Modifier.background(Color.White, shape = MaterialTheme.shapes.small)
+                ) {
+                    Icon(Icons.Default.Menu, contentDescription = "Open Menu", tint = Black)
                 }
-            }) {
-                Text("Logout")
+            }
+
+            Column(
+                modifier = Modifier.fillMaxSize().padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "Good to see you again, $userName!", style = MaterialTheme.typography.headlineMedium, color = Black)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(onClick = { navController.navigate(Screen.UpdateData.route) }) {
+                    Text("Update Data")
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Button(onClick = {
+                    navController.navigate(Screen.ChatScreen.createRoute(selectedDoctorId))
+                })
+                {
+                    Text("Message Doctor")
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Button(onClick = {
+                    auth.signOut()
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.Main.route) { inclusive = true }
+                    }
+                }) {
+                    Text("Logout")
+                }
             }
         }
-
-
-        Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .width(20.dp)
-                .background(LightGrey.copy(alpha = 0.5f))
-                .clickable { scope.launch { drawerState.open() } }
-        )
-
     }
 }
 
@@ -129,7 +118,6 @@ fun ScreenModel(navController: NavController, userId: String, userName: String, 
 @Composable
 fun MainUserScreenPreview() {
     MediMateTheme {
-       ScreenModel(navController = rememberNavController(), userId = "123", userName = "John", drawerState = rememberDrawerState(DrawerValue.Closed), scope = rememberCoroutineScope())
+        MainUserScreen(navController = rememberNavController())
     }
 }
-

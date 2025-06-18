@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.compose.compiler)
-    //alias(libs.plugins.kotlin.serialization)
     kotlin("plugin.serialization") version "2.0.21"
 }
 
@@ -50,69 +49,73 @@ android {
 //}
 
 dependencies {
-    implementation(libs.androidx.navigation.runtime.android)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.firebase.firestore.ktx)
-    implementation(libs.androidx.ui.test.android)
+    // Compose BOM
     val composeBom = platform("androidx.compose:compose-bom:2025.02.00")
     implementation(composeBom)
     androidTestImplementation(composeBom)
+
+    // Compose & Material3
     implementation(libs.androidx.compose.material3.material3)
     implementation(libs.androidx.compose.ui.ui.tooling.preview)
+    implementation(libs.androidx.material.icons.extended)
+    implementation("androidx.compose.material3.adaptive:adaptive")
     debugImplementation(libs.ui.tooling)
     androidTestImplementation(libs.ui.test.junit4)
     debugImplementation(libs.ui.test.manifest)
 
-    // Optional - Add full set of material icons
-    implementation(libs.androidx.material.icons.extended)
-    // Optional - Add window size utils
-    implementation("androidx.compose.material3.adaptive:adaptive")
-
-    // Optional - Integration with activities
+    // Jetpack
     implementation("androidx.activity:activity-compose:1.10.0")
-    // Optional - Integration with ViewModels
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
-    // Optional - Integration with LiveData
-    implementation("androidx.compose.runtime:runtime-livedata")
-    // Optional - Integration with RxJava
+    implementation(libs.androidx.runtime.livedata)
     implementation("androidx.compose.runtime:runtime-rxjava2")
-
-    implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-   // implementation(libs.firebase.firestore)
-    implementation(libs.firebase.auth.ktx)
 
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-
-    //nav controller
+    // Navigation
     val nav_version = "2.8.9"
-
-    // Jetpack Compose integration
     implementation("androidx.navigation:navigation-compose:$nav_version")
-
-    // Views/Fragments integration
     implementation("androidx.navigation:navigation-fragment:$nav_version")
     implementation("androidx.navigation:navigation-ui:$nav_version")
+    implementation(libs.androidx.navigation.runtime.android)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.navigation.dynamic.features.fragment)
+    androidTestImplementation(libs.androidx.navigation.testing)
 
-    // Feature module support for Fragments
-    implementation("androidx.navigation:navigation-dynamic-features-fragment:$nav_version")
+    // Firebase
+    implementation(platform(libs.firebase.bom.v33150))
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.storage.ktx.v2030)
+    implementation(libs.kotlinx.coroutines.core)
 
-    // Testing Navigation
-    androidTestImplementation("androidx.navigation:navigation-testing:$nav_version")
-
-    // JSON serialization library, works with the Kotlin serialization plugin
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
-
-    implementation(libs.navigation.compose)
+    // Kotlinx Serialization
     implementation(libs.kotlinx.serialization.json)
 
-    implementation("com.github.ZEGOCLOUD:zego_inapp_chat_uikit_android:+")  {
-        exclude(group = "com.android.support", module = "support-compat")
-    }
+    // Chat ZEGOCLOUD
+    implementation(libs.zego.uikit.signaling.plugin.android)
+//  implementation(libs.uikit.chat)
+    implementation(libs.zego.inapp.chat.uikit.android)
+
+//    // Fragment & AppCompat (for ZIMKit)
+//    implementation(libs.androidx.fragment.ktx.v162)
+//    implementation(libs.androidx.fragment.ktx)
+//    implementation(libs.androidx.appcompat.v161)
+
+    // Coil – image loading
+    implementation(libs.coil.compose.v240)
+    implementation(libs.kotlinx.coroutines.core.v160)// or newer version
+    implementation(libs.kotlinx.coroutines.android) // or newer version
+
+    // Date formatting
+    implementation(libs.threetenabp)
+
+    // Core KTX versioned
+    implementation(libs.androidx.core.ktx.v1120)
+
+    // Testing
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
 }

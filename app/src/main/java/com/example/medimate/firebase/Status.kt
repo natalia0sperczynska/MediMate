@@ -3,5 +3,9 @@ package com.example.medimate.firebase
 enum class Status {
     EXPECTED,
     COMPLETED,
-    CANCELLED
+    CANCELLED,
+    SENDING,
+    SENT,
+    DELIVERED,
+    READ
 }

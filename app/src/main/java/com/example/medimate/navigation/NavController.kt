@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.medimate.appointments.AppointmentsScreen
+import com.example.medimate.chat.ChatScreen
 import com.example.medimate.login.LoginScreen
 import com.example.medimate.mainViews.admin.MainAdminScreen
 import com.example.medimate.mainViews.doctor.MainDoctorScreen
@@ -17,9 +18,7 @@ import com.example.medimate.register.RegisterScreen
 import com.example.medimate.tests.getSampleDoctors
 import com.example.medimate.user.UpdateDataScreen
 import com.example.medimate.user.DoctorScreen
-
-//import com.example.medimate.auth.LoginScreen
-//import com.example.medimate.auth.RegisterScreen
+import com.example.medimate.chat.ChatScreen
 
 sealed class Screen(val route: String) {
     object Main : Screen("main")
@@ -34,6 +33,9 @@ sealed class Screen(val route: String) {
         fun createRoute(doctorId: String) = "appointments_doctor/$doctorId"
     }
     object Doctors : Screen("doctors")
+    object ChatScreen : Screen("chat/{targetUserId}") {
+        fun createRoute(targetUserId: String) = "chat/$targetUserId"
+    }
 }
 
 @SuppressLint("ViewModelConstructorInComposable")
@@ -77,6 +79,12 @@ fun AppNavHost(navController: NavHostController) {
         composable(Screen.Doctors.route) {
             DoctorScreen(navController)
 
+        }
+        composable(route = Screen.ChatScreen.route,
+            arguments = listOf(navArgument("targetUserId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val targetUserId = backStackEntry.arguments?.getString("targetUserId") ?: return@composable
+            ChatScreen(targetUserId = targetUserId)
         }
     }
 

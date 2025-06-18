@@ -101,5 +101,4 @@ class FireStoreUser {
         return appointmentsList
 
     }
-
 }

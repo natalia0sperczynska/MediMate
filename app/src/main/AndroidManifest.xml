@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
 
     <application
         android:allowBackup="true"
@@ -13,7 +15,8 @@
         android:roundIcon="@mipmap/medimate_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MediMate"
-        tools:targetApi="34">
+        tools:targetApi="34"
+        >
         <activity
             android:name="com.example.medimate.mainViews.MainActivity"
             android:exported="true"
