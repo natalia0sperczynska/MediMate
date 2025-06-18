@@ -26,6 +26,8 @@ import com.example.medimate.user.appointments.SingleAppointment
 import com.example.medimate.user.appointments.YourFutureAppointmentsScreen
 import com.example.medimate.user.updateData.UpdateDataScreen
 import com.example.medimate.user.doctorsView.DoctorScreen
+import com.example.medimate.user.reviews.DoctorReviewScreen
+import com.example.medimate.user.reviews.ReviewModel
 
 sealed class Screen(val route: String) {
     object Main : Screen("main")
@@ -33,6 +35,7 @@ sealed class Screen(val route: String) {
     object MainAdmin : Screen("main_admin")
     object AddDoctor : Screen("add_doctor")
     object ManageUsers : Screen("manage_users")
+
     object SingleAppointment : Screen("single_appointment/{appointmentId}"){
         fun createRoute(appointmentId:String) ="single_appointment/$appointmentId"
     }
@@ -40,6 +43,9 @@ sealed class Screen(val route: String) {
     object Login : Screen("login")
     object Register : Screen("register")
     object UpdateData : Screen("update_data")
+    object DoctorReviewScreen : Screen("doctor_review/{doctorId}"){
+        fun createRoute(doctorId: String) = "doctor_review/$doctorId"
+    }
     object Appointments : Screen("appointments")
     object AppointmentsDoctor : Screen("appointments_doctor/{doctorId}"){
         fun createRoute(doctorId: String) = "appointments_doctor/$doctorId"
@@ -119,6 +125,13 @@ fun AppNavHost(navController: NavHostController) {
             val appointmentId = backStackEntry.arguments?.getString("appointmentId")
                 ?: ""
             SingleAppointment(appointmentId, navController)
+        }
+        composable(
+            route = Screen.DoctorReviewScreen.route,
+            arguments = listOf(navArgument("doctorId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val doctorId = backStackEntry.arguments?.getString("doctorId") ?:""
+            DoctorReviewScreen(navController,doctorId)
         }
         composable(
             route = Screen.AppointmentsDoctor.route,

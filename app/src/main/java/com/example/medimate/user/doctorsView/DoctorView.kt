@@ -96,6 +96,13 @@ fun SingleDoctor(doctor: Doctor, isSelected: Boolean, onDoctorSelected: (String)
                     color = White
                 )
             }
+            OutlinedButton(onClick = {onDoctorSelected(doctor.id)
+                navController.navigate(Screen.DoctorReviewScreen.createRoute(doctor.id))}) {
+                Text(text = "Reviews",
+                    color = White
+                )
+            }
+
         }
     }
     }
