@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import com.example.medimate.ui.theme.White
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -20,7 +21,10 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.healme.R
 import com.example.medimate.navigation.Screen
+import com.example.medimate.ui.theme.Grey2
 import com.example.medimate.ui.theme.MediMateTheme
+import com.example.medimate.ui.theme.PurpleGrey2
+import com.example.medimate.ui.theme.PurpleMain
 
 
 @Composable
@@ -38,6 +42,7 @@ fun MainScreen(navController: NavController) {
             requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
+    Surface(color=White) {
     Column(
         modifier = Modifier
             .fillMaxSize(),
@@ -46,20 +51,36 @@ fun MainScreen(navController: NavController) {
     ) {
         Image(
             painter = painterResource(id = R.drawable.medimate_logo),
-            contentDescription = null)
+            contentDescription = null
+        )
         Spacer(modifier = Modifier.height(15.dp))
 
-        Button(onClick = { navController.navigate(Screen.Login.route)}, shape = MaterialTheme.shapes.large,
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) {
-            Text(stringResource(R.string.Login), color= MaterialTheme.colorScheme.onPrimary)
+        Button(
+            onClick = { navController.navigate(Screen.Login.route) },
+            modifier = Modifier.width(180.dp),
+            colors=ButtonDefaults.buttonColors(
+                containerColor = PurpleMain,
+                contentColor = White,
+                disabledContainerColor = PurpleGrey2,
+                disabledContentColor = White)
+        ) {
+            Text(stringResource(R.string.Login), color = MaterialTheme.colorScheme.onPrimary)
         }
 
         Spacer(modifier = Modifier.height(15.dp))
 
-        Button(onClick = { navController.navigate(Screen.Register.route)}, shape = MaterialTheme.shapes.large,
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) {
-            Text(stringResource(R.string.Register),color=MaterialTheme.colorScheme.onSecondary)
+        Button(
+            onClick = { navController.navigate(Screen.Register.route) },
+            modifier = Modifier.width(180.dp),
+            colors=ButtonDefaults.buttonColors(
+                containerColor = PurpleMain,
+                contentColor = White,
+                disabledContainerColor = PurpleGrey2,
+                disabledContentColor = White
+        ) ){
+            Text(stringResource(R.string.Register), color = MaterialTheme.colorScheme.onSecondary)
         }
+    }
 
 //        if (!hasPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
 //            Toast.makeText(context, "Notification permission required!", Toast.LENGTH_SHORT).show()

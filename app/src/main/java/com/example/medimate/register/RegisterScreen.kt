@@ -15,7 +15,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.medimate.firebase.*
+import com.example.medimate.firebase.user.User
+import com.example.medimate.firebase.user.UserDAO
 import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.MediMateTheme
 import com.google.firebase.auth.FirebaseAuth
@@ -35,7 +36,7 @@ fun RegisterScreen(navController: NavHostController) {
     var showDatePicker by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    val fireStore = FireStoreUser()
+    val fireStore = UserDAO()
 
     Column(modifier = Modifier.padding(16.dp).fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -176,7 +177,7 @@ private suspend fun registerUser(
     dateOfBirth: String,
     password: String,
     repeatPassword: String,
-    fireStore: FireStoreUser,
+    fireStore: UserDAO,
     context: android.content.Context
 ) {
     if (name.isBlank() || surname.isBlank() || email.isBlank() || dateOfBirth.isBlank() || password.isBlank()) {

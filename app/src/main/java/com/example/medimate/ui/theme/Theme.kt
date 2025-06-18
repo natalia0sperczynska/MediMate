@@ -10,34 +10,44 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
-private val DarkColorScheme = darkColorScheme(
-    primary = PurpleGrey,
+private val  LightColorScheme =lightColorScheme (
+    primary = PurpleMain,
     onPrimary = White,
-    secondary = PurpleMain,
-    tertiary = PurpleGreyLight,
-    background = PurpleGrey3,
-    surface = PurpleGrey2,
-    onSurface = Black
+    primaryContainer = PurpleLight,
+    onPrimaryContainer = Grey2,
+
+    secondary = PurpleGrey,
+    onSecondary = White,
+    secondaryContainer = PurpleGreyLight,
+    onSecondaryContainer = Grey2,
+
+    tertiary = PurpleGrey3,
+
+    background = LightGrey,
+    surface = White,
+    onSurface = Grey2,
+
+    inversePrimary = PurpleGrey2
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = Grey2,
-    onPrimary = White,
-    secondary = PurpleMain,
-    tertiary = Purple,
-    background = LightGrey,
-    surface = PurpleLight,
-    onSurface = Black
+private val DarkColorScheme = darkColorScheme(
+    primary = PurpleLight,
+    onPrimary = Black,
+    primaryContainer = Purple,
+    onPrimaryContainer = White,
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    secondary = PurpleGreyLight,
+    onSecondary = Grey2,
+    secondaryContainer = PurpleGrey,
+    onSecondaryContainer = White,
+
+    tertiary = Purple2,
+
+    background = Grey2,
+    surface = PurpleGrey2,
+    onSurface = White,
+
+    inversePrimary = PurpleMain
 )
 
 @Composable

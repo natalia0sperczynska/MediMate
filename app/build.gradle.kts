@@ -15,6 +15,16 @@ android {
         compose = true
     }
 
+    packagingOptions {
+        resources {
+            excludes += setOf(
+                "META-INF/LICENSE.md",
+                "META-INF/NOTICE.md"
+            )
+        }
+    }
+
+
     defaultConfig {
         applicationId = "com.example.medimate"
         minSdk = 26
@@ -50,6 +60,11 @@ android {
 
 dependencies {
     // Compose BOM
+    implementation(libs.androidx.navigation.runtime.android)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.androidx.ui.test.android)
+    implementation(libs.androidx.work.runtime.ktx)
     val composeBom = platform("androidx.compose:compose-bom:2025.02.00")
     implementation(composeBom)
     androidTestImplementation(composeBom)
@@ -68,6 +83,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
     implementation(libs.androidx.runtime.livedata)
     implementation("androidx.compose.runtime:runtime-rxjava2")
+
+    implementation(platform("com.google.firebase:firebase-bom:33.14.0"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -75,6 +92,11 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
 
     // Navigation
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    //androidTestImplementation(libs.androidx.espresso.core)
+
+    //nav controller
     val nav_version = "2.8.9"
     implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation("androidx.navigation:navigation-fragment:$nav_version")
@@ -118,4 +140,15 @@ dependencies {
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
+    //material 3
+    implementation("androidx.compose.material3:material3:1.3.2")
+    implementation("androidx.compose.material3:material3-window-size-class-android:1.3.2")
+
+    //mail
+    implementation ("com.sun.mail:android-mail:1.6.7")
+    implementation ("com.sun.mail:android-activation:1.6.7")
+    // workManager
+    implementation (libs.androidx.work.runtime.ktx.v271)
+    //firestore storage
+    implementation("com.google.firebase:firebase-storage")
 }
