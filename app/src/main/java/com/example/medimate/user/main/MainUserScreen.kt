@@ -46,6 +46,7 @@ import com.example.medimate.ui.theme.PurpleGrey3
 import com.example.medimate.ui.theme.PurpleLight
 import com.example.medimate.ui.theme.PurpleLight2
 import com.example.medimate.user.appointments.AppointmentsViewPreview
+import com.example.medimate.user.doctorsView.getDoctorList
 
 
 @Composable
@@ -302,6 +303,8 @@ fun UserActionsSection(navController: NavController) {
 }
 @Composable
 fun OurDoctors() {
+    var doctors by remember { mutableStateOf<List<Doctor>>(emptyList()) }
+    LaunchedEffect(Unit) { doctors = getDoctorList() }
     Column {
         Text(
             text = "Our Doctors",
@@ -314,7 +317,7 @@ fun OurDoctors() {
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.height(200.dp)
         ) {
-            items(getSampleDoctors()) { doctor ->
+            items(doctors) { doctor ->
                 DoctorCard(doctor = doctor)
             }
         }
