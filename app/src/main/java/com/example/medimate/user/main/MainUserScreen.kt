@@ -97,7 +97,7 @@ fun ScreenModel(navController: NavController, userId: String, userName: String, 
                 Spacer(modifier = Modifier.height(24.dp))
                 MainMenuSection(navController = navController)
                 Spacer(modifier = Modifier.height(24.dp))
-                OurDoctors()
+                OurDoctors(navController = navController)
                 Spacer(modifier = Modifier.height(16.dp))
                 UserActionsSection(navController=navController)
             }
@@ -301,28 +301,39 @@ fun UserActionsSection(navController: NavController) {
     }
 }
 @Composable
-fun OurDoctors() {
+fun OurDoctors(navController: NavController) {
     Column {
-        Text(
-            text = "Our Doctors",
-            style = MaterialTheme.typography.headlineSmall,
-            color = Black,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Our Doctors",
+                style = MaterialTheme.typography.headlineSmall,
+                color = Black,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            TextButton(
+                onClick = { navController.navigate(Screen.ChatSelection.createRoute(false)) }
+            ) {
+                Text("Message Doctor")
+            }
+        }
 
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.height(200.dp)
         ) {
             items(getSampleDoctors()) { doctor ->
-                DoctorCard(doctor = doctor)
+                DoctorCard(doctor = doctor, navController = navController)
             }
         }
     }
 }
-
 @Composable
-fun DoctorCard(doctor:Doctor){
+fun DoctorCard(doctor:Doctor, navController: NavController){
     Card(modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
@@ -370,8 +381,16 @@ fun DoctorCard(doctor:Doctor){
                 }
             }
         }
+        Button(
+            onClick = { navController.navigate(Screen.ChatScreen.createRoute(doctor.id)) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp)
+        ) {
+            Text("Message This Doctor")
+        }
     }
-}
+    }
 
 fun MainMenuItems(): List<MainMenuItem> {
     return listOf(

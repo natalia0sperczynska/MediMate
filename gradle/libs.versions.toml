@@ -65,6 +65,7 @@ zimkit = "1.0.0"
 zimkit_android = "2.8.1"
 zimkitVersion = "2.7.0"
 firebaseStorageKtx = "21.0.2"
+playServicesBase = "18.0.1"
 
 [libraries]
 androidx-activity = { module = "androidx.activity:activity", version.ref = "activity" }
@@ -148,6 +149,7 @@ zimkit-v200 = { module = "com.github.ZEGOCLOUD:zimkit", version.ref = "githubZim
 #zimkit-v271 = { module = "com.zegocloud:zimkit", version.ref = "zegocloudZimkit" }
 #zimkit_android = { module = "com.github.ZEGOCLOUD:zimkit_android", version.ref = "zimkit_android" }
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
+play-services-base = { group = "com.google.android.gms", name = "play-services-base", version.ref = "playServicesBase" }
 
 
 [plugins]

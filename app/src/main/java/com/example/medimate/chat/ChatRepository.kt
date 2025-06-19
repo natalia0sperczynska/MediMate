@@ -5,6 +5,7 @@ import com.example.medimate.firebase.Message
 import com.example.medimate.firebase.appointment.Status
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.tasks.await
@@ -81,7 +82,7 @@ class ChatRepository {
     suspend fun setTypingStatus(currentUserId: String, targetUserId: String, isTyping: Boolean) {
         val chatId = getChatId(currentUserId, targetUserId)
         db.collection("chats").document(chatId)
-            .update("${currentUserId}_typing", isTyping)
+            .set(mapOf("${currentUserId}_typing" to isTyping), SetOptions.merge())
             .await()
     }
 
@@ -96,9 +97,4 @@ class ChatRepository {
                 doc.reference.update("status", Status.READ).await()
             }
     }
-
-
-
-
-
 }

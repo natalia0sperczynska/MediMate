@@ -52,10 +52,15 @@ fun MainDoctorScreen(navController: NavController) {
         }
         Spacer(modifier = Modifier.height(8.dp))
 
+//        Button(onClick = {
+//            navController.navigate(Screen.ChatScreen.createRoute(doctorId ?: ""))
+//        }) {
+//            Text("Message")
+//        }
         Button(onClick = {
-            navController.navigate(Screen.ChatScreen.createRoute(doctorId ?: ""))
+            navController.navigate(Screen.ChatSelection.createRoute(true))
         }) {
-            Text("Message")
+            Text("Message User")
         }
 
         Button(onClick = {

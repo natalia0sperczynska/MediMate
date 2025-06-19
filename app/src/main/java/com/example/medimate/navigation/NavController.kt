@@ -17,6 +17,7 @@ import com.example.medimate.admin.usersManagement.ManageUsers
 import com.example.medimate.admin.main.MainAdminScreen
 import com.example.medimate.admin.usersManagement.userDocumentation.UserDocumentation
 import com.example.medimate.admin.doctorsManagement.DoctorsAdmin
+import com.example.medimate.chat.ChatSelectionScreen
 import com.example.medimate.doctor.main.MainDoctorScreen
 import com.example.medimate.mainViews.MainScreen
 import com.example.medimate.register.RegisterScreen
@@ -53,6 +54,9 @@ sealed class Screen(val route: String) {
     object AppointmentsHistory : Screen("past_appointments")
     object UserDocumentation : Screen("user_documentation/{userId}"){
         fun createRoute(userId:String) = "user_documentation/$userId"
+    }
+    object ChatSelection : Screen("chat_selection/{isDoctor}") {
+        fun createRoute(isDoctor: Boolean) = "chat_selection/$isDoctor"
     }
 }
 
@@ -142,11 +146,18 @@ fun AppNavHost(navController: NavHostController) {
             DoctorScreen(navController)
 
         }
-        composable(route = Screen.ChatScreen.route,
+        composable(
+            route = Screen.ChatScreen.route,
             arguments = listOf(navArgument("targetUserId") { type = NavType.StringType })
         ) { backStackEntry ->
             val targetUserId = backStackEntry.arguments?.getString("targetUserId") ?: return@composable
             ChatScreen(targetUserId = targetUserId)
+        }
+        composable(route = Screen.ChatSelection.route,
+            arguments = listOf(navArgument("isDoctor") { type = NavType.BoolType })
+        ) { backStackEntry ->
+            val isDoctor = backStackEntry.arguments?.getBoolean("isDoctor") ?: false
+            ChatSelectionScreen(navController = navController, isDoctor = isDoctor)
         }
     }
 }

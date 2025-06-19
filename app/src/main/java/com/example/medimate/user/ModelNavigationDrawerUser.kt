@@ -143,7 +143,7 @@ fun ModelNavDrawerUser(navController: NavController,
                 NavigationDrawerItem(
                     label = { Text(text = "Chat", color = Black) },
                     selected = false,
-                    onClick = { navController.navigate(Screen.ChatScreen.route) }
+                    onClick = { navController.navigate(Screen.ChatSelection.createRoute(false)) }
                 )
                 NavigationDrawerItem(
                     label = { Text(text = "Appointments History", color = Black) },

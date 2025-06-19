@@ -1,7 +1,9 @@
 package com.example.medimate.firebase.doctor
 
 import com.example.medimate.firebase.appointment.Appointment
+import com.example.medimate.firebase.user.User
 import com.example.medimate.user.appointments.getAvailableTermsForDate
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 /**
@@ -155,6 +157,39 @@ class DoctorDAO {
             e.printStackTrace()
             null
         }
+    }
+    suspend fun getPatientsForDoctor(doctorId: String): List<User> {
+        val mFireStore = FirebaseFirestore.getInstance()
+        val patientsList = mutableListOf<User>()
+
+        try {
+            val appointments = mFireStore.collection("appointments")
+                .whereEqualTo("doctorId", doctorId)
+                .get()
+                .await()
+
+            val patientIds = appointments.documents
+                .mapNotNull { it.toObject(Appointment::class.java)?.patientId }
+                .distinct()
+
+            if (patientIds.isNotEmpty()) {
+                val patients = mFireStore.collection("users")
+                    .whereIn(FieldPath.documentId(), patientIds)
+                    .get()
+                    .await()
+
+                patients.documents.forEach { doc ->
+                    doc.toObject(User::class.java)?.let { user ->
+                        patientsList.add(user.copy(id = doc.id))
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw Exception("Error loading patients: ${e.message}")
+        }
+
+        return patientsList
     }
 
 
