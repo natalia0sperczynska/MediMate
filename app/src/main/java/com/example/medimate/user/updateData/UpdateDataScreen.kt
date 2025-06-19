@@ -16,6 +16,7 @@ import com.example.healme.R
 import com.example.medimate.firebase.storage.storage
 import com.example.medimate.firebase.user.UserDAO
 import com.example.medimate.firebase.user.User
+import com.example.medimate.ui.theme.MediMateButton
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.storage
@@ -84,7 +85,7 @@ fun UpdateDataScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Row {
-            Button(onClick = {
+            MediMateButton("Save",onClick = {
                 coroutineScope.launch {
                     val updatedData = mapOf(
                         "name" to name,
@@ -105,15 +106,11 @@ fun UpdateDataScreen(navController: NavController) {
                         Toast.makeText(context, "Failed to update data: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
-            }) {
-                Text("Save")
-            }
+            })
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Button(onClick = { navController.popBackStack() }) {
-                Text("Cancel")
-            }
+            MediMateButton("Cancel",onClick = { navController.popBackStack() })
         }
     }
 }
