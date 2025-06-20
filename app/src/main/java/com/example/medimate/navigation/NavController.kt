@@ -17,6 +17,7 @@ import com.example.medimate.admin.usersManagement.ManageUsers
 import com.example.medimate.admin.main.MainAdminScreen
 import com.example.medimate.admin.usersManagement.userDocumentation.UserDocumentation
 import com.example.medimate.admin.doctorsManagement.DoctorsAdmin
+import com.example.medimate.admin.usersManagement.usersView.EditUserDataScreen
 import com.example.medimate.doctor.main.MainDoctorScreen
 import com.example.medimate.mainViews.MainScreen
 import com.example.medimate.register.RegisterScreen
@@ -59,6 +60,9 @@ sealed class Screen(val route: String) {
     object AppointmentsHistory : Screen("past_appointments")
     object UserDocumentation : Screen("user_documentation/{userId}"){
         fun createRoute(userId:String?) = "user_documentation/$userId"
+    }
+    object EditUserData : Screen("edit_user_data/{userId}"){
+        fun createRoute(userId:String?) = "edit_user_data/$userId"
     }
 }
 
@@ -116,6 +120,15 @@ fun AppNavHost(navController: NavHostController) {
             val userId = backStackEntry.arguments?.getString("userId")
             if (userId != null) {
                 UserDocumentation(navController, userId)
+            }
+        }
+        composable(
+            route = Screen.EditUserData.route,
+            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId")
+            if (userId != null) {
+                EditUserDataScreen(navController, userId)
             }
         }
         composable(

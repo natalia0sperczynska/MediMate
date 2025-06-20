@@ -95,6 +95,12 @@ fun SingleUser(user: User, isSelected: Boolean, onUserSelected: (String) -> Unit
                         color = White
                     )
                 }
+                OutlinedButton(onClick = {onUserSelected(user.id)
+                    navController.navigate(Screen.EditUserData.createRoute(user.id))}) {
+                    Text(text = "Edit user data",
+                        color = White
+                    )
+                }
             }
         }
     }

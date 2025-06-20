@@ -82,5 +82,22 @@ data class User (
                 profilePictureUrl = data["profilePictureUrl"] as? String ?: ""
             )
         }
+
+    }
+    fun toMap(): Map<String, Any?> {
+        return mapOf(
+            "id" to id,
+            "name" to name,
+            "surname" to surname,
+            "email" to email,
+            "dateOfBirth" to dateOfBirth,
+            "phoneNumber" to phoneNumber,
+            "profilePictureUrl" to profilePictureUrl,
+            "address" to address,
+            "allergies" to allergies,
+            "diseases" to diseases,
+            "medications" to medications,
+            "documents" to documents
+        )
     }
 }

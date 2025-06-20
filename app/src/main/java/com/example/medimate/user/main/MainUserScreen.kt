@@ -96,7 +96,7 @@ fun ScreenModel(navController: NavController, userId: String, userName: String, 
                 Spacer(modifier = Modifier.height(24.dp))
                 UpcomingAppointmentsCard(closestAppointment, navController = navController)
                 Spacer(modifier = Modifier.height(24.dp))
-                MainMenuSection(navController = navController)
+                MainMenuSection(navController = navController,userId)
                 Spacer(modifier = Modifier.height(24.dp))
                 OurDoctors()
                 Spacer(modifier = Modifier.height(16.dp))
@@ -226,7 +226,7 @@ fun UpcomingAppointmentsCard(appointment: Appointment?,navController: NavControl
 }
 
 @Composable
-fun MainMenuSection(navController: NavController){
+fun MainMenuSection(navController: NavController,userId: String){
     Column { Text(text="Main Menu",
         style = MaterialTheme.typography.headlineSmall,
         color = Black,
@@ -241,7 +241,7 @@ fun MainMenuSection(navController: NavController){
                 onClick = {
                     when(item.title) {
                         "Appointments History" -> navController.navigate(Screen.AppointmentsHistory.route)
-                        "My Profile" -> navController.navigate(Screen.UpdateData.route)
+                        "My Profile" -> navController.navigate(Screen.UserDocumentation.createRoute(userId = userId))
                         "Update Data" -> navController.navigate(Screen.UpdateData.route)
                     }
                 }

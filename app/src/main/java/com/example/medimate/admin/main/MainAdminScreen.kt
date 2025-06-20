@@ -160,8 +160,8 @@ fun AdminMenuItems(): List<AdminMenuItem> {
         AdminMenuItem(Icons.Default.Settings, "Manage Users") { navController ->
             navController.navigate(Screen.ManageUsers.route)
         },
-        AdminMenuItem(Icons.Default.Star, "View Reports") { navController ->
-            navController.navigate(Screen.ManageUsers.route)
+        AdminMenuItem(Icons.Default.Person, "Manage Doctors") { navController ->
+            navController.navigate(Screen.DoctorsAdmin.route)
         },
         AdminMenuItem(Icons.Default.SmartToy, "Update Data") { navController ->
             navController.navigate(Screen.UpdateData.route)
