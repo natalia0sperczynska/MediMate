@@ -192,7 +192,7 @@ class UserDAO {
         return all_app.mapNotNull { app ->
             try{
                 val appointmentDate=LocalDate.parse(app.date,formatter)
-                if(!appointmentDate.isBefore(today)){
+                if(!appointmentDate.isBefore(today)&&app.status!=Status.CANCELLED){
                     Pair(app,appointmentDate)
                 } else null
             } catch (e:Exception) {

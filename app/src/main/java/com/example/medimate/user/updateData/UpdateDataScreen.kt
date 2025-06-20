@@ -1,25 +1,39 @@
 package com.example.medimate.user.updateData
 
+import android.content.Context
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberImagePainter
 import com.example.healme.R
 import com.example.medimate.firebase.storage.storage
 import com.example.medimate.firebase.user.UserDAO
 import com.example.medimate.firebase.user.User
+import com.example.medimate.ui.theme.MediMateButton
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.storage
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 @Composable
 fun UpdateDataScreen(navController: NavController) {
@@ -29,7 +43,9 @@ fun UpdateDataScreen(navController: NavController) {
     val userId = auth.currentUser?.uid
     val coroutineScope = rememberCoroutineScope()
     storage = Firebase.storage
-    var storageRef = storage.reference
+    val storageRef = storage.reference
+    var spaceRef = storageRef.child("profile/profile_pic.png")
+
 
     var name by remember { mutableStateOf("") }
     var surname by remember { mutableStateOf("") }
@@ -40,6 +56,15 @@ fun UpdateDataScreen(navController: NavController) {
     var diseases by remember { mutableStateOf("") }
     var medications by remember { mutableStateOf("") }
     var profileImageUrl by remember { mutableStateOf("") }
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri: Uri? ->
+            uri?.let { uploadProfilePic(uri, userId, context, coroutineScope, firestoreClass) { url ->
+                profileImageUrl = url
+            }}
+        }
+    )
 
     LaunchedEffect(userId) {
         if (userId != null) {
@@ -65,11 +90,25 @@ fun UpdateDataScreen(navController: NavController) {
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.Center) {
-        profileImageUrl.let {
-            if (it.isNotEmpty()) {
-                Image(painter = painterResource(id = R.drawable.profile_pic), contentDescription = "Profile Image")
-            }
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+
+        if(profileImageUrl.isNotEmpty()) {
+            Image(
+                painter = rememberImagePainter(
+                    data = profileImageUrl,
+                    builder = {
+                        placeholder(R.drawable.profile_pic)
+                        error(R.drawable.profile_pic)
+                    }),
+                contentDescription = "Profile picture",
+                modifier = Modifier.size(120.dp).padding(8.dp)
+            )
+        }else {
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = "Default profile",
+                modifier = Modifier.size(120.dp)
+            )
         }
 
         OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name") })
@@ -80,11 +119,13 @@ fun UpdateDataScreen(navController: NavController) {
         OutlinedTextField(value = allergies, onValueChange = { allergies = it }, label = { Text("Allergies") })
         OutlinedTextField(value = diseases, onValueChange = { diseases = it }, label = { Text("Diseases") })
         OutlinedTextField(value = medications, onValueChange = { medications = it }, label = { Text("Medications") })
-
+        MediMateButton("Change profile picture", onClick = {imagePickerLauncher.launch("image/*")},icon = Icons.Filled.Image)
         Spacer(modifier = Modifier.height(8.dp))
 
-        Row {
-            Button(onClick = {
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+            MediMateButton("Save",onClick = {
                 coroutineScope.launch {
                     val updatedData = mapOf(
                         "name" to name,
@@ -94,26 +135,57 @@ fun UpdateDataScreen(navController: NavController) {
                         "address" to address.split(",").map { it.trim() },
                         "allergies" to allergies.split(",").map { it.trim() },
                         "diseases" to diseases.split(",").map { it.trim() },
-                        "medications" to medications.split(",").map { it.trim() }
+                        "medications" to medications.split(",").map { it.trim() },
+                        "profilePictureUrl" to profileImageUrl
                     )
 
                     try {
-                        firestoreClass.updateUserData(userId!!, updatedData)
-                        Toast.makeText(context, "Data updated successfully!", Toast.LENGTH_SHORT).show()
-                        navController.popBackStack()
+                        if (userId!=null) {
+                            firestoreClass.updateUserData(userId, updatedData)
+                            Toast.makeText(
+                                context,
+                                "Data updated successfully!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            navController.popBackStack()
+                        }
                     } catch (e: Exception) {
                         Toast.makeText(context, "Failed to update data: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
-            }) {
-                Text("Save")
-            }
+            })
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Button(onClick = { navController.popBackStack() }) {
-                Text("Cancel")
-            }
+            MediMateButton("Cancel",onClick = { navController.popBackStack() })
+        }
+    }
+}
+
+fun uploadProfilePic(
+    imageUri: Uri,
+    userId: String?,
+    context: Context,
+    coroutineScope: CoroutineScope,
+    firestoreClass: UserDAO,
+    onSuccess: (String) -> Unit
+) {
+    if (userId == null) {
+        Toast.makeText(context, "User not logged in", Toast.LENGTH_SHORT).show()
+        return
+    }
+
+    coroutineScope.launch {
+        try {
+            val storageRef = Firebase.storage.reference
+            val profileImageRef = storageRef.child("profiles/$userId/profile.jpg")
+            val uploadTask = profileImageRef.putFile(imageUri).await()
+            val downloadUrl = profileImageRef.downloadUrl.await().toString()
+            firestoreClass.updateUserData(userId, mapOf("profilePictureUrl" to downloadUrl))
+            onSuccess(downloadUrl)
+            Toast.makeText(context, "Profile picture updated!", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(context, "Upload failed: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 }

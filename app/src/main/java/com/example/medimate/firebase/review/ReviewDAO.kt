@@ -1,0 +1,38 @@
+package com.example.medimate.firebase.review
+
+import com.example.medimate.firebase.appointment.Appointment
+import com.example.medimate.firebase.doctor.Doctor
+import com.example.medimate.firebase.doctor.Review
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
+
+class ReviewDAO {
+    private val firestore = FirebaseFirestore.getInstance()
+    private val doctorsCollection = firestore.collection("doctors")
+
+    suspend fun AddReview(doctorId:String, review: Review) {
+            val doctorRef = doctorsCollection.document(doctorId)
+            val doctor = doctorRef.get().await().toObject(Doctor::class.java) ?: return
+
+            val updatedReviews = doctor.reviews.toMutableList().apply {
+                add(review)
+            }
+            val newRating = updatedReviews.map { it.rate }.average()
+            doctorRef.update(
+                mapOf(
+                    "reviews" to updatedReviews,
+                    "rating" to newRating
+                )
+            ).await()
+
+        }
+    suspend fun GetReviewsForDoctor(doctorId: String): List<Review> {
+        return try {
+            val doctor = doctorsCollection.document(doctorId).get().await()
+                .toObject(Doctor::class.java)
+            doctor?.reviews ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+}

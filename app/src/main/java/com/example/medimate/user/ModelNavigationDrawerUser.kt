@@ -41,12 +41,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import androidx.navigation.NavController
 import com.example.healme.R
+import com.example.medimate.firebase.AuthManager
 import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.Black
 import com.example.medimate.ui.theme.LightGrey
 import com.example.medimate.ui.theme.PurpleGrey
 import com.example.medimate.ui.theme.PurpleGrey2
 import com.google.firebase.auth.FirebaseAuth
+import com.google.rpc.context.AttributeContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 @Composable
@@ -102,6 +104,9 @@ fun ModelNavDrawerUser(navController: NavController,
                        content: @Composable () -> Unit){
     val scope = rememberCoroutineScope()
     val drawerAnimatable = remember { Animatable(0f)}
+    val auth = AuthManager
+
+    val userId= auth.getCurrentUser()?.id
 
     LaunchedEffect(drawerState.isOpen) {
         if (drawerState.isOpen) {
@@ -149,6 +154,11 @@ fun ModelNavDrawerUser(navController: NavController,
                     label = { Text(text = "Appointments History", color = Black) },
                     selected = false,
                     onClick = { navController.navigate(Screen.AppointmentsHistory.route) }
+                )
+                NavigationDrawerItem(
+                    label = { Text(text = "My Documentation", color = Black) },
+                    selected = false,
+                    onClick = { navController.navigate(Screen.UserDocumentation.createRoute(userId = userId)) }
                 )
                 NavigationDrawerItem(
                     label = { Text(text = "Update Data", color = Black) },

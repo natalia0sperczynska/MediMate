@@ -1,5 +1,6 @@
 package com.example.medimate.firebase.appointment
 
+import android.util.Log
 import com.example.medimate.firebase.doctor.Doctor
 import com.example.medimate.firebase.doctor.DoctorDAO
 import com.example.medimate.firebase.user.UserDAO
@@ -75,12 +76,43 @@ class AppointmentDAO {
         transaction.update(doctorRef, "availabilityChanges", updatedChanges)
     }
 
-    suspend fun deleteAppointment(appointmentId: String) {
-        val mFireStore = FirebaseFirestore.getInstance()
+    suspend fun cancelAppointment(appointmentId: String) {
         try {
-            mFireStore.collection("appointments").document(appointmentId).delete().await()
+            mFireStore.runTransaction { transaction ->
+                // All reads first
+                val appointmentRef = mFireStore.collection("appointments").document(appointmentId)
+                val appointment = transaction.get(appointmentRef).toObject(Appointment::class.java)
+                    ?: throw Exception("Appointment not found")
+
+                val doctorRef = mFireStore.collection("doctors").document(appointment.doctorId)
+                val doctor = transaction.get(doctorRef).toObject(Doctor::class.java)
+                    ?: throw Exception("Doctor not found")
+
+                // Validate time format
+                val timeParts = appointment.time.split("-")
+                if (timeParts.size != 2) throw Exception("Invalid time format")
+                val (startTime, endTime) = timeParts
+
+                // Then all writes
+                transaction.update(appointmentRef, "status", Status.CANCELLED.name)
+
+                val updatedChanges = doctor.availabilityChanges.toMutableMap()
+                val termsForDate = updatedChanges[appointment.date] ?:
+                getAvailableTermsForDate(doctor, appointment.date)
+
+                updatedChanges[appointment.date] = termsForDate.map { term ->
+                    if (term.startTime == startTime && term.endTime == endTime) {
+                        term.copy(isAvailable = true)
+                    } else {
+                        term
+                    }
+                }
+
+                transaction.update(doctorRef, "availabilityChanges", updatedChanges)
+            }.await()
         } catch (e: Exception) {
-            throw Exception("Error deleting appointment data: ${e.message}")
+            Log.e("AppointmentDAO", "Cancellation failed", e)
+            throw Exception("Failed to cancel appointment: ${e.message}")
         }
     }
 

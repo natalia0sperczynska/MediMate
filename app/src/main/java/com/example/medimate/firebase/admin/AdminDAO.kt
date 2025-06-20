@@ -91,6 +91,37 @@ class AdminDAO {
             throw Exception("Error deleting doctor: ${e.message}")
         }
     }
+    suspend fun getUserById(id: String?): User? {
+        if (id.isNullOrBlank()) return null
+        return try {
+            val documentSnapshot = FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(id)
+                .get()
+                .await()
+            documentSnapshot.toObject(User::class.java)?.apply {
+                this.id = documentSnapshot.id
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+    suspend fun updateUserData(userId: String, updatedData: Map<String, Any?>) {
+        val mFireStore = FirebaseFirestore.getInstance()
+        try {
+            val filteredData = updatedData.filterValues { value ->
+                value != null && !(value is String && value.isBlank())
+            }
+            if (filteredData.isEmpty()) return
+            mFireStore.collection("users")
+                .document(userId)
+                .update(filteredData)
+                .await()
+        } catch (e: Exception) {
+            throw Exception("Error updating admin data: ${e.message}")
+        }
+    }
     suspend fun addUser(adminId: String, user: User) {
         val mFireStore = FirebaseFirestore.getInstance()
         try {
@@ -99,10 +130,10 @@ class AdminDAO {
             throw Exception("Error adding user: ${e.message}")
         }
     }
-    suspend fun deleteUser(adminId: String, user: User) {
+    suspend fun deleteUser(userId: String) {
         val mFireStore = FirebaseFirestore.getInstance()
         try {
-            mFireStore.collection("users").document(user.id).delete().await()
+            mFireStore.collection("users").document(userId).delete().await()
         } catch (e: Exception) {
             throw Exception("Error deleting user: ${e.message}")
         }

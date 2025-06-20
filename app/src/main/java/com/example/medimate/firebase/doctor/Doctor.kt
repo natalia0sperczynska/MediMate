@@ -50,5 +50,18 @@ data class Doctor(
             it.contains(query, ignoreCase = true)
         }
     }
+    fun withUpdatedAvailability(date: String, startTime: String, endTime: String, isAvailable: Boolean): Doctor {
+        val updatedTerms = availabilityChanges[date]?.map { term ->
+            if (term.startTime == startTime && term.endTime == endTime) {
+                term.copy(isAvailable = isAvailable)
+            } else {
+                term
+            }
+        } ?: emptyList()
+
+        return this.copy(
+            availabilityChanges = availabilityChanges + (date to updatedTerms)
+        )
+    }
 }
 
