@@ -64,6 +64,17 @@ data class Doctor(
             availabilityChanges = availabilityChanges + (date to updatedTerms)
         )
     }
+    fun toMap(): Map<String, Any?> {
+        return mapOf(
+            "id" to id,
+            "name" to name,
+            "surname" to surname,
+            "email" to email,
+            "phoneNumber" to phoneNumber,
+            "specialisation" to specialisation,
+            "room" to room
+        )
+    }
 
 }
 

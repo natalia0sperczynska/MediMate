@@ -83,10 +83,10 @@ class AdminDAO {
             throw Exception("Error adding doctor: ${e.message}")
         }
     }
-    suspend fun deleteDoctor(adminId: String, doctor: Doctor) {
+    suspend fun deleteDoctor(doctorId: String) {
         val mFireStore = FirebaseFirestore.getInstance()
         try {
-            mFireStore.collection("doctors").document(doctor.id).delete().await()
+            mFireStore.collection("doctors").document(doctorId).delete().await()
         } catch (e: Exception) {
             throw Exception("Error deleting doctor: ${e.message}")
         }
@@ -107,6 +107,22 @@ class AdminDAO {
             null
         }
     }
+    suspend fun getDoctorById(id: String?): Doctor? {
+        if (id.isNullOrBlank()) return null
+        return try {
+            val documentSnapshot = FirebaseFirestore.getInstance()
+                .collection("doctors")
+                .document(id)
+                .get()
+                .await()
+            documentSnapshot.toObject(Doctor::class.java)?.apply {
+                this.id = documentSnapshot.id
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
     suspend fun updateUserData(userId: String, updatedData: Map<String, Any?>) {
         val mFireStore = FirebaseFirestore.getInstance()
         try {
@@ -120,6 +136,21 @@ class AdminDAO {
                 .await()
         } catch (e: Exception) {
             throw Exception("Error updating admin data: ${e.message}")
+        }
+    }
+    suspend fun updateDoctorData(doctorId: String, updatedData: Map<String, Any?>) {
+        val mFireStore = FirebaseFirestore.getInstance()
+        try {
+            val filteredData = updatedData.filterValues { value ->
+                value != null && !(value is String && value.isBlank())
+            }
+            if (filteredData.isEmpty()) return
+            mFireStore.collection("doctors")
+                .document(doctorId)
+                .update(filteredData)
+                .await()
+        } catch (e: Exception) {
+            throw Exception("Error updating doctor data: ${e.message}")
         }
     }
     suspend fun addUser(adminId: String, user: User) {

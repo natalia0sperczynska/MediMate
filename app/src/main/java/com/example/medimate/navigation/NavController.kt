@@ -17,6 +17,7 @@ import com.example.medimate.admin.usersManagement.ManageUsers
 import com.example.medimate.admin.main.MainAdminScreen
 import com.example.medimate.admin.usersManagement.userDocumentation.UserDocumentation
 import com.example.medimate.admin.doctorsManagement.DoctorsAdmin
+import com.example.medimate.admin.doctorsManagement.EditDoctorDataScreen
 import com.example.medimate.chat.ChatSelectionScreen
 import com.example.medimate.admin.usersManagement.usersView.EditUserDataScreen
 import com.example.medimate.doctor.main.MainDoctorScreen
@@ -64,6 +65,9 @@ sealed class Screen(val route: String) {
     }
     object EditUserData : Screen("edit_user_data/{userId}"){
         fun createRoute(userId:String?) = "edit_user_data/$userId"
+    }
+    object EditDoctorData : Screen("edit_doctor_data/{doctorId}"){
+        fun createRoute(doctorId: String?) = "edit_doctor_data/$doctorId"
     }
     object ChatSelection : Screen("chat_selection/{isDoctor}") {
         fun createRoute(isDoctor: Boolean) = "chat_selection/$isDoctor"
@@ -133,6 +137,15 @@ fun AppNavHost(navController: NavHostController) {
             val userId = backStackEntry.arguments?.getString("userId")
             if (userId != null) {
                 EditUserDataScreen(navController, userId)
+            }
+        }
+        composable(
+            route = Screen.EditDoctorData.route,
+            arguments = listOf(navArgument("doctorId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val doctorId = backStackEntry.arguments?.getString("doctorId")
+            if (doctorId != null) {
+                EditDoctorDataScreen(navController, doctorId)
             }
         }
         composable(
