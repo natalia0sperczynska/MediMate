@@ -39,4 +39,18 @@ class ReviewDAO {
             emptyList()
         }
     }
+    suspend fun deleteReview(doctorId:String, review:Review, currentReviews:List<Review>, newRating:Double){
+        val doctorRef = doctorsCollection.document(doctorId)
+        try {
+            doctorRef.update(
+                mapOf(
+                    "reviews" to currentReviews,
+                    "rating" to newRating
+                )
+            ).await()
+        }
+        catch (e:Exception){
+            Log.e("Failed to delte a review","${e.message}")
+        }
+    }
 }

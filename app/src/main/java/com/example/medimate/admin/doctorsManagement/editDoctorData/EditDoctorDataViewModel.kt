@@ -1,4 +1,4 @@
-package com.example.medimate.admin.doctorsManagement
+package com.example.medimate.admin.doctorsManagement.editDoctorData
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

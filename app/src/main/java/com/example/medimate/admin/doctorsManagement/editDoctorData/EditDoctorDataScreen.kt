@@ -1,4 +1,4 @@
-package com.example.medimate.admin.doctorsManagement
+package com.example.medimate.admin.doctorsManagement.editDoctorData
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -15,6 +15,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.MediMateButton
 import kotlinx.coroutines.launch
 
@@ -151,6 +152,12 @@ fun EditDoctorDataScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
+                MediMateButton(
+                    text="Manage reviews",
+                    onClick = {navController.navigate(Screen.ManageDoctorReviews.createRoute(doctorId))},
+                    enabled = !isUpdating&&!isDeleting,
+                    modifier = Modifier.fillMaxWidth()
+                )
                 MediMateButton(
                     text = if (isDeleting) "Deleting..." else "Delete User",
                     onClick = {

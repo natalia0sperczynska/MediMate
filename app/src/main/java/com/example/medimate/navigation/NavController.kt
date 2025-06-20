@@ -8,7 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.medimate.admin.doctorsManagement.AddDoctor
+import com.example.medimate.admin.doctorsManagement.add.AddDoctor
 import com.example.medimate.user.main.MainUserScreen
 import com.example.medimate.chat.ChatScreen
 import com.example.medimate.user.appointments.AppointmentsScreen
@@ -16,8 +16,9 @@ import com.example.medimate.login.LoginScreen
 import com.example.medimate.admin.usersManagement.ManageUsers
 import com.example.medimate.admin.main.MainAdminScreen
 import com.example.medimate.admin.usersManagement.userDocumentation.UserDocumentation
-import com.example.medimate.admin.doctorsManagement.DoctorsAdmin
-import com.example.medimate.admin.doctorsManagement.EditDoctorDataScreen
+import com.example.medimate.admin.doctorsManagement.editDoctorData.DoctorsAdmin
+import com.example.medimate.admin.doctorsManagement.editDoctorData.EditDoctorDataScreen
+import com.example.medimate.admin.doctorsManagement.reviewsManagement.ManageDoctorReviewsScreen
 import com.example.medimate.chat.ChatSelectionScreen
 import com.example.medimate.admin.usersManagement.usersView.EditUserDataScreen
 import com.example.medimate.doctor.main.MainDoctorScreen
@@ -30,7 +31,6 @@ import com.example.medimate.user.appointments.YourFutureAppointmentsScreen
 import com.example.medimate.user.updateData.UpdateDataScreen
 import com.example.medimate.user.doctorsView.DoctorScreen
 import com.example.medimate.user.reviews.DoctorReviewScreen
-import com.example.medimate.user.reviews.ReviewModel
 
 sealed class Screen(val route: String) {
     object Main : Screen("main")
@@ -68,6 +68,9 @@ sealed class Screen(val route: String) {
     }
     object EditDoctorData : Screen("edit_doctor_data/{doctorId}"){
         fun createRoute(doctorId: String?) = "edit_doctor_data/$doctorId"
+    }
+    object ManageDoctorReviews : Screen("manage_doctor_reviews/{doctorId}"){
+        fun createRoute(doctorId: String?) = "manage_doctor_reviews/$doctorId"
     }
     object ChatSelection : Screen("chat_selection/{isDoctor}") {
         fun createRoute(isDoctor: Boolean) = "chat_selection/$isDoctor"
@@ -146,6 +149,15 @@ fun AppNavHost(navController: NavHostController) {
             val doctorId = backStackEntry.arguments?.getString("doctorId")
             if (doctorId != null) {
                 EditDoctorDataScreen(navController, doctorId)
+            }
+        }
+        composable(
+            route = Screen.ManageDoctorReviews.route,
+            arguments = listOf(navArgument("doctorId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val doctorId = backStackEntry.arguments?.getString("doctorId")
+            if (doctorId != null) {
+                ManageDoctorReviewsScreen(navController, doctorId)
             }
         }
         composable(

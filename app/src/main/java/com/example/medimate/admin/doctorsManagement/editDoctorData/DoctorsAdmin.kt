@@ -1,4 +1,4 @@
-package com.example.medimate.admin.doctorsManagement
+package com.example.medimate.admin.doctorsManagement.editDoctorData
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
@@ -115,16 +115,6 @@ fun SingleDoctorAdmin(
                         color = White
                     )
                 }
-                OutlinedButton(onClick = {
-                    onDoctorSelected(doctor.id)
-                    navController.navigate(Screen.AppointmentsDoctor.createRoute(doctor.id))
-                }) {
-                    Text(
-                        text = "Set the appointment",
-                        color = White
-                    )
-                }
-
                     OutlinedButton(onClick = {
                         onDoctorSelected(doctor.id)
                         navController.navigate(Screen.EditDoctorData.createRoute(doctor.id))
