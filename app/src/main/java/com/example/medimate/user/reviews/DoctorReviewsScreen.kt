@@ -39,11 +39,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.medimate.firebase.doctor.Review
+import com.example.medimate.firebase.review.Review
 import com.example.medimate.ui.theme.MediMateButton
 import com.example.medimate.ui.theme.PurpleDark
 import com.example.medimate.ui.theme.PurpleGrey2
-import com.example.medimate.ui.theme.PurpleLight
 import com.example.medimate.ui.theme.PurpleLight2
 import com.example.medimate.ui.theme.PurpleMain
 import com.example.medimate.user.ModelNavDrawerUser

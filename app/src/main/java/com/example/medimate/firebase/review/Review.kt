@@ -1,4 +1,4 @@
-package com.example.medimate.firebase.doctor
+package com.example.medimate.firebase.review
 
 data class Review(
     val rate: Double= 0.0,

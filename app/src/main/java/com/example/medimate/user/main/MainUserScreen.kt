@@ -1,12 +1,19 @@
 package com.example.medimate.user.main
+
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.animation.core.*
+import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Person
@@ -38,6 +45,9 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.LightGray
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import com.example.medimate.firebase.appointment.Appointment
 import com.example.medimate.firebase.doctor.Doctor
 import com.example.medimate.firebase.doctor.DoctorDAO
@@ -55,7 +65,7 @@ fun MainUserScreen(navController: NavController) {
     val context = LocalContext.current
     val userId = auth.currentUser?.uid
     val firestoreClass = UserDAO()
-    var closestAppointment by remember { mutableStateOf<Appointment?>(null)}
+    var closestAppointment by remember { mutableStateOf<Appointment?>(null) }
     var userName by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -67,71 +77,89 @@ fun MainUserScreen(navController: NavController) {
                 try {
                     val data = firestoreClass.loadUserData(userId)
                     userName = (data?.getValue("name") ?: "User").toString()
-                    closestAppointment=firestoreClass.getClosestAppointment(userId)?.also{
-                        if(it.id.isEmpty()){
+                    closestAppointment = firestoreClass.getClosestAppointment(userId)?.also {
+                        if (it.id.isEmpty()) {
                             throw Exception("Appointment ID is missing")
                         }
                     }
                 } catch (e: Exception) {
-                    Toast.makeText(context, "Failed to load user data: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        "Failed to load user data: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
     }
-    ModelNavDrawerUser(navController,drawerState) {
-        ScreenModel(navController, userId.toString(), userName, drawerState,closestAppointment)
+    ModelNavDrawerUser(navController, drawerState) {
+        ScreenModel(navController, userId.toString(), userName, drawerState, closestAppointment)
     }
 }
 
 @Composable
-fun ScreenModel(navController: NavController, userId: String, userName: String, drawerState: DrawerState,closestAppointment: Appointment?) {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-
-                HeaderCard(userName=userName)
-                Spacer(modifier = Modifier.height(24.dp))
-                UpcomingAppointmentsCard(closestAppointment, navController = navController)
-                Spacer(modifier = Modifier.height(24.dp))
-                MainMenuSection(navController = navController,userId)
-                Spacer(modifier = Modifier.height(24.dp))
-                OurDoctors(navController = navController)
-                Spacer(modifier = Modifier.height(16.dp))
-                UserActionsSection(navController=navController)
-            }
+fun ScreenModel(
+    navController: NavController,
+    userId: String,
+    userName: String,
+    drawerState: DrawerState,
+    closestAppointment: Appointment?
+) {
+    Surface(color = Color(0xFFF9F9F9)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Spacer(modifier = Modifier.height(8.dp))
+            HeaderCard(userName = userName)
+            SectionDivider()
+            UpcomingAppointmentsCard(closestAppointment, navController = navController)
+            SectionDivider(verticalPadding = 16.dp)
+            MainMenuSection(navController = navController, userId)
+            SectionDivider()
+            OurDoctors(navController = navController)
+            SectionDivider(color = PurpleMain.copy(alpha = 0.1f))
+            UserActionsSection(navController = navController)
+            Spacer(modifier = Modifier.height(16.dp))
         }
+    }
 
 }
 
 @Composable
 fun HeaderCard(userName: String) {
     Card(
-        modifier = Modifier.fillMaxWidth().height(100.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(120.dp),
         colors = CardDefaults.cardColors(containerColor = PurpleMain),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(24.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(20.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .size(60.dp)
+                    .size(70.dp)
                     .background(
                         color = White.copy(alpha = 0.2f),
-                        shape = RoundedCornerShape(30.dp)
+                        shape = RoundedCornerShape(35.dp)
                     )
             ) {
                 Icon(
                     imageVector = Icons.Default.Person,
                     contentDescription = "Profile",
                     tint = White,
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(32.dp)
                 )
             }
 
@@ -145,110 +173,151 @@ fun HeaderCard(userName: String) {
                 )
                 Text(
                     text = userName,
-                    style = MaterialTheme.typography.headlineSmall,
+                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                     color = White
                 )
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "How are you feeling today?",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = White.copy(alpha = 0.7f)
-                )
-            }
-        }
-    }
-}
-@Composable
-fun UpcomingAppointmentsCard(appointment: Appointment?,navController: NavController){
-    val context = LocalContext.current
-    Card(
-        modifier = Modifier.fillMaxWidth().height(160.dp),
-        colors = CardDefaults.cardColors(containerColor = PurpleLight2),
-        shape = RoundedCornerShape(20.dp),
-        onClick = {
-            appointment?.let {
-                navController.navigate(
-                    Screen.SingleAppointment.createRoute(it.id
-                    )
-                )
-            } ?: run{
-                Toast.makeText(context, "No appointment details available", Toast.LENGTH_SHORT).show()
-            }
-        }) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(60.dp)
-                    .background(
-                        color = White.copy(alpha = 0.2f),
-                        shape = RoundedCornerShape(30.dp)
-                    )
-            ) {
-                Icon(
-                    imageVector = Icons.Default.DateRange,
-                    contentDescription = "Appointment",
-                    tint = White,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Column {
-                Text(
-                    text = "Your upcoming appointment",
                     style = MaterialTheme.typography.bodyMedium,
                     color = White.copy(alpha = 0.8f)
                 )
-                appointment?.let {
-                    Text(
-                        text = "Date: ${it.date}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = White
-                    )
-                    Text(
-                        text = "With: Dr. ${it.doctorId}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = White.copy(alpha = 0.7f)
-                    )
-                } ?: Text(
-                    text = "No upcoming appointments",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = White
-                )
             }
         }
     }
 }
 
 @Composable
-fun MainMenuSection(navController: NavController,userId: String){
-    Column { Text(text="Main Menu",
-        style = MaterialTheme.typography.headlineSmall,
-        color = Black,
-        modifier = Modifier.padding(bottom = 16.dp) )}
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        items(MainMenuItems()) { item ->
-            MainMenuCard(
-                icon = item.icon,
-                title = item.title,
-                onClick = {
-                    when(item.title) {
-                        "Appointments History" -> navController.navigate(Screen.AppointmentsHistory.route)
-                        "My Profile" -> navController.navigate(Screen.UserDocumentation.createRoute(userId = userId))
-                        "Update Data" -> navController.navigate(Screen.UpdateData.route)
-                    }
+fun UpcomingAppointmentsCard(appointment: Appointment?, navController: NavController) {
+    val context = LocalContext.current
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(180.dp),
+        colors = CardDefaults.cardColors(containerColor = PurpleLight2),
+        shape = RoundedCornerShape(24.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        onClick = {
+            appointment?.let {
+                navController.navigate(
+                    Screen.SingleAppointment.createRoute(
+                        it.id
+                    )
+                )
+            } ?: run {
+                Toast.makeText(context, "No appointment details available", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(70.dp)
+                        .background(
+                            color = White.copy(alpha = 0.2f),
+                            shape = RoundedCornerShape(35.dp)
+                        )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = "Appointment",
+                        tint = White,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .size(32.dp)
+                    )
                 }
+
+                Spacer(modifier = Modifier.width(20.dp))
+
+                Column {
+                    Text(
+                        text = "Your upcoming appointment",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = White.copy(alpha = 0.8f)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    appointment?.let {
+                        Text(
+                            text = it.date,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = White
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "With: Dr. ${it.doctorId}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = White.copy(alpha = 0.7f)
+                        )
+                    } ?: Text(
+                        text = "No upcoming appointments",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = White
+                    )
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .background(
+                        color = White.copy(alpha = 0.05f),
+                        shape = CircleShape
+                    )
+                    .align(Alignment.TopEnd)
+                    .offset(x = 30.dp, y = (-30).dp)
             )
         }
     }
 }
+
+@Composable
+fun MainMenuSection(navController: NavController, userId: String) {
+    Column(modifier = Modifier.padding(horizontal = 8.dp)) {
+        Text(
+            text = "Quick Actions",
+            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+            color = Black,
+            modifier = Modifier.padding(bottom = 16.dp, start = 8.dp)
+        )
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(horizontal = 8.dp)
+        ) {
+            items(MainMenuItems()) { item ->
+                AnimatedVisibility(
+                    visible = true,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
+                ) {
+                    MainMenuCard(
+                        icon = item.icon,
+                        title = item.title,
+                        onClick = {
+                            when (item.title) {
+                                "Appointments History" -> navController.navigate(Screen.AppointmentsHistory.route)
+                                "My Profile" -> navController.navigate(
+                                    Screen.UserDocumentation.createRoute(
+                                        userId = userId
+                                    )
+                                )
+
+                                "Update Data" -> navController.navigate(Screen.UpdateData.route)
+                                "Medical facts" -> navController.navigate(Screen.UpdateData.route)
+                            }
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Composable
 fun MainMenuCard(
     icon: ImageVector,
@@ -257,33 +326,50 @@ fun MainMenuCard(
 ) {
     Card(
         modifier = Modifier
-            .size(100.dp)
+            .size(120.dp, 100.dp)
             .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(16.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(20.dp),
+        border = BorderStroke(1.dp, PurpleLight.copy(alpha = 0.2f))
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = title,
-                tint = PurpleMain,
-                modifier = Modifier.size(32.dp)
-            )
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(
+                        color = PurpleMain.copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(12.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = title,
+                    tint = PurpleMain,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodySmall,
                 color = Black,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+
             )
         }
     }
 }
+
 @Composable
 fun UserActionsSection(navController: NavController) {
     Row(
@@ -301,9 +387,9 @@ fun UserActionsSection(navController: NavController) {
         )
     }
 }
+
 @Composable
 fun OurDoctors(navController: NavController) {
-fun OurDoctors() {
     var doctors by remember { mutableStateOf<List<Doctor>>(emptyList()) }
     LaunchedEffect(Unit) { doctors = getDoctorList() }
     Column {
@@ -319,11 +405,10 @@ fun OurDoctors() {
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            TextButton(
-                onClick = { navController.navigate(Screen.ChatSelection.createRoute(false)) }
-            ) {
-                Text("Message Doctor")
-            }
+            MediMateButton(
+                "Message Doctor",
+                onClick = { navController.navigate(Screen.ChatSelection.createRoute(false)) })
+
         }
 
         LazyColumn(
@@ -331,78 +416,114 @@ fun OurDoctors() {
             modifier = Modifier.height(200.dp)
         ) {
             items(doctors) { doctor ->
-                DoctorCard(doctor = doctor)
-            items(getSampleDoctors()) { doctor ->
                 DoctorCard(doctor = doctor, navController = navController)
             }
         }
     }
 }
+
 @Composable
-fun DoctorCard(doctor:Doctor, navController: NavController){
-    Card(modifier = Modifier.fillMaxWidth(),
+fun DoctorCard(doctor: Doctor, navController: NavController) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp),
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors=CardDefaults.cardColors(containerColor = PurpleGrey3)){
-        Row(modifier = Modifier.fillMaxWidth().padding(16.dp)){
-            Box(
-                modifier = Modifier
-                    .size(50.dp)
-                    .background(
-                        color = PurpleMain.copy(alpha = 0.1f),
-                        shape = RoundedCornerShape(25.dp)
-                    )
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(containerColor = White)
+    ) {
+        Column(modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Doctor",
-                    tint = PurpleMain,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = doctor.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Black
-                )
-                Text(
-                    text = doctor.specialisation,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Black.copy(alpha = 0.6f)
-                )
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(
+                            color = PurpleMain.copy(alpha = 0.1f),
+                            shape = CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
                     Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = "Rating",
-                        tint = Color(0xFFFFB800),
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Text(
-                        text = "${doctor.rating} (${doctor.reviews} Reviews)",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Black.copy(alpha = 0.6f)
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Doctor",
+                        tint = PurpleMain,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
+                Spacer(modifier = Modifier.width(16.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Dr. ${doctor.name}",
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                        color = Black
+                    )
+                    Text(
+                        text = doctor.specialisation,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Black.copy(alpha = 0.7f)
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = Color(0xFFFFF8E1),
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = "Rating",
+                            tint = Color(0xFFFFB800),
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "${doctor.rating}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Black.copy(alpha = 0.7f)
+                        )
+                    }
+                }
             }
-        }
-        Button(
-            onClick = { navController.navigate(Screen.ChatScreen.createRoute(doctor.id)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp)
-        ) {
-            Text("Message This Doctor")
+            Spacer(modifier = Modifier.height(12.dp))
+            MediMateButton(
+                "Message This Doctor",
+                onClick = { navController.navigate(Screen.ChatScreen.createRoute(doctor.id)) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+            )
         }
     }
-    }
+}
 
 fun MainMenuItems(): List<MainMenuItem> {
     return listOf(
         MainMenuItem(Icons.Default.Timelapse, "Appointments History"),
         MainMenuItem(Icons.Default.SmartToy, "My Profile"),
-        MainMenuItem(Icons.Default.Settings, "Update Data")
+        MainMenuItem(Icons.Default.Settings, "Update Data"),
+        MainMenuItem(Icons.Default.Star, "Medical facts")
+    )
+}
+@Composable
+fun SectionDivider(modifier: Modifier = Modifier,
+                   color: Color = PurpleLight.copy(alpha = 0.2f),
+                   thickness: Dp = 1.dp,
+                   verticalPadding: Dp = 8.dp) {
+    Divider(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = verticalPadding),
+        color = color,
+        thickness = thickness,
     )
 }
 
@@ -410,7 +531,13 @@ fun MainMenuItems(): List<MainMenuItem> {
 @Composable
 fun MainUserScreenPreview() {
     MediMateTheme {
-       ScreenModel(navController = rememberNavController(), userId = "123", userName = "John", drawerState = rememberDrawerState(DrawerValue.Closed), closestAppointment = null)
+        ScreenModel(
+            navController = rememberNavController(),
+            userId = "123",
+            userName = "John",
+            drawerState = rememberDrawerState(DrawerValue.Closed),
+            closestAppointment = null
+        )
     }
 }
 

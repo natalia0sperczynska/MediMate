@@ -25,6 +25,7 @@ import com.example.medimate.firebase.doctor.DoctorDAO
 import com.example.medimate.firebase.user.User
 import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.MediMateTheme
+import com.example.medimate.ui.theme.PurpleMain
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
@@ -46,11 +47,9 @@ fun ChatSelectionScreen(
         coroutineScope.launch {
             try {
                 contacts = if (isDoctor) {
-                    // Only show patients for this doctor
                     DoctorDAO().getPatientsForDoctor(currentUserId)
                         .sortedBy { "${it.name} ${it.surname}" }
                 } else {
-                    // For users: show all doctors
                     DoctorDAO().getAllDoctors()
                         .filter { it.id != currentUserId }
                         .sortedBy { "${it.name} ${it.surname}" }
@@ -74,7 +73,8 @@ fun ChatSelectionScreen(
         Text(
             text = if (isDoctor) "Select a patient to message" else "Select a doctor to message",
             style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp),
+            color = PurpleMain
         )
 
         OutlinedTextField(

@@ -2,11 +2,9 @@ package com.example.medimate.user.reviews
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.medimate.firebase.appointment.Appointment
-import com.example.medimate.firebase.appointment.AppointmentDAO
 import com.example.medimate.firebase.doctor.Doctor
 import com.example.medimate.firebase.doctor.DoctorDAO
-import com.example.medimate.firebase.doctor.Review
+import com.example.medimate.firebase.review.Review
 import com.example.medimate.firebase.review.ReviewDAO
 import com.example.medimate.user.doctorsView.getDoctorList
 import kotlinx.coroutines.flow.MutableStateFlow

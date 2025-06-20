@@ -1,6 +1,7 @@
 package com.example.medimate.firebase.doctor
 
 import com.example.medimate.firebase.appointment.Term
+import com.example.medimate.firebase.review.Review
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale

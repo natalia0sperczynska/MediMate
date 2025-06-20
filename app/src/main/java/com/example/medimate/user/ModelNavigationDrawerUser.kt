@@ -183,7 +183,7 @@ fun ModelNavDrawerUser(navController: NavController,
             ) {
                 IconButton(
                     onClick = { scope.launch { drawerState.open() } },
-                    modifier = Modifier.background(Color.White, shape = MaterialTheme.shapes.small)
+                    modifier = Modifier.background(Color(0xFFF9F9F9), shape = MaterialTheme.shapes.small)
 
                 ) {
                     Icon(Icons.Default.Menu, contentDescription = "Open Menu", tint = Black)

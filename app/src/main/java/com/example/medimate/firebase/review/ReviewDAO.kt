@@ -1,8 +1,6 @@
 package com.example.medimate.firebase.review
 
-import com.example.medimate.firebase.appointment.Appointment
 import com.example.medimate.firebase.doctor.Doctor
-import com.example.medimate.firebase.doctor.Review
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
