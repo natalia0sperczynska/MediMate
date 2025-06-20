@@ -30,10 +30,13 @@ import com.example.medimate.firebase.user.User
 import com.example.medimate.ui.theme.MediMateButton
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.storage.storage
+import com.google.firebase.storage.storageMetadata
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import androidx.core.net.toUri
 
 @Composable
 fun UpdateDataScreen(navController: NavController) {
@@ -44,7 +47,6 @@ fun UpdateDataScreen(navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
     storage = Firebase.storage
     val storageRef = storage.reference
-    var spaceRef = storageRef.child("profile/profile_pic.png")
 
 
     var name by remember { mutableStateOf("") }
@@ -177,11 +179,17 @@ fun uploadProfilePic(
 
     coroutineScope.launch {
         try {
-            val storageRef = Firebase.storage.reference
-            val profileImageRef = storageRef.child("profiles/$userId/profile.jpg")
-            val uploadTask = profileImageRef.putFile(imageUri).await()
-            val downloadUrl = profileImageRef.downloadUrl.await().toString()
+            val metadata = storageMetadata {
+                contentType = "image/jpeg"
+            }
+            val storage = Firebase.storage("gs://medimate-79d20.firebasestorage.app")
+            val storageRef = storage.reference.child("user_documents/$userId/$imageUri")
+            storageRef .putFile(imageUri, metadata).await()
+            val downloadUrl = storageRef.downloadUrl.await().toString()
             firestoreClass.updateUserData(userId, mapOf("profilePictureUrl" to downloadUrl))
+            FirebaseAuth.getInstance().currentUser?.updateProfile(
+                UserProfileChangeRequest.Builder().setPhotoUri(downloadUrl.toUri()).build()
+            )
             onSuccess(downloadUrl)
             Toast.makeText(context, "Profile picture updated!", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
