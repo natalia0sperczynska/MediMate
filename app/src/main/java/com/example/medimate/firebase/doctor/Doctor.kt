@@ -64,5 +64,6 @@ data class Doctor(
             availabilityChanges = availabilityChanges + (date to updatedTerms)
         )
     }
+
 }
 

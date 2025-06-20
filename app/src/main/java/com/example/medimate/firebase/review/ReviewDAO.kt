@@ -1,5 +1,6 @@
 package com.example.medimate.firebase.review
 
+import android.util.Log
 import com.example.medimate.firebase.doctor.Doctor
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -26,10 +27,15 @@ class ReviewDAO {
         }
     suspend fun GetReviewsForDoctor(doctorId: String): List<Review> {
         return try {
-            val doctor = doctorsCollection.document(doctorId).get().await()
-                .toObject(Doctor::class.java)
-            doctor?.reviews ?: emptyList()
+            val doctorSnapshot = doctorsCollection.document(doctorId).get().await()
+            if (doctorSnapshot.exists()) {
+                val doctor = doctorSnapshot.toObject(Doctor::class.java)
+                doctor?.reviews ?: emptyList()
+            }else {
+                emptyList()
+            }
         } catch (e: Exception) {
+            Log.e("ReviewDAO", "Error getting reviews: ${e.message}")
             emptyList()
         }
     }

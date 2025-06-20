@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.medimate.firebase.user.UserDAO
+import com.example.medimate.firebase.review.ReviewDAO
 import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.Black
 import com.example.medimate.ui.theme.MediMateButton
@@ -51,12 +52,15 @@ import androidx.compose.ui.unit.Dp
 import com.example.medimate.firebase.appointment.Appointment
 import com.example.medimate.firebase.doctor.Doctor
 import com.example.medimate.firebase.doctor.DoctorDAO
+import com.example.medimate.firebase.review.Review
 import com.example.medimate.tests.getSampleDoctors
 import com.example.medimate.ui.theme.PurpleGrey3
 import com.example.medimate.ui.theme.PurpleLight
 import com.example.medimate.ui.theme.PurpleLight2
 import com.example.medimate.user.appointments.AppointmentsViewPreview
 import com.example.medimate.user.doctorsView.getDoctorList
+import com.example.medimate.user.reviews.ReviewItem
+import kotlinx.coroutines.currentCoroutineContext
 
 
 @Composable
@@ -413,10 +417,11 @@ fun OurDoctors(navController: NavController) {
 
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.height(200.dp)
+            modifier = Modifier.heightIn(min =200.dp, max=600.dp)
         ) {
             items(doctors) { doctor ->
                 DoctorCard(doctor = doctor, navController = navController)
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }
@@ -424,6 +429,28 @@ fun OurDoctors(navController: NavController) {
 
 @Composable
 fun DoctorCard(doctor: Doctor, navController: NavController) {
+    var showReviews by remember { mutableStateOf(false) }
+    var reviews by remember { mutableStateOf<List<Review>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(false) }
+    val reviewDao = remember { ReviewDAO() }
+    val context = LocalContext.current
+
+    LaunchedEffect(showReviews) {
+        if (showReviews && reviews.isEmpty()) {
+            isLoading = true
+            try {
+                reviews = reviewDao.GetReviewsForDoctor(doctor.id)
+                if (reviews.isEmpty()) {
+                    Toast.makeText(context, "No reviews found for this doctor", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(context, "Error loading reviews: ${e.message}", Toast.LENGTH_SHORT).show()
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -454,7 +481,7 @@ fun DoctorCard(doctor: Doctor, navController: NavController) {
                         modifier = Modifier.size(24.dp)
                     )
                 }
-                Spacer(modifier = Modifier.width(16.dp))
+
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "Dr. ${doctor.name}",
@@ -474,6 +501,7 @@ fun DoctorCard(doctor: Doctor, navController: NavController) {
                             shape = RoundedCornerShape(16.dp)
                         )
                         .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .clickable{showReviews =!showReviews}
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically
@@ -493,7 +521,6 @@ fun DoctorCard(doctor: Doctor, navController: NavController) {
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(12.dp))
             MediMateButton(
                 "Message This Doctor",
                 onClick = { navController.navigate(Screen.ChatScreen.createRoute(doctor.id)) },
@@ -501,6 +528,40 @@ fun DoctorCard(doctor: Doctor, navController: NavController) {
                     .fillMaxWidth()
                     .padding(top = 8.dp)
             )
+            AnimatedVisibility(
+                visible = showReviews,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    if (isLoading) {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    } else {
+                        if (reviews.isEmpty()) {
+                            Text(
+                                text = "No reviews yet",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color.Gray,
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            )
+                        } else {
+                            Text(
+                                text = "Patient's reviews",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            reviews.forEach { review ->
+                                ReviewItem(review = review)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
