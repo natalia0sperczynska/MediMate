@@ -58,7 +58,7 @@ sealed class Screen(val route: String) {
     object FutureAppointments : Screen("future_appointments")
     object AppointmentsHistory : Screen("past_appointments")
     object UserDocumentation : Screen("user_documentation/{userId}"){
-        fun createRoute(userId:String) = "user_documentation/$userId"
+        fun createRoute(userId:String?) = "user_documentation/$userId"
     }
 }
 
