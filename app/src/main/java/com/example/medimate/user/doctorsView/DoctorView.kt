@@ -1,4 +1,5 @@
 package com.example.medimate.user.doctorsView
+
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -27,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,8 +46,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.healme.R
+import com.example.medimate.firebase.AuthManager
+import com.example.medimate.firebase.UserProvider
 import com.example.medimate.firebase.doctor.Doctor
 import com.example.medimate.firebase.doctor.DoctorDAO
+import com.example.medimate.firebase.user.UserDAO
 import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.MediMateButton
 import com.example.medimate.ui.theme.MediMateTheme
@@ -67,79 +72,105 @@ import kotlinx.coroutines.launch
  * Composable function for displaying a single doctor.
  */
 @Composable
-fun SingleDoctor(doctor: Doctor, isSelected: Boolean, onDoctorSelected: (String) -> Unit, navController: NavController) {
+fun SingleDoctor(
+    doctor: Doctor,
+    isSelected: Boolean,
+    onDoctorSelected: (String) -> Unit,
+    navController: NavController
+) {
     var expand by remember { mutableStateOf(false) }
-    val extraPadding by animateDpAsState(targetValue = if(expand) 40.dp else 0.dp, label = "")
-    Surface(border = BorderStroke(1.dp, White), color = PurpleDark,
-        shape= MaterialTheme.shapes.medium){
-    Row (modifier = Modifier.padding(16.dp).fillMaxWidth()) {
-        Column(modifier = Modifier.weight(1f).padding(bottom = extraPadding)) {
-            Image(painter = painterResource(id = R.drawable.profile_pic), contentDescription = null, modifier = Modifier. requiredSize(50.dp))
-            Text(text = "${doctor.name}  ${doctor.surname}",color=White)
-            Text(doctor.specialisation,color=White)
-            if (expand) {
-                Text("e-mail: ${doctor.email}",color=White)
-                Text("phone number: ${doctor.phoneNumber}",color=White)
-                Text("room: ${doctor.room}",color=White)
-            }
-        }
-        Column(modifier = Modifier.selectableGroup()) {
-            OutlinedButton(onClick = { expand = !expand }) {
-                Text(
-                    if (expand) "Show less" else "Show more",
-                    color = White
+    val extraPadding by animateDpAsState(targetValue = if (expand) 40.dp else 0.dp, label = "")
+    Surface(
+        border = BorderStroke(1.dp, White), color = PurpleDark,
+        shape = MaterialTheme.shapes.medium
+    ) {
+        Row(modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()) {
+            Column(modifier = Modifier
+                .weight(1f)
+                .padding(bottom = extraPadding)) {
+                Image(
+                    painter = painterResource(id = R.drawable.profile_pic),
+                    contentDescription = null,
+                    modifier = Modifier.requiredSize(50.dp)
                 )
+                Text(text = "${doctor.name}  ${doctor.surname}", color = White)
+                Text(doctor.specialisation, color = White)
+                if (expand) {
+                    Text("e-mail: ${doctor.email}", color = White)
+                    Text("phone number: ${doctor.phoneNumber}", color = White)
+                    Text("room: ${doctor.room}", color = White)
+                }
             }
-            OutlinedButton(onClick = {onDoctorSelected(doctor.id)
-            navController.navigate(Screen.AppointmentsDoctor.createRoute(doctor.id))}) {
-                Text(text = "Set the appointment",
-                    color = White
-                )
-            }
-            OutlinedButton(onClick = {onDoctorSelected(doctor.id)
-                navController.navigate(Screen.DoctorReviewScreen.createRoute(doctor.id))}) {
-                Text(text = "Reviews",
-                    color = White
-                )
-            }
+            Column(modifier = Modifier.selectableGroup()) {
+                OutlinedButton(onClick = { expand = !expand }) {
+                    Text(
+                        if (expand) "Show less" else "Show more",
+                        color = White
+                    )
+                }
+                OutlinedButton(onClick = {
+                    onDoctorSelected(doctor.id)
+                    navController.navigate(Screen.AppointmentsDoctor.createRoute(doctor.id))
+                }) {
+                    Text(
+                        text = "Set the appointment",
+                        color = White
+                    )
+                }
+                OutlinedButton(onClick = {
+                    onDoctorSelected(doctor.id)
+                    navController.navigate(Screen.DoctorReviewScreen.createRoute(doctor.id))
+                }) {
+                    Text(
+                        text = "Reviews",
+                        color = White
+                    )
+                }
 
+            }
         }
-    }
     }
 }
 
 @Composable
 fun DoctorList(doctors: List<Doctor>, navController: NavController) {
     var selectedDoctorId: String? by remember { mutableStateOf(null) }
-    var selectedDoctor : Doctor? by
+    var selectedDoctor: Doctor? by
     remember { mutableStateOf(null) }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         if (doctors.isEmpty()) {
             Text("No doctors available")
         } else
             LazyColumn {
-                item{Text("Select a doctor:", color = White)}
-                items(doctors){ doctor ->
-                    SingleDoctor(doctor = doctor, isSelected = (selectedDoctorId == doctor.id),
-                        onDoctorSelected = { id -> selectedDoctorId = id }, navController = navController)
+                item { Text("Select a doctor:", color = White) }
+                items(doctors) { doctor ->
+                    SingleDoctor(
+                        doctor = doctor,
+                        isSelected = (selectedDoctorId == doctor.id),
+                        onDoctorSelected = { id -> selectedDoctorId = id },
+                        navController = navController
+                    )
                 }
             }
-        }
+    }
 
 }
 
-class MainViewModel: ViewModel(){
+class MainViewModel : ViewModel() {
     private val _searchText = MutableStateFlow("")
     private val _isSearching = MutableStateFlow(false)
     val searchText = _searchText.asStateFlow()
     var doctors: StateFlow<List<Doctor>>? = MutableStateFlow(emptyList())
 
     val isSearching = _isSearching.asStateFlow()
+
     init {
         viewModelScope.launch {
-            val _doctors=MutableStateFlow(getDoctorList())
+            val _doctors = MutableStateFlow(getDoctorList())
 
-            doctors=searchText
+            doctors = searchText
                 .debounce(500L)
                 .onEach { _isSearching.update { true } }
                 .combine(_doctors) { text, doctors ->
@@ -166,7 +197,7 @@ class MainViewModel: ViewModel(){
 
 }
 
-suspend fun getDoctorList():List<Doctor>{
+suspend fun getDoctorList(): List<Doctor> {
     val mFireBase = DoctorDAO()
     val doctors = mFireBase.getAllDoctors()
     return doctors
@@ -179,24 +210,26 @@ fun DoctorScreen(navController: NavController) {
     val person by viewModel.doctors!!.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-
-    ModelNavDrawerUser(navController,drawerState) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            SearchBar(modifier = Modifier.fillMaxWidth(), viewModel = viewModel, searchText)
-            Spacer(modifier = Modifier.height(16.dp))
-            MediMateButton(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = { navController.navigate(Screen.MainUser.route)},
-                text="Go back")
-            Spacer(modifier = Modifier.height(16.dp))
-            if (isSearching) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center)
-                    )
+    UserProvider { profilePictureUrl ->
+        ModelNavDrawerUser(navController, drawerState, profilePictureUrl) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                SearchBar(modifier = Modifier.fillMaxWidth(), viewModel = viewModel, searchText)
+                Spacer(modifier = Modifier.height(16.dp))
+                MediMateButton(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    onClick = { navController.navigate(Screen.MainUser.route) },
+                    text = "Go back"
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                if (isSearching) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
+                } else {
+                    DoctorList(doctors = person, navController = navController)
                 }
-            } else {
-                DoctorList(doctors = person, navController = navController)
             }
         }
     }
@@ -205,19 +238,20 @@ fun DoctorScreen(navController: NavController) {
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel= viewModel(),
+    viewModel: MainViewModel = viewModel(),
     searchText: String
-){
-    TextField( value=searchText, onValueChange = viewModel::onSearchTextChange, trailingIcon = {
+) {
+    TextField(
+        value = searchText, onValueChange = viewModel::onSearchTextChange, trailingIcon = {
         Icon(Icons.Default.Search, contentDescription = null)
-    }, placeholder = { Text(stringResource(id=R.string.place_holder_search)) },
+    }, placeholder = { Text(stringResource(id = R.string.place_holder_search)) },
         modifier = modifier
-        .heightIn(min=56.dp)
-        .fillMaxWidth()
-        .padding(horizontal = 8.dp))
+            .heightIn(min = 56.dp)
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
+    )
 
 }
-
 
 
 @Preview(showSystemUi = true)

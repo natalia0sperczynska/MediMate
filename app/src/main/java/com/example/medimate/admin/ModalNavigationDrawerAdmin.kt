@@ -72,7 +72,7 @@ fun ModelNavDrawerAdmin(navController: NavController,
             ModalDrawerSheet(
                 modifier = Modifier.background(PurpleGrey2).offset(x = (1 - drawerAnimatable.value) * (-300.dp))
             ) {
-                DrawerHeader()
+                DrawerHeader("")
                 NavigationDrawerItem(
                     label = {Text(text="Menu", modifier = Modifier.padding(16.dp), color = Black)},
                     selected = false,

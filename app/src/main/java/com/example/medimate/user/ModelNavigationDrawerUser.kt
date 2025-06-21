@@ -1,4 +1,5 @@
 package com.example.medimate.user
+import ProfilePicture
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.LaunchedEffect
@@ -52,7 +53,7 @@ import com.google.rpc.context.AttributeContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 @Composable
-fun DrawerHeader(){
+fun DrawerHeader(profilePictureUrl: String?){
     val auth = FirebaseAuth.getInstance()
     val name= auth.currentUser?.displayName
     val email = auth.currentUser?.email
@@ -64,17 +65,25 @@ fun DrawerHeader(){
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Box(
-            modifier = Modifier
-                .size(64.dp)
-                .background(LightGrey, CircleShape)
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.profile_pic),
-                contentDescription = "Profile",
-                modifier = Modifier.size(32.dp).align(Alignment.Center)
-            )
-        }
+        ProfilePicture(
+            profilePictureUrl = profilePictureUrl,
+            modifier = Modifier.size(64.dp),
+            size = 64.dp,
+            placeholder = {
+                Box(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .background(LightGrey, CircleShape)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.profile_pic),
+                        contentDescription = "Profile",
+                        modifier = Modifier.size(32.dp).align(Alignment.Center)
+                    )
+                }
+            }
+        )
+
         name?.let {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -101,6 +110,7 @@ fun DrawerHeader(){
 @Composable
 fun ModelNavDrawerUser(navController: NavController,
                        drawerState: DrawerState,
+                       profilePictureUrl: String?=null,
                        content: @Composable () -> Unit){
     val scope = rememberCoroutineScope()
     val drawerAnimatable = remember { Animatable(0f)}
@@ -123,7 +133,7 @@ fun ModelNavDrawerUser(navController: NavController,
             ModalDrawerSheet(
                 modifier = Modifier.background(PurpleGrey).offset(x = (1 - drawerAnimatable.value) * (-300.dp))
             ) {
-                DrawerHeader()
+                DrawerHeader(profilePictureUrl = profilePictureUrl)
                 NavigationDrawerItem(
                     label = {Text(text="Menu", modifier = Modifier.padding(16.dp), color = Black)},
                     selected = false,

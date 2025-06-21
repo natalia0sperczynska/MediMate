@@ -1,5 +1,6 @@
 package com.example.medimate.admin.usersManagement.usersView
 
+import ProfilePicture
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -73,7 +74,10 @@ fun SingleUser(user: User, isSelected: Boolean, onUserSelected: (String) -> Unit
         shape= MaterialTheme.shapes.medium){
         Row (modifier = Modifier.padding(16.dp).fillMaxWidth()) {
             Column(modifier = Modifier.weight(1f).padding(bottom = extraPadding)) {
-                Image(painter = painterResource(id = R.drawable.profile_pic), contentDescription = null, modifier = Modifier. requiredSize(50.dp))
+                ProfilePicture(
+                    profilePictureUrl = user.profilePictureUrl,
+                    modifier = Modifier.requiredSize(50.dp)
+                )
                 Text(text = "${user.name}  ${user.surname}",color=White)
                 Text(user.dateOfBirth,color=White)
                 if (expand) {

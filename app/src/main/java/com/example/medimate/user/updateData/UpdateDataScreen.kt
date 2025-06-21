@@ -123,7 +123,6 @@ fun UpdateDataScreen(navController: NavController) {
         OutlinedTextField(value = allergies, onValueChange = { allergies = it }, label = { Text("Allergies") })
         OutlinedTextField(value = diseases, onValueChange = { diseases = it }, label = { Text("Diseases") })
         OutlinedTextField(value = medications, onValueChange = { medications = it }, label = { Text("Medications") })
-        OutlinedTextField(value = documents, onValueChange = { documents = it }, label = { Text("Documents") })
         MediMateButton("Change profile picture", onClick = {imagePickerLauncher.launch("image/*")},icon = Icons.Filled.Image)
         Spacer(modifier = Modifier.height(8.dp))
 

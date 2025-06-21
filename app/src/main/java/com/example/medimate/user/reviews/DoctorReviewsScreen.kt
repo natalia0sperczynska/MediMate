@@ -39,7 +39,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.medimate.firebase.UserProvider
 import com.example.medimate.firebase.review.Review
+import com.example.medimate.firebase.user.UserDAO
 import com.example.medimate.ui.theme.MediMateButton
 import com.example.medimate.ui.theme.PurpleDark
 import com.example.medimate.ui.theme.PurpleGrey2
@@ -50,12 +52,13 @@ import com.example.medimate.user.ModelNavDrawerUser
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DoctorReviewScreen(navController: NavController,selectedDoctorId: String){
+fun DoctorReviewScreen(navController: NavController, selectedDoctorId: String) {
     val viewModel = viewModel<ReviewModel>()
     val doctor by viewModel.selectedDoctor.collectAsState()
     val reviews by viewModel.reviews.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val reviewAdded by viewModel.reviewAdded.collectAsState()
+    var profilePictureUrl by remember { mutableStateOf<String?>(null) }
 
     var rating by remember { mutableStateOf(0.0) }
     var text by remember { mutableStateOf("") }
@@ -64,143 +67,146 @@ fun DoctorReviewScreen(navController: NavController,selectedDoctorId: String){
     val drawerState = rememberDrawerState(DrawerValue.Closed)
 
     LaunchedEffect(selectedDoctorId) {
-            viewModel.loadDoctorById(selectedDoctorId)
+        viewModel.loadDoctorById(selectedDoctorId)
 
     }
-    ModelNavDrawerUser(navController,drawerState) {
+    UserProvider { profilePictureUrl ->
+        ModelNavDrawerUser(navController, drawerState, profilePictureUrl = profilePictureUrl) {
 
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text("Doctor Reviews") },
-                    navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+            Scaffold(
+                topBar = {
+                    TopAppBar(
+                        title = { Text("Doctor Reviews") },
+                        navigationIcon = {
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                            }
                         }
-                    }
-                )
-            }
-        ) { padding ->
-            if (isLoading) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+                    )
                 }
-            } else {
-                Column(
-                    modifier = Modifier
-                        .padding(padding)
-                        .padding(16.dp)
-                ) {
-                    doctor?.let {
-                        Text(
-                            text = "Dr. ${it.name} ${it.surname}",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = PurpleDark
-                        )
-                        Text(
-                            text = "Specialization: ${it.specialisation}",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = PurpleDark
-                        )
-                        Row {
+            ) { padding ->
+                if (isLoading) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .padding(padding)
+                            .padding(16.dp)
+                    ) {
+                        doctor?.let {
                             Text(
-                                text = "Rating: ${"%.1f".format(it.rating)}",
+                                text = "Dr. ${it.name} ${it.surname}",
+                                style = MaterialTheme.typography.headlineSmall,
+                                color = PurpleDark
+                            )
+                            Text(
+                                text = "Specialization: ${it.specialisation}",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = PurpleDark
                             )
-                            Icon(
-                                imageVector = Icons.Filled.Star,
-                                contentDescription = "Rating",
-                                tint = Color.Yellow,
-                                modifier = Modifier.padding(start = 4.dp)
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
-
-                    if (currentUser != null) {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(8.dp),
-                            elevation = CardDefaults.cardElevation(4.dp)
-                        ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
+                            Row {
                                 Text(
-                                    text = "Leave a Review",
-                                    style = MaterialTheme.typography.titleMedium
+                                    text = "Rating: ${"%.1f".format(it.rating)}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = PurpleDark
                                 )
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                Text("Rating (0-5)")
-                                Slider(
-                                    value = rating.toFloat(),
-                                    onValueChange = { rating = it.toDouble() },
-                                    colors = SliderDefaults.colors( thumbColor = PurpleLight2,
-                                        activeTrackColor = PurpleMain,
-                                        inactiveTrackColor =  PurpleGrey2,
-                                    ),
-                                    valueRange = 0f..5f,
-                                    steps = 4,
-                                    modifier = Modifier.fillMaxWidth(),
-                                )
-                                Text(text = "%.1f".format(rating))
-
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text("Your Review")
-                                OutlinedTextField(
-                                    value = text,
-                                    onValueChange = { text = it },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    placeholder = { Text("Write your review here...") },
-                                    maxLines = 3
-                                )
-
-                                Spacer(modifier = Modifier.height(16.dp))
-                                MediMateButton(
-                                    "Submit Review",
-                                    onClick = {
-                                        if (selectedDoctorId.isNotEmpty() && currentUser.id.isNotEmpty()) {
-                                            val review = Review(
-                                                rate = rating,
-                                                text = text,
-                                                userId = currentUser.id,
-                                                doctorId = selectedDoctorId
-                                            )
-                                            viewModel.addReview(review)
-                                        }
-                                    },
-                                    modifier = Modifier.align(Alignment.End)
+                                Icon(
+                                    imageVector = Icons.Filled.Star,
+                                    contentDescription = "Rating",
+                                    tint = Color.Yellow,
+                                    modifier = Modifier.padding(start = 4.dp)
                                 )
                             }
+                            Spacer(modifier = Modifier.height(16.dp))
                         }
 
-                        if (reviewAdded) {
-                            LaunchedEffect(Unit) {
-                                viewModel.resetReviewAdded()
+                        if (currentUser != null) {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(8.dp),
+                                elevation = CardDefaults.cardElevation(4.dp)
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    Text(
+                                        text = "Leave a Review",
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    Text("Rating (0-5)")
+                                    Slider(
+                                        value = rating.toFloat(),
+                                        onValueChange = { rating = it.toDouble() },
+                                        colors = SliderDefaults.colors(
+                                            thumbColor = PurpleLight2,
+                                            activeTrackColor = PurpleMain,
+                                            inactiveTrackColor = PurpleGrey2,
+                                        ),
+                                        valueRange = 0f..5f,
+                                        steps = 4,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                    Text(text = "%.1f".format(rating))
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text("Your Review")
+                                    OutlinedTextField(
+                                        value = text,
+                                        onValueChange = { text = it },
+                                        modifier = Modifier.fillMaxWidth(),
+                                        placeholder = { Text("Write your review here...") },
+                                        maxLines = 3
+                                    )
+
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    MediMateButton(
+                                        "Submit Review",
+                                        onClick = {
+                                            if (selectedDoctorId.isNotEmpty() && currentUser.id.isNotEmpty()) {
+                                                val review = Review(
+                                                    rate = rating,
+                                                    text = text,
+                                                    userId = currentUser.id,
+                                                    doctorId = selectedDoctorId
+                                                )
+                                                viewModel.addReview(review)
+                                            }
+                                        },
+                                        modifier = Modifier.align(Alignment.End)
+                                    )
+                                }
                             }
-                            Text(
-                                text = "Review submitted successfully!",
-                                color = PurpleMain,
-                                modifier = Modifier.padding(top = 8.dp)
-                            )
+
+                            if (reviewAdded) {
+                                LaunchedEffect(Unit) {
+                                    viewModel.resetReviewAdded()
+                                }
+                                Text(
+                                    text = "Review submitted successfully!",
+                                    color = PurpleMain,
+                                    modifier = Modifier.padding(top = 8.dp)
+                                )
+                            }
+                        } else {
+                            Text("Please log in to leave a review")
                         }
-                    } else {
-                        Text("Please log in to leave a review")
-                    }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                    Text(
-                        text = "Reviews",
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                        Text(
+                            text = "Reviews",
+                            style = MaterialTheme.typography.titleMedium
+                        )
 
-                    if (reviews.isNullOrEmpty()) {
-                        Text("No reviews yet")
-                    } else {
-                        LazyColumn {
-                            items(reviews!!) { review ->
-                                ReviewItem(review = review)
+                        if (reviews.isNullOrEmpty()) {
+                            Text("No reviews yet")
+                        } else {
+                            LazyColumn {
+                                items(reviews!!) { review ->
+                                    ReviewItem(review = review)
+                                }
                             }
                         }
                     }
@@ -239,10 +245,11 @@ fun ReviewItem(review: Review) {
         }
     }
 }
+
 @Preview(showSystemUi = true)
 @Composable
 fun DoctorsViewPreview() {
     MediMateTheme {
-        DoctorReviewScreen(navController = rememberNavController(),"122wejuhfbwke")
+        DoctorReviewScreen(navController = rememberNavController(), "122wejuhfbwke")
     }
 }

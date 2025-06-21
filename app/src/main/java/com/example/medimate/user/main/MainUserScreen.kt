@@ -1,5 +1,6 @@
 package com.example.medimate.user.main
 
+import ProfilePicture
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -71,6 +72,7 @@ fun MainUserScreen(navController: NavController) {
     val firestoreClass = UserDAO()
     var closestAppointment by remember { mutableStateOf<Appointment?>(null) }
     var userName by remember { mutableStateOf("") }
+    var profilePictureUrl by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -81,6 +83,7 @@ fun MainUserScreen(navController: NavController) {
                 try {
                     val data = firestoreClass.loadUserData(userId)
                     userName = (data?.getValue("name") ?: "User").toString()
+                    profilePictureUrl = data?.get("profilePictureUrl") as? String
                     closestAppointment = firestoreClass.getClosestAppointment(userId)?.also {
                         if (it.id.isEmpty()) {
                             throw Exception("Appointment ID is missing")
@@ -96,8 +99,8 @@ fun MainUserScreen(navController: NavController) {
             }
         }
     }
-    ModelNavDrawerUser(navController, drawerState) {
-        ScreenModel(navController, userId.toString(), userName, drawerState, closestAppointment)
+    ModelNavDrawerUser(navController, drawerState, profilePictureUrl = profilePictureUrl) {
+        ScreenModel(navController, userId.toString(), userName, drawerState, closestAppointment, profilePictureUrl = profilePictureUrl)
     }
 }
 
@@ -107,7 +110,8 @@ fun ScreenModel(
     userId: String,
     userName: String,
     drawerState: DrawerState,
-    closestAppointment: Appointment?
+    closestAppointment: Appointment?,
+    profilePictureUrl: String?
 ) {
     Surface(color = Color(0xFFF9F9F9)) {
         Column(
@@ -118,7 +122,7 @@ fun ScreenModel(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Spacer(modifier = Modifier.height(8.dp))
-            HeaderCard(userName = userName)
+            HeaderCard(userName = userName,profilePictureUrl)
             SectionDivider()
             UpcomingAppointmentsCard(closestAppointment, navController = navController)
             SectionDivider(verticalPadding = 16.dp)
@@ -134,7 +138,7 @@ fun ScreenModel(
 }
 
 @Composable
-fun HeaderCard(userName: String) {
+fun HeaderCard(userName: String,profilePictureUrl:String?) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -149,23 +153,30 @@ fun HeaderCard(userName: String) {
                 .padding(20.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = Modifier
-                    .size(70.dp)
-                    .background(
-                        color = White.copy(alpha = 0.2f),
-                        shape = RoundedCornerShape(35.dp)
-                    )
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Profile",
-                    tint = White,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .size(32.dp)
-                )
-            }
+            ProfilePicture(
+                profilePictureUrl = profilePictureUrl,
+                modifier = Modifier.size(70.dp),
+                size = 70.dp,
+                placeholder = {
+                    Box(
+                        modifier = Modifier
+                            .size(70.dp)
+                            .background(
+                                color = White.copy(alpha = 0.2f),
+                                shape = RoundedCornerShape(35.dp)
+                            )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Profile",
+                            tint = White,
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .size(32.dp)
+                        )
+                    }
+                }
+            )
 
             Spacer(modifier = Modifier.width(16.dp))
 
@@ -597,7 +608,8 @@ fun MainUserScreenPreview() {
             userId = "123",
             userName = "John",
             drawerState = rememberDrawerState(DrawerValue.Closed),
-            closestAppointment = null
+            closestAppointment = null,
+            profilePictureUrl = ""
         )
     }
 }
