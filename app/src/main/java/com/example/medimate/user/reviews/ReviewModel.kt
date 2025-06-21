@@ -34,7 +34,7 @@ open class ReviewModel: ViewModel(){
         viewModelScope.launch {
             _isLoading.value = true
             _selectedDoctor.value = doctorDAO.getDoctorById(doctorId)
-            _reviews.value = reviewDAO.GetReviewsForDoctor(doctorId)
+            _reviews.value = reviewDAO.getReviewsForDoctor(doctorId)
             _isLoading.value = false
         }
     }
@@ -44,7 +44,7 @@ open class ReviewModel: ViewModel(){
             try {
                 reviewDAO.AddReview(review.doctorId, review)
                 _reviewAdded.value = true
-                _reviews.value = reviewDAO.GetReviewsForDoctor(review.doctorId)
+                _reviews.value = reviewDAO.getReviewsForDoctor(review.doctorId)
             } catch (_: Exception) {
             } finally {
                 _isLoading.value = false

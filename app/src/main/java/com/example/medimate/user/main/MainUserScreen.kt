@@ -451,7 +451,7 @@ fun DoctorCard(doctor: Doctor, navController: NavController) {
         if (showReviews && reviews.isEmpty()) {
             isLoading = true
             try {
-                reviews = reviewDao.GetReviewsForDoctor(doctor.id)
+                reviews = reviewDao.getReviewsForDoctor(doctor.id)
                 if (reviews.isEmpty()) {
                     Toast.makeText(context, "No reviews found for this doctor", Toast.LENGTH_SHORT).show()
                 }
@@ -513,7 +513,7 @@ fun DoctorCard(doctor: Doctor, navController: NavController) {
                             shape = RoundedCornerShape(16.dp)
                         )
                         .padding(horizontal = 8.dp, vertical = 4.dp)
-                        .clickable{showReviews =!showReviews}
+                        .clickable { showReviews = !showReviews }
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically

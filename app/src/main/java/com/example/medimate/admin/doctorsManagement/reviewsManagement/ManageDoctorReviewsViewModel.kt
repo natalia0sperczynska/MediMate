@@ -25,7 +25,7 @@ open class ManageDoctorReviewsViewModel (
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                _reviews.value = reviewDAO.GetReviewsForDoctor(doctorId)
+                _reviews.value = reviewDAO.getReviewsForDoctor(doctorId)
             } catch (e: Exception) {
             } finally {
                 _isLoading.value = false

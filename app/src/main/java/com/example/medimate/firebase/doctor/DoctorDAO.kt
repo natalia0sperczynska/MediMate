@@ -1,11 +1,17 @@
 package com.example.medimate.firebase.doctor
 
 import com.example.medimate.firebase.appointment.Appointment
+import com.example.medimate.firebase.appointment.Status
+import com.example.medimate.firebase.review.Review
 import com.example.medimate.firebase.user.User
 import com.example.medimate.user.appointments.getAvailableTermsForDate
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+
 /**
  * Class for interacting with Firebase Firestore for user data management.
  */
@@ -191,6 +197,32 @@ class DoctorDAO {
 
         return patientsList
     }
+
+    suspend fun getClosestAppointmentForDoctor(doctorId: String): Appointment? {
+        val all_app = loadAppointments(doctorId)
+        if (all_app.isEmpty()) {
+            return null
+        }
+        val formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy")
+        val today = LocalDate.now()
+
+        return all_app.mapNotNull { app ->
+            try{
+                val appointmentDate= LocalDate.parse(app.date,formatter)
+                if(!appointmentDate.isBefore(today)&&app.status!= Status.CANCELLED){
+                    Pair(app,appointmentDate)
+                } else null
+            } catch (e:Exception) {
+                null
+            }
+        }
+            .minByOrNull { (_, date) ->
+                ChronoUnit.DAYS.between(today, date)
+            }
+            ?.first
+    }
+
+
 
 
 }

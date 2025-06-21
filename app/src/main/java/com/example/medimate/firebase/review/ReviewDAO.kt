@@ -4,6 +4,8 @@ import android.util.Log
 import com.example.medimate.firebase.doctor.Doctor
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import com.google.firebase.Timestamp
+import java.util.Date
 
 class ReviewDAO {
     private val firestore = FirebaseFirestore.getInstance()
@@ -25,13 +27,25 @@ class ReviewDAO {
             ).await()
 
         }
-    suspend fun GetReviewsForDoctor(doctorId: String): List<Review> {
+    suspend fun getReviewsForDoctor(doctorId: String): List<Review> {
         return try {
             val doctorSnapshot = doctorsCollection.document(doctorId).get().await()
             if (doctorSnapshot.exists()) {
-                val doctor = doctorSnapshot.toObject(Doctor::class.java)
-                doctor?.reviews ?: emptyList()
-            }else {
+                val reviewsData = doctorSnapshot.get("reviews") as? List<Map<String, Any>> ?: emptyList()
+                reviewsData.map { data ->
+                    Review(
+                        rate = data["rate"] as? Double ?: 0.0,
+                        text = data["text"] as? String ?: "",
+                        userId = data["userId"] as? String ?: "",
+                        doctorId = data["doctorId"] as? String ?: "",
+                        timestamp = when (val ts = data["timestamp"]) {
+                            is Long -> ts
+                            is Timestamp -> ts.toDate().time
+                            else -> System.currentTimeMillis()
+                        }
+                    )
+                }
+            } else {
                 emptyList()
             }
         } catch (e: Exception) {
