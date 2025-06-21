@@ -54,6 +54,7 @@ class UserDAO {
         } catch (e: Exception) {
 
             throw Exception("Error loading user data: ${e.message}")
+            e.printStackTrace()
         }
     }
 
@@ -75,7 +76,6 @@ class UserDAO {
             }
 
             if (filteredData.isEmpty()) return
-
 
             mFireStore.collection("users")
                 .document(userId)
@@ -111,6 +111,7 @@ class UserDAO {
     }
     suspend fun getUserById(id: String?): User? {
         if (id.isNullOrBlank()) return null
+        println("Attempting to fetch user with ID: $id")
 
         return try {
             val documentSnapshot = FirebaseFirestore.getInstance()
@@ -118,10 +119,17 @@ class UserDAO {
                 .document(id)
                 .get()
                 .await()
+            println("Document exists: ${documentSnapshot.exists()}")
+            println("Document data: ${documentSnapshot.data}")
 
-            documentSnapshot.toObject(User::class.java)?.apply {
+            val user = documentSnapshot.toObject(User::class.java)?.apply {
                 this.id = documentSnapshot.id
+                println("Successfully mapped to User object")
             }
+            if (user == null) {
+                println("Failed to automatically map to User object")
+            }
+            user
 
         } catch (e: Exception) {
             e.printStackTrace()

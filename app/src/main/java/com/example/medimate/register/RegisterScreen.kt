@@ -207,7 +207,7 @@ private suspend fun registerUser(
             dateOfBirth = dateOfBirth,
             phoneNumber = "",
             profilePictureUrl = "",
-            address = mapOf(),
+            address = listOf(),
             allergies = listOf(),
             diseases = listOf(),
             medications = listOf()

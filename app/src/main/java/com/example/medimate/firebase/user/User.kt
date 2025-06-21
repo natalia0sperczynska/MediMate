@@ -26,12 +26,12 @@ data class User (
     var dateOfBirth: String = "",
     var phoneNumber: String = "",
     var profilePictureUrl: String = "",
-    var address:Map<String,String> = mapOf(),
-    var allergies:List<String> = listOf(),
-    var diseases:List<String> = listOf(),
-    var medications:List<String> = listOf(),
-    var documents:List<String> = listOf(),
-    var medicalHistory:List<Appointment> = listOf(),
+    var address:List<String> = emptyList(),
+    var allergies:List<String> = emptyList(),
+    var diseases:List<String> = emptyList(),
+    var medications:List<String> = emptyList(),
+    var documents:List<String> = emptyList(),
+   // var medicalHistory:List<Appointment> = listOf(),
 ){
     fun doesMatchSearchQuery(query: String): Boolean {
         val matchingCombinations = listOf(
@@ -62,15 +62,13 @@ data class User (
                 surname = data["surname"] as? String,
 
                 email = data["email"] as? String ?: "",
+                dateOfBirth = data["dateOfBirth"] as? String ?: "",
 
                 phoneNumber = data["phoneNumber"] as? String ?: "",
 
-                dateOfBirth = data["dateOfBirth"] as? String ?: "",
+                profilePictureUrl = data["profilePictureUrl"] as? String ?: "",
 
-                address = (data["address"] as? Map<*, *>)
-                    ?.mapNotNull { (key, value) ->
-                        if (key is String && value is String) key to value else null
-                    }?.toMap() ?: mapOf(),
+                address = (data["address"] as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
 
                 allergies = (data["allergies"] as? List<*>)
                     ?.mapNotNull { it as? String } ?: listOf(),
@@ -78,8 +76,9 @@ data class User (
                     ?.mapNotNull { it as? String } ?: listOf(),
                 medications = (data["medications"] as? List<*>)
                     ?.mapNotNull { it as? String } ?: listOf(),
+                documents = (data["documents"] as? List<*>)
+                    ?.mapNotNull { it as? String } ?: listOf(),
 
-                profilePictureUrl = data["profilePictureUrl"] as? String ?: ""
             )
         }
 

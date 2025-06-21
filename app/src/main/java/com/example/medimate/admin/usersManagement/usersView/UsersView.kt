@@ -153,7 +153,7 @@ class MainUserViewModel: ViewModel() {
                 .debounce(500L)
                 .collect { query ->
                     _isSearching.value = true
-                    val allUsers = UserDAO().getAllUsers() // Get fresh list
+                    val allUsers = UserDAO().getAllUsers()
                     val filtered = if (query.isBlank()) {
                         allUsers
                     } else {
@@ -180,7 +180,7 @@ suspend fun getUserList():List<User>{
 fun UsersScreen(navController: NavController) {
     val viewModel = viewModel<MainUserViewModel>()
     val searchText by viewModel.searchText.collectAsState()
-    val person by viewModel.users!!.collectAsState()
+    val person by viewModel.users.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)

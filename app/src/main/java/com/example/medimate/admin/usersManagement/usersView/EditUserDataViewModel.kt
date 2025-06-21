@@ -59,10 +59,8 @@ class EditUserDataViewModel(private val adminDAO: AdminDAO = AdminDAO()) : ViewM
         _userState.value = _userState.value?.copy(phoneNumber = phoneNumber)
     }
 
-    fun updateAddress(key: String, value: String) {
-        val currentAddress = _userState.value?.address?.toMutableMap() ?: mutableMapOf()
-        currentAddress[key] = value
-        _userState.value = _userState.value?.copy(address = currentAddress)
+    fun updateAddress(address: List<String>) {
+        _userState.value = _userState.value?.copy(address=address)
     }
 
     fun updateAllergies(allergies: List<String>) {

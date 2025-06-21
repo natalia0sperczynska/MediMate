@@ -2,6 +2,7 @@ package com.example.medimate.admin.usersManagement.userDocumentation
 
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -35,6 +36,7 @@ import com.example.medimate.ui.theme.MediMateButton
 import com.example.medimate.ui.theme.PurpleLight2
 import com.example.medimate.ui.theme.PurpleMain
 import com.example.medimate.ui.theme.White
+import androidx.core.net.toUri
 
 
 @Composable
@@ -46,6 +48,11 @@ fun UserDocumentation(
     val isUploading by viewModel.isUploading.collectAsState()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    val errorMessage by viewModel.errorMessage.collectAsState()
+
+    errorMessage?.let { message ->
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+    }
 
     if (userId != null) {
         LaunchedEffect(userId) {
@@ -118,7 +125,7 @@ Surface( color = MaterialTheme.colorScheme.background,
                                             .clickable {
                                                 val intent = Intent(
                                                     Intent.ACTION_VIEW,
-                                                    Uri.parse(url)
+                                                    url.toUri()
                                                 )
                                                 context.startActivity(intent)
                                             }

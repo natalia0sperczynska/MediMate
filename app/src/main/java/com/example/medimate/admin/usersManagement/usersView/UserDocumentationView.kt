@@ -2,6 +2,7 @@ package com.example.medimate.admin.usersManagement.usersView
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,18 +20,25 @@ class UserDocumentationViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     private val _isUploading = MutableStateFlow(false)
     val isUploading = _isUploading.asStateFlow()
+    private var _errorMessage = MutableStateFlow<String?>(null)
 
     val user = _user.asStateFlow()
     val isLoading = _isLoading.asStateFlow()
+    var errorMessage = _errorMessage.asStateFlow()
 
     fun loadUserData(userId: String) {
         viewModelScope.launch {
             _isLoading.value = true
+            _errorMessage.value = null
             try {
                 val user = UserDAO().getUserById(userId)
-                _user.value = user
-            } catch (e: Exception) {
+                if (user == null) {
+                    _errorMessage.value = "User not found"
 
+                }
+                _user.value = user?.copy()
+            } catch (e: Exception) {
+                Log.e("Error","${e.message}")
             } finally {
                 _isLoading.value = false
             }
@@ -40,7 +48,9 @@ class UserDocumentationViewModel : ViewModel() {
         viewModelScope.launch {
             _isUploading.value = true
             try {
-                val storageRef = Firebase.storage.reference.child("user_documents/$userId/${System.currentTimeMillis()}_${uri.lastPathSegment}")
+                val storage = Firebase.storage("gs://medimate-79d20.firebasestorage.app")
+                val filename = "${System.currentTimeMillis()}_${uri.lastPathSegment}"
+                val storageRef = storage.reference.child("user_documents/$userId/$filename")
                 storageRef.putFile(uri).await()
                 val downloadUrl = storageRef.downloadUrl.await().toString()
                 val userDAO = UserDAO()

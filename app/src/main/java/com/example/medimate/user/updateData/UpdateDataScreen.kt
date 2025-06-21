@@ -58,6 +58,7 @@ fun UpdateDataScreen(navController: NavController) {
     var diseases by remember { mutableStateOf("") }
     var medications by remember { mutableStateOf("") }
     var profileImageUrl by remember { mutableStateOf("") }
+    var documents by remember { mutableStateOf("") }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -79,11 +80,12 @@ fun UpdateDataScreen(navController: NavController) {
                         surname = user.surname ?: ""
                         email = user.email
                         phone = user.phoneNumber
-                        address = user.address.values.joinToString(", ")
+                        address = user.address.joinToString(", ")
                         allergies = user.allergies.joinToString(", ")
                         diseases = user.diseases.joinToString(", ")
                         medications = user.medications.joinToString(", ")
                         profileImageUrl = user.profilePictureUrl
+                        documents = user.documents.joinToString { "," }
                     }
                 } catch (e: Exception) {
                     Toast.makeText(context, "Error loading user data: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -121,6 +123,7 @@ fun UpdateDataScreen(navController: NavController) {
         OutlinedTextField(value = allergies, onValueChange = { allergies = it }, label = { Text("Allergies") })
         OutlinedTextField(value = diseases, onValueChange = { diseases = it }, label = { Text("Diseases") })
         OutlinedTextField(value = medications, onValueChange = { medications = it }, label = { Text("Medications") })
+        OutlinedTextField(value = documents, onValueChange = { documents = it }, label = { Text("Documents") })
         MediMateButton("Change profile picture", onClick = {imagePickerLauncher.launch("image/*")},icon = Icons.Filled.Image)
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -138,6 +141,7 @@ fun UpdateDataScreen(navController: NavController) {
                         "allergies" to allergies.split(",").map { it.trim() },
                         "diseases" to diseases.split(",").map { it.trim() },
                         "medications" to medications.split(",").map { it.trim() },
+                        "documents" to documents.split(",").map { it.trim() },
                         "profilePictureUrl" to profileImageUrl
                     )
 
@@ -183,13 +187,13 @@ fun uploadProfilePic(
                 contentType = "image/jpeg"
             }
             val storage = Firebase.storage("gs://medimate-79d20.firebasestorage.app")
-            val storageRef = storage.reference.child("user_documents/$userId/$imageUri")
-            storageRef .putFile(imageUri, metadata).await()
+            val filename = "profile_${System.currentTimeMillis()}"
+            val storageRef = storage.reference.child("user_profile_pics/$userId/$filename")
+            storageRef.putFile(imageUri, metadata).await()
             val downloadUrl = storageRef.downloadUrl.await().toString()
-            firestoreClass.updateUserData(userId, mapOf("profilePictureUrl" to downloadUrl))
-            FirebaseAuth.getInstance().currentUser?.updateProfile(
-                UserProfileChangeRequest.Builder().setPhotoUri(downloadUrl.toUri()).build()
-            )
+            firestoreClass.updateUserData(userId, mapOf(
+                "profilePictureUrl" to downloadUrl
+            ))
             onSuccess(downloadUrl)
             Toast.makeText(context, "Profile picture updated!", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {

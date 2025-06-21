@@ -124,29 +124,11 @@ fun EditUserDataScreen(
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
                 )
-                Text("Address", style = MaterialTheme.typography.headlineSmall)
                 OutlinedTextField(
-                    value = userState?.address?.get("street") ?: "",
-                    onValueChange = { viewModel.updateAddress("street", it) },
-                    label = { Text("Street") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
-                )
-
-                OutlinedTextField(
-                    value = userState?.address?.get("city") ?: "",
-                    onValueChange = { viewModel.updateAddress("city", it) },
-                    label = { Text("City") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
-                )
-
-                OutlinedTextField(
-                    value = userState?.address?.get("postalCode") ?: "",
-                    onValueChange = { viewModel.updateAddress("postalCode", it) },
-                    label = { Text("Postal Code") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    value = userState?.address?.joinToString(", ") ?: "",
+                    onValueChange = { viewModel.updateAddress(it.split(", ")) },
+                    label = { Text("Adress (comma separated)") },
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 Text("Medical Information", style = MaterialTheme.typography.headlineSmall)
