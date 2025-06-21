@@ -122,7 +122,7 @@ fun ScreenModel(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Spacer(modifier = Modifier.height(8.dp))
-            HeaderCard(userName = userName,profilePictureUrl)
+            HeaderCard(navController,userId=userId,userName = userName,profilePictureUrl)
             SectionDivider()
             UpcomingAppointmentsCard(closestAppointment, navController = navController)
             SectionDivider(verticalPadding = 16.dp)
@@ -138,14 +138,15 @@ fun ScreenModel(
 }
 
 @Composable
-fun HeaderCard(userName: String,profilePictureUrl:String?) {
+fun HeaderCard(navController: NavController,userId: String,userName: String,profilePictureUrl:String?) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(120.dp),
         colors = CardDefaults.cardColors(containerColor = PurpleMain),
         shape = RoundedCornerShape(24.dp),
-        elevation = CardDefaults.cardElevation(8.dp)
+        elevation = CardDefaults.cardElevation(8.dp),
+        onClick = {navController.navigate(Screen.UserDocumentation.createRoute(userId = userId))}
     ) {
         Row(
             modifier = Modifier

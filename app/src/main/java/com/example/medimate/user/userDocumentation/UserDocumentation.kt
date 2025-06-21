@@ -1,4 +1,4 @@
-package com.example.medimate.admin.usersManagement.userDocumentation
+package com.example.medimate.user.userDocumentation
 
 import android.content.Intent
 import android.net.Uri

@@ -15,7 +15,7 @@ import com.example.medimate.user.appointments.AppointmentsScreen
 import com.example.medimate.login.LoginScreen
 import com.example.medimate.admin.usersManagement.ManageUsers
 import com.example.medimate.admin.main.MainAdminScreen
-import com.example.medimate.admin.usersManagement.userDocumentation.UserDocumentation
+import com.example.medimate.user.userDocumentation.UserDocumentation
 import com.example.medimate.admin.doctorsManagement.editDoctorData.DoctorsAdmin
 import com.example.medimate.admin.doctorsManagement.editDoctorData.EditDoctorDataScreen
 import com.example.medimate.admin.doctorsManagement.reviewsManagement.ManageDoctorReviewsScreen
