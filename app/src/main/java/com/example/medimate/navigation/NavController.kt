@@ -21,6 +21,7 @@ import com.example.medimate.admin.doctorsManagement.editDoctorData.EditDoctorDat
 import com.example.medimate.admin.doctorsManagement.reviewsManagement.ManageDoctorReviewsScreen
 import com.example.medimate.chat.ChatSelectionScreen
 import com.example.medimate.admin.usersManagement.usersView.EditUserDataScreen
+import com.example.medimate.doctor.availability.SetAvailabilityScreen
 import com.example.medimate.doctor.main.MainDoctorScreen
 import com.example.medimate.mainViews.MainScreen
 import com.example.medimate.register.RegisterScreen
@@ -74,6 +75,9 @@ sealed class Screen(val route: String) {
     }
     object ChatSelection : Screen("chat_selection/{isDoctor}") {
         fun createRoute(isDoctor: Boolean) = "chat_selection/$isDoctor"
+    }
+    object DoctorAvailability : Screen("doctor_availability/{doctorId}") {
+        fun createRoute(doctorId: String) = "doctor_availability/$doctorId"
     }
 }
 
@@ -209,6 +213,15 @@ fun AppNavHost(navController: NavHostController) {
         ) { backStackEntry ->
             val isDoctor = backStackEntry.arguments?.getBoolean("isDoctor") ?: false
             ChatSelectionScreen(navController = navController, isDoctor = isDoctor)
+        }
+        composable(
+            route = Screen.DoctorAvailability.route,
+            arguments = listOf(navArgument("doctorId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val doctorId = backStackEntry.arguments?.getString("doctorId")
+            if (doctorId != null) {
+                SetAvailabilityScreen(navController, doctorId = doctorId)
+            }
         }
     }
 }

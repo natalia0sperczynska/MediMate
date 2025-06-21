@@ -313,9 +313,9 @@ fun DoctorMainMenuItems(): List<MainMenuItem> = listOf(
         "Chat"
     ) { nav, id -> nav.navigate(Screen.ChatSelection.createRoute(true)) },
     MainMenuItem(
-        Icons.Default.Settings,
-        "Update Data"
-    ) { nav, id -> nav.navigate(Screen.UpdateData.route) },
+        Icons.Default.People,
+        "My Availability"
+    ) { nav, id -> nav.navigate(Screen.DoctorAvailability.createRoute(id)) },
     MainMenuItem(Icons.Default.Star, "Reviews") { nav, id -> nav.navigate(Screen.UpdateData.route) }
 )
 

@@ -1,4 +1,5 @@
 package com.example.medimate.login
+
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -28,6 +29,7 @@ import com.example.medimate.ui.theme.PurpleGrey2
 import com.example.medimate.ui.theme.PurpleMain
 import com.example.medimate.ui.theme.White
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -36,18 +38,24 @@ fun LoginScreen(navController: NavController) {
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var passwordVisible by remember { mutableStateOf(false) }
-    val icon= if (passwordVisible)
+    val icon = if (passwordVisible)
         painterResource(id = android.R.drawable.ic_secure)
     else
         painterResource(id = android.R.drawable.ic_menu_view)
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         //Image(painter = painterResource(id = R.drawable.medimate_logo), contentDescription = null, modifier = Modifier.size(200.dp))
-        Text(text = stringResource(R.string.app_name), style = MaterialTheme.typography.headlineLarge,color = MaterialTheme.colorScheme.secondary)
+        Text(
+            text = stringResource(R.string.app_name),
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.secondary
+        )
 
         Spacer(modifier = Modifier.height(18.dp))
 
@@ -60,7 +68,7 @@ fun LoginScreen(navController: NavController) {
             leadingIcon = {
                 Icon(
                     painter = painterResource(id = android.R.drawable.ic_dialog_email),
-                    contentDescription =null
+                    contentDescription = null
                 )
             }
         )
@@ -76,17 +84,17 @@ fun LoginScreen(navController: NavController) {
             leadingIcon = {
                 Icon(
                     painter = painterResource(id = android.R.drawable.ic_secure),
-                    contentDescription =null
+                    contentDescription = null
                 )
             },
             trailingIcon = {
-                IconButton(onClick = { passwordVisible=!passwordVisible}){
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(painter = icon, contentDescription = null)
                 }
             },
-            visualTransformation = if(passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
 
-        )
+            )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -97,26 +105,50 @@ fun LoginScreen(navController: NavController) {
                     .addOnCompleteListener { task ->
                         isLoading = false
                         if (task.isSuccessful) {
-                            Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
-                            when {
-                                email.contains("@doc") -> {
-                                    navController.navigate(Screen.MainDoctor.route)
-                                }
-                                email.contains("@admin") -> {
-                                    navController.navigate(Screen.MainAdmin.route)
-                                }
-                                else -> {
-                                    navController.navigate(Screen.MainUser.route)
-                                }
+                            val user = FirebaseAuth.getInstance().currentUser
+                            user?.let { firebaseUser ->
+                                FirebaseFirestore.getInstance()
+                                    .collection("admins")
+                                    .document(firebaseUser.uid)
+                                    .get()
+                                    .addOnSuccessListener { adminDoc ->
+                                        if (adminDoc.exists()) {
+                                            navController.navigate(Screen.MainAdmin.route)
+                                        } else {
+                                            FirebaseFirestore.getInstance()
+                                                .collection("doctors")
+                                                .document(firebaseUser.uid)
+                                                .get()
+                                                .addOnSuccessListener { doctorDoc ->
+                                                    if (doctorDoc.exists()) {
+                                                        navController.navigate(Screen.MainDoctor.route)
+                                                    } else {
+                                                        navController.navigate(Screen.MainUser.route)
+                                                    }
+                                                }
+                                                .addOnFailureListener {
+                                                    Toast.makeText(
+                                                        context,
+                                                        "Error checking doctor status",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                }
+                                        }
+                                    }
+                                    .addOnFailureListener {
+                                        Toast.makeText(
+                                            context,
+                                            "Error checking admin status",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                             }
-                        } else {
-                            Toast.makeText(context, "Login Failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                         }
                     }
             },
             modifier = Modifier.fillMaxWidth(),
             enabled = email.isNotBlank() && password.isNotBlank(),
-            colors=ButtonDefaults.buttonColors(
+            colors = ButtonDefaults.buttonColors(
                 containerColor = PurpleMain,
                 contentColor = White,
                 disabledContainerColor = PurpleGrey2,
@@ -126,17 +158,21 @@ fun LoginScreen(navController: NavController) {
             if (isLoading) {
                 CircularProgressIndicator(color = White)
             } else {
-                Text("Login",color= White)
+                Text("Login", color = White)
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         TextButton(onClick = { navController.navigate(Screen.Register.route) }) {
-            Text("Don't have an account? Register here",color= MaterialTheme.colorScheme.secondary)
+            Text(
+                "Don't have an account? Register here",
+                color = MaterialTheme.colorScheme.secondary
+            )
         }
     }
 }
+
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun LoginScreenPreview() {

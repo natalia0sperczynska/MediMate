@@ -130,43 +130,56 @@ fun AddDoctor(navController: NavController) {
                 LaunchedEffect(Unit) {
                     doctors = adminDAO.getAllDoctors()
                 }
-
                 Button(
                     onClick = {
-                        val doctor = Doctor(
-                            id = adminDAO.generateDoctorId(), name = name, surname = surname,
-                            email = email,
-                            phoneNumber = phoneNumber,
-                            specialisation = specialisation,
-                            room = room,
-                            profilePicture = ""
-                        )
                         scope.launch {
                             try {
+                                isLoading = true
+                                val authResult = FirebaseAuth.getInstance()
+                                    .createUserWithEmailAndPassword(email, password)
+                                    .await()
+                                val doctorUid = authResult.user?.uid
+                                    ?: throw Exception("Failed to get user UID")
+
+                                val doctor = Doctor(
+                                    id = doctorUid,
+                                    name = name,
+                                    surname = surname,
+                                    email = email,
+                                    phoneNumber = phoneNumber,
+                                    specialisation = specialisation,
+                                    room = room,
+                                    profilePicture = ""
+                                )
+
                                 adminDAO.addDoctor(adminId, doctor)
-                                doctors = adminDAO.getAllDoctors()
-                                val authResult = FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password).await()
+
                                 snackbarHostState.showSnackbar(
                                     message = "Doctor added successfully!",
                                     duration = SnackbarDuration.Short
                                 )
+
+                                name = ""
+                                surname = ""
+                                email = ""
+                                phoneNumber=""
+                                room=""
+                                specialisation=""
+                                password=""
+
                             } catch (e: Exception) {
                                 snackbarHostState.showSnackbar(
-                                    message = "Failed to add doctor",
-                                    duration = SnackbarDuration.Short
+                                    message = "Error: ${e.message}",
+                                    duration = SnackbarDuration.Long
                                 )
-
+                            } finally {
+                                isLoading = false
                             }
                         }
                     },
                     modifier = Modifier.padding(top = 8.dp),
                     enabled = name.isNotBlank() && surname.isNotBlank() && email.isNotBlank()
                 ) {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_menu_add),
-                        contentDescription = null
-                    )
                     Text("Add Doctor")
                 }
                 Spacer(modifier = Modifier.height(24.dp))
