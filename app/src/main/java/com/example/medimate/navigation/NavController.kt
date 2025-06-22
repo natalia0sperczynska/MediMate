@@ -76,9 +76,7 @@ sealed class Screen(val route: String) {
     object ChatSelection : Screen("chat_selection/{isDoctor}") {
         fun createRoute(isDoctor: Boolean) = "chat_selection/$isDoctor"
     }
-    object DoctorAvailability : Screen("doctor_availability/{doctorId}") {
-        fun createRoute(doctorId: String) = "doctor_availability/$doctorId"
-    }
+    object DoctorAvailability : Screen("doctor_availability")
 }
 
 @SuppressLint("ViewModelConstructorInComposable")
@@ -214,14 +212,8 @@ fun AppNavHost(navController: NavHostController) {
             val isDoctor = backStackEntry.arguments?.getBoolean("isDoctor") ?: false
             ChatSelectionScreen(navController = navController, isDoctor = isDoctor)
         }
-        composable(
-            route = Screen.DoctorAvailability.route,
-            arguments = listOf(navArgument("doctorId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val doctorId = backStackEntry.arguments?.getString("doctorId")
-            if (doctorId != null) {
-                SetAvailabilityScreen(navController, doctorId = doctorId)
-            }
+        composable(Screen.DoctorAvailability.route) {
+            SetAvailabilityScreen(navController)
         }
     }
 }

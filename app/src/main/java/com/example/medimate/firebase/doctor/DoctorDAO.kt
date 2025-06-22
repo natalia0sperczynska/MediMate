@@ -2,6 +2,7 @@ package com.example.medimate.firebase.doctor
 
 import com.example.medimate.firebase.appointment.Appointment
 import com.example.medimate.firebase.appointment.Status
+import com.example.medimate.firebase.appointment.Term
 import com.example.medimate.firebase.review.Review
 import com.example.medimate.firebase.user.User
 import com.example.medimate.user.appointments.getAvailableTermsForDate
@@ -102,6 +103,20 @@ class DoctorDAO {
         }
         return appointmentsList
 
+    }
+    suspend fun updateDoctorAvailabilityNotApp(doctor: Doctor, date: String, terms: List<Term>) {
+        val mFireStore = FirebaseFirestore.getInstance()
+        try {
+            val updateChanges = doctor.availabilityChanges.toMutableMap().apply {
+                put(date, terms)
+            }
+
+            mFireStore.collection("doctors").document(doctor.id)
+                .update("availabilityChanges", updateChanges)
+                .await()
+        } catch (e: Exception) {
+            throw Exception("Error updating availability: ${e.message}")
+        }
     }
 
     suspend fun updateDoctorAvailability(doctor: Doctor?,appointment: Appointment){
