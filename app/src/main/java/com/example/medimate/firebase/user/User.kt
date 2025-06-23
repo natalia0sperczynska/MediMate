@@ -31,6 +31,7 @@ data class User (
     var diseases:List<String> = emptyList(),
     var medications:List<String> = emptyList(),
     var documents:List<String> = emptyList(),
+    var fcmToken: String = ""
    // var medicalHistory:List<Appointment> = listOf(),
 ){
     fun doesMatchSearchQuery(query: String): Boolean {

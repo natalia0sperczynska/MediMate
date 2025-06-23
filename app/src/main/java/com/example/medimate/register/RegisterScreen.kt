@@ -82,7 +82,7 @@ fun RegisterScreen(navController: NavHostController) {
         OutlinedTextField(
             value = dateOfBirth?.let { convertMillisToDate(it) } ?: "",
             onValueChange = {},
-            label = { Text("Date of Birth") },
+            label = { Text("Date of Birth (MM/DD/YYYY)") },
             readOnly = true,
             modifier = Modifier.clickable { showDatePicker = true }.fillMaxWidth(),
             leadingIcon = {
@@ -121,11 +121,17 @@ fun RegisterScreen(navController: NavHostController) {
             }
         )
         Spacer(modifier = Modifier.height(18.dp))
+
         Button(onClick = {
+//            if (dateOfBirth == null) {
+//                Toast.makeText(context, "Please select a date of birth", Toast.LENGTH_SHORT).show()
+//                return@Button
+//            }
             coroutineScope.launch {
-                registerUser(name, surname, email, dateOfBirth?.let { convertMillisToDate(it) } ?: "", password, repeatPassword, fireStore, context)
+                registerUser(name, surname, email,
+                    dateOfBirth!!.toString(), password, repeatPassword, fireStore, context)
             }
-        },colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary), modifier = Modifier.fillMaxWidth(),shape = MaterialTheme.shapes.large,enabled = name.isNotBlank() && surname.isNotBlank() && email.isNotBlank() && dateOfBirth != null && password.isNotBlank() && repeatPassword.isNotBlank()) {
+        },colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary), modifier = Modifier.fillMaxWidth(),shape = MaterialTheme.shapes.large,enabled = name.isNotBlank() && surname.isNotBlank() && email.isNotBlank() && password.isNotBlank() && repeatPassword.isNotBlank()) {
             Text("Create an Account", color = MaterialTheme.colorScheme.onSecondary)
         }
         Spacer(modifier = Modifier.height(18.dp))
@@ -136,7 +142,12 @@ fun RegisterScreen(navController: NavHostController) {
 
     if (showDatePicker) {
         DatePickerModal(
-            onDateSelected = { dateOfBirth = it },
+            onDateSelected = { selectedDate ->
+                selectedDate?.let {
+                    dateOfBirth = it
+                }
+                showDatePicker = false
+            },
             onDismiss = { showDatePicker = false }
         )
     }

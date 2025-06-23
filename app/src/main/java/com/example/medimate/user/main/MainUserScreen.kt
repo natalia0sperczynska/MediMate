@@ -1,6 +1,7 @@
 package com.example.medimate.user.main
 
 import ProfilePicture
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -61,6 +62,10 @@ import com.example.medimate.ui.theme.PurpleLight2
 import com.example.medimate.user.appointments.AppointmentsViewPreview
 import com.example.medimate.user.doctorsView.getDoctorList
 import com.example.medimate.user.reviews.ReviewItem
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.currentCoroutineContext
 
 
@@ -77,8 +82,24 @@ fun MainUserScreen(navController: NavController) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+
     LaunchedEffect(userId) {
         if (userId != null) {
+            FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val token = task.result
+                    Firebase.firestore.collection("users").document(userId)
+                            .update("fcmToken", token)
+                            .addOnSuccessListener {
+                                Log.d("FCM", "Token saved successfully")
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("FCM", "Error saving token", e)
+                            }
+                } else {
+                    Log.w("FCM", "Fetching FCM token failed", task.exception)
+                }
+            }
             coroutineScope.launch {
                 try {
                     val data = firestoreClass.loadUserData(userId)
