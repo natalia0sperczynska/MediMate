@@ -30,7 +30,8 @@ data class Doctor(
     var availability: Availability = Availability(),
     var availabilityChanges: Map<String, List<Term>> = emptyMap(),
     var rating: Double =0.0,
-    var reviews:List<Review> = emptyList()
+    var reviews:List<Review> = emptyList(),
+    var fcmToken: String = ""
 
 ) {
     fun getAvailableTermsForDate(date: String): List<Term> {

@@ -1,5 +1,17 @@
 package com.example.medimate.user.main
-
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.filled.SmartToy
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.unit.dp
+import com.example.medimate.ui.theme.Black
+import com.example.medimate.ui.theme.PurpleLight
+import com.example.medimate.ui.theme.PurpleMain
+import com.example.medimate.ui.theme.White
 import ProfilePicture
 import android.util.Log
 import android.widget.Toast
@@ -8,6 +20,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.animation.core.*
 import androidx.compose.animation.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -25,8 +38,6 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
@@ -46,11 +57,15 @@ import com.example.medimate.user.ModelNavDrawerUser
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.LightGray
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import com.example.healme.R
 import com.example.medimate.firebase.appointment.Appointment
 import com.example.medimate.firebase.doctor.Doctor
 import com.example.medimate.firebase.doctor.DoctorDAO
@@ -74,6 +89,7 @@ fun MainUserScreen(navController: NavController) {
     val auth = FirebaseAuth.getInstance()
     val context = LocalContext.current
     val userId = auth.currentUser?.uid
+    var isLoading by remember { mutableStateOf(true) }
     val firestoreClass = UserDAO()
     var closestAppointment by remember { mutableStateOf<Appointment?>(null) }
     var userName by remember { mutableStateOf("") }
@@ -89,13 +105,13 @@ fun MainUserScreen(navController: NavController) {
                 if (task.isSuccessful) {
                     val token = task.result
                     Firebase.firestore.collection("users").document(userId)
-                            .update("fcmToken", token)
-                            .addOnSuccessListener {
-                                Log.d("FCM", "Token saved successfully")
-                            }
-                            .addOnFailureListener { e ->
-                                Log.e("FCM", "Error saving token", e)
-                            }
+                        .update("fcmToken", token)
+                        .addOnSuccessListener {
+                            Log.d("FCM", "Token saved successfully")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("FCM", "Error saving token", e)
+                        }
                 } else {
                     Log.w("FCM", "Fetching FCM token failed", task.exception)
                 }
@@ -116,12 +132,27 @@ fun MainUserScreen(navController: NavController) {
                         "Failed to load user data: ${e.message}",
                         Toast.LENGTH_SHORT
                     ).show()
+                } finally {
+                    isLoading = false
                 }
             }
+        }else{
+            isLoading=true
         }
     }
-    ModelNavDrawerUser(navController, drawerState, profilePictureUrl = profilePictureUrl) {
-        ScreenModel(navController, userId.toString(), userName, drawerState, closestAppointment, profilePictureUrl = profilePictureUrl)
+    if (isLoading) {
+        LoadingScreen()
+    } else {
+        ModelNavDrawerUser(navController, drawerState, profilePictureUrl = profilePictureUrl) {
+            ScreenModel(
+                navController,
+                userId.toString(),
+                userName,
+                drawerState,
+                closestAppointment,
+                profilePictureUrl = profilePictureUrl
+            )
+        }
     }
 }
 
@@ -619,6 +650,62 @@ fun SectionDivider(modifier: Modifier = Modifier,
         color = color,
         thickness = thickness,
     )
+}
+
+@Composable
+fun LoadingScreen() {
+    val infiniteTransition = rememberInfiniteTransition()
+    val pulseValue by infiniteTransition.animateFloat(
+        initialValue = 0.8f,
+        targetValue = 1.2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(White),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(120.dp)
+                    .scale(pulseValue)
+                    .background(
+                        color = PurpleMain,
+                        shape = RoundedCornerShape(24.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.medimate_logo),
+                    contentDescription = "App Logo",
+                    modifier = Modifier.size(64.dp)
+                )
+            }
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth(0.6f)
+                    .height(8.dp)
+                    .clip(RoundedCornerShape(4.dp)),
+                color = PurpleMain,
+                trackColor = PurpleLight.copy(alpha = 0.2f)
+            )
+
+            Text(
+                text = "Preparing your MediMate experience",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Black.copy(alpha = 0.7f)
+            )
+        }
+    }
 }
 
 @Preview(showSystemUi = true)
