@@ -32,7 +32,6 @@ data class User (
     var medications:List<String> = emptyList(),
     var documents:List<String> = emptyList(),
     var fcmToken: String = ""
-   // var medicalHistory:List<Appointment> = listOf(),
 ){
     fun doesMatchSearchQuery(query: String): Boolean {
         val matchingCombinations = listOf(

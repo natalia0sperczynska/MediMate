@@ -3,13 +3,11 @@ package com.example.medimate.doctor.main
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.launch
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.example.medimate.ui.theme.MediMateTheme
-import kotlinx.coroutines.launch
-import androidx.compose.foundation.rememberScrollState
 import ProfilePicture
 import android.util.Log
 import android.widget.Toast
@@ -23,13 +21,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarHalf
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,16 +35,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.medimate.doctor.ModelNavDrawerDoctor
 import com.example.medimate.firebase.appointment.Appointment
 import com.example.medimate.firebase.doctor.DoctorDAO
 import com.example.medimate.firebase.review.Review
 import com.example.medimate.firebase.review.ReviewDAO
+import com.example.medimate.firebase.user.User
 import com.example.medimate.firebase.user.UserDAO
 import com.example.medimate.navigation.Screen
 import com.example.medimate.user.main.SectionDivider
 import com.example.medimate.ui.theme.*
+import com.example.medimate.user.main.LoadingScreen
 import com.google.firebase.auth.FirebaseAuth
 /**
  * Main screen for doctors displaying their dashboard with appointments, quick actions, and reviews.
@@ -66,6 +64,9 @@ fun MainDoctorScreen(navController: NavController) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var closestAppointment by remember { mutableStateOf<Appointment?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
+    var frequentPatients by remember { mutableStateOf<List<Pair<User, Int>>>(emptyList()) }
+    var doctorStats by remember { mutableStateOf<Map<String, Any>?>(null) }
 
     LaunchedEffect(doctorId) {
         if (doctorId != null) {
@@ -73,6 +74,8 @@ fun MainDoctorScreen(navController: NavController) {
                 try {
                     val data = firestoreClass.loadDoctorData(doctorId)
                     doctorName = (data?.getValue("name") ?: "Doctor").toString()
+                    frequentPatients = firestoreClass.getFrequentPatients(doctorId)
+                    doctorStats = firestoreClass.getDoctorStatistics(doctorId)
                     profilePictureUrl = data?.get("profilePictureUrl") as? String
                     closestAppointment =
                         firestoreClass.getClosestAppointmentForDoctor(doctorId)?.also {
@@ -87,18 +90,30 @@ fun MainDoctorScreen(navController: NavController) {
                         Toast.LENGTH_SHORT
                     ).show()
                 }
+                finally{
+                    isLoading=false
+                }
             }
         }
+        else{
+            isLoading=false
+        }
     }
-    ModelNavDrawerDoctor(navController, drawerState, profilePictureUrl) {
-        ScreenModelDoctor(
-            navController,
-            doctorId.toString(),
-            doctorName,
-            drawerState,
-            closestAppointment,
-            profilePictureUrl
-        )
+    if (isLoading) {
+        LoadingScreen()
+    } else {
+        ModelNavDrawerDoctor(navController, drawerState, profilePictureUrl) {
+            ScreenModelDoctor(
+                navController,
+                doctorId.toString(),
+                doctorName,
+                drawerState,
+                closestAppointment,
+                profilePictureUrl,
+                frequentPatients,
+                doctorStats
+            )
+        }
     }
 }
 
@@ -109,7 +124,9 @@ fun ScreenModelDoctor(
     doctorName: String,
     drawerState: DrawerState,
     closestAppointment: Appointment?,
-    profilePictureUrl: String?
+    profilePictureUrl: String?,
+    frequentPatients: List<Pair<User, Int>>,
+    doctorStats: Map<String, Any>?
 ) {
     Surface(color = Color(0xFFF9F9F9)) {
         LazyColumn(
@@ -122,8 +139,17 @@ fun ScreenModelDoctor(
                 Spacer(modifier = Modifier.height(8.dp))
                 DoctorHeaderCard(doctorName, profilePictureUrl)
                 SectionDivider()
+                DailyStatsCard(
+                    appointmentsToday = (doctorStats?.get("totalAppointments") as? Int) ?: 0,
+                    completed = (doctorStats?.get("completedAppointments") as? Int) ?: 0,
+                    averageRating = (doctorStats?.get("averageRating") as? Double) ?: 0.0
+                )
                 NextAppointmentCard(closestAppointment, navController)
                 SectionDivider(verticalPadding = 16.dp)
+                if (frequentPatients.isNotEmpty()) {
+                    FrequentPatientsSection(patients = frequentPatients)
+                }
+                SectionDivider()
                 DoctorMainMenuSection(navController, doctorId)
                 SectionDivider()
                 RecentReviewsSection(doctorId)
@@ -210,7 +236,10 @@ fun DoctorHeaderCard(doctorName: String, profilePictureUrl: String?) {
  */
 @Composable
 fun NextAppointmentCard(closestAppointment: Appointment?, navController: NavController) {
-
+    var patientName by remember { mutableStateOf("") }
+    var patientSurname by remember { mutableStateOf("") }
+    var patientId by remember { mutableStateOf("") }
+    val userDAO=UserDAO()
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -254,6 +283,11 @@ fun NextAppointmentCard(closestAppointment: Appointment?, navController: NavCont
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     closestAppointment?.let {
+                        LaunchedEffect(Unit) {
+                            patientId=closestAppointment.patientId
+                            patientName= userDAO.getUserById(patientId)?.name ?: ""
+                            patientSurname= userDAO.getUserById(patientId)?.surname ?: ""
+                        }
                         Text(
                             text = it.date,
                             style = MaterialTheme.typography.bodyMedium,
@@ -261,7 +295,7 @@ fun NextAppointmentCard(closestAppointment: Appointment?, navController: NavCont
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Patient: ${it.patientId}",
+                            text = "Patient: ${patientName} ${patientSurname}",
                             style = MaterialTheme.typography.bodySmall,
                             color = White.copy(alpha = 0.7f)
                         )
@@ -329,9 +363,9 @@ data class MainMenuItem(
 
 fun DoctorMainMenuItems(): List<MainMenuItem> = listOf(
     MainMenuItem(
-        Icons.Default.People,
-        "My Patients"
-    ) { nav, id -> nav.navigate(Screen.UpdateData.route) },
+        Icons.Default.Star,
+        "My Reviews"
+    ) { nav, id -> nav.navigate(Screen.DoctorMyReviews.route) },
     MainMenuItem(
         Icons.Default.Chat,
         "Chat"
@@ -535,7 +569,116 @@ fun DoctorActionsSection(navController: NavController) {
         )
     }
 }
+@Composable
+fun FrequentPatientsSection(patients: List<Pair<User, Int>>) {
+    Column {
+        Text(
+            text = "Frequent Patients",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        )
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(patients.take(5)) { (patient, count) ->
+                PatientChip(patient = patient, appointmentCount = count)
+            }
+        }
+    }
+}
 
+@Composable
+fun PatientChip(patient: User, appointmentCount: Int) {
+    Card(
+        onClick = { },
+        colors = CardDefaults.cardColors(containerColor = PurpleLight2),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .background(color = PurpleMain, shape = CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = (patient.name?.take(1) ?: "") + (patient.surname?.take(1) ?: ""),
+                    color = White
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Column {
+                Text(text = "${patient.name} ${patient.surname}")
+                Text(
+                    text = "$appointmentCount visits",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = White.copy(alpha = 0.8f)
+                )
+            }
+        }
+    }
+}
+@Composable
+fun DailyStatsCard(appointmentsToday: Int, completed: Int, averageRating: Double) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = White),
+        elevation = CardDefaults.cardElevation(4.dp),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(24.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            StatItem(
+                value = appointmentsToday.toString(),
+                label = "Today's Appointments",
+                icon = Icons.Default.Event
+            )
+            StatItem(
+                value = completed.toString(),
+                label = "Completed",
+                icon = Icons.Default.Check
+            )
+            StatItem(
+                value = "%.1f".format(averageRating),
+                label = "Average Rating",
+                icon = Icons.Default.Star
+            )
+        }
+    }
+}
+@Composable
+fun StatItem(value: String, label: String, icon: ImageVector) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                tint = PurpleMain,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+        }
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.Gray
+        )
+    }
+}
 @Preview(showBackground = true)
 @Composable
 fun MainDoctorScreenPreview() {

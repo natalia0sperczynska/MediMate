@@ -36,7 +36,13 @@ import com.example.medimate.user.appointments.YourFutureAppointmentsScreen
 import com.example.medimate.user.updateData.UpdateDataScreen
 import com.example.medimate.user.doctorsView.DoctorScreen
 import com.example.medimate.user.reviews.DoctorReviewScreen
-
+import com.example.medimate.doctor.reviews.DoctorMyReviewsScreen
+import com.example.medimate.doctor.updateData.UpdateDataDoctor
+/**
+ * Sealed class representing all possible screens (routes) in the application navigation.
+ *
+ * @property route The navigation route string associated with the screen.
+ */
 sealed class Screen(val route: String) {
     object Main : Screen("main")
     object MainDoctor : Screen("main_doctor")
@@ -84,9 +90,16 @@ sealed class Screen(val route: String) {
     object DoctorAvailability : Screen("doctor_availability")
 
     object EditDoctorAvailability : Screen("edit_doctor_availability")
+    object DoctorMyReviews : Screen("doctor_my_reviews")
+    object UpdateDataDoctor : Screen("update_data_doctor")
 
 }
-
+/**
+ * Composable function that sets up the navigation host for the application.
+ * Defines all navigation routes and their corresponding composable screens.
+ *
+ * @param navController The NavHostController used to manage navigation state.
+ */
 @SuppressLint("ViewModelConstructorInComposable")
 @Composable
 fun AppNavHost(navController: NavHostController) {
@@ -234,6 +247,12 @@ fun AppNavHost(navController: NavHostController) {
         }
         composable("doctor_past_appointments") {
             DoctorPastAppointmentsScreen(navController)
+        }
+        composable(Screen.DoctorMyReviews.route) {
+            DoctorMyReviewsScreen(navController)
+        }
+        composable(Screen.UpdateDataDoctor.route) {
+            UpdateDataDoctor(navController)
         }
     }
 }

@@ -154,9 +154,9 @@ fun ModelNavDrawerDoctor(navController: NavController,
                 )
 
                 NavigationDrawerItem(
-                    label = { Text(text = "Patients", color = Black) },
+                    label = { Text(text = "Reviews", color = Black) },
                     selected = false,
-                    onClick = { navController.navigate(Screen.Doctors.route) }
+                    onClick = { navController.navigate(Screen.DoctorMyReviews.route) }
                 )
                 NavigationDrawerItem(
                     label = { Text(text = "My Appointments", color = Black) },
@@ -176,7 +176,7 @@ fun ModelNavDrawerDoctor(navController: NavController,
                 NavigationDrawerItem(
                     label = { Text(text = "Update Data", color = Black) },
                     selected = false,
-                    onClick = { navController.navigate(Screen.UpdateData.route) }
+                    onClick = { navController.navigate(Screen.UpdateDataDoctor.route) }
                 )
                 NavigationDrawerItem(
                     label = { Text(text = "Logout", color = Black) },

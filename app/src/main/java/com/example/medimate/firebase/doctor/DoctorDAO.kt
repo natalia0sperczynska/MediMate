@@ -81,7 +81,12 @@ class DoctorDAO {
             throw Exception("Error updating user data: ${e.message}")
         }
     }
-
+    /**
+     * Retrieves a list of all doctors from Firestore.
+     *
+     * @return List of [Doctor] objects.
+     * @throws Exception If an error occurs while fetching the data.
+     */
     suspend fun getAllDoctors(): List<Doctor> {
         val mFireStore = FirebaseFirestore.getInstance()
         val doctorsList = mutableListOf<Doctor>()
@@ -92,6 +97,13 @@ class DoctorDAO {
         }
         return doctorsList
     }
+    /**
+     * Loads all appointments for a specific doctor from Firestore.
+     *
+     * @param doctorId The ID of the doctor.
+     * @return List of [Appointment] objects for the doctor.
+     * @throws Exception If an error occurs while fetching the data.
+     */
     suspend fun loadAppointments(doctorId: String): List<Appointment> {
         val mFireStore = FirebaseFirestore.getInstance()
         val appointmentsList = mutableListOf<Appointment>()
@@ -104,6 +116,14 @@ class DoctorDAO {
         return appointmentsList
 
     }
+    /**
+     * Updates the availability of a doctor for a specific date with the given terms (without an appointment context).
+     *
+     * @param doctor The [Doctor] whose availability is being updated.
+     * @param date The date for which availability is changed.
+     * @param terms The list of available [Term]s for the date.
+     * @throws Exception If an error occurs while updating the data.
+     */
     suspend fun updateDoctorAvailabilityNotApp(doctor: Doctor, date: String, terms: List<Term>) {
         val mFireStore = FirebaseFirestore.getInstance()
         try {
@@ -118,7 +138,12 @@ class DoctorDAO {
             throw Exception("Error updating availability: ${e.message}")
         }
     }
-
+    /**
+     * Updates the doctor's availability after an appointment is booked.
+     *
+     * @param doctor The [Doctor] whose availability is being updated.
+     * @param appointment The [Appointment] that affects availability.
+     */
     suspend fun updateDoctorAvailability(doctor: Doctor?,appointment: Appointment){
         if (doctor == null) return
         val mFireStore = FirebaseFirestore.getInstance()
@@ -157,6 +182,12 @@ class DoctorDAO {
         val doc = mFireStore.collection("doctors").document(doctorId)
         //doc.update()
     }
+    /**
+     * Retrieves a [Doctor] object by ID from Firestore.
+     *
+     * @param id The ID of the doctor.
+     * @return The [Doctor] object if found, null otherwise.
+     */
     suspend fun getDoctorById(id: String?): Doctor? {
         if (id.isNullOrBlank()) return null
 
@@ -179,6 +210,13 @@ class DoctorDAO {
             null
         }
     }
+    /**
+     * Retrieves a list of patients for a given doctor based on their appointments.
+     *
+     * @param doctorId The ID of the doctor.
+     * @return List of [User] objects who are patients of the doctor.
+     * @throws Exception If an error occurs while loading patients.
+     */
     suspend fun getPatientsForDoctor(doctorId: String): List<User> {
         val mFireStore = FirebaseFirestore.getInstance()
         val patientsList = mutableListOf<User>()
@@ -212,7 +250,12 @@ class DoctorDAO {
 
         return patientsList
     }
-
+    /**
+     * Finds the closest upcoming appointment for a doctor.
+     *
+     * @param doctorId The ID of the doctor.
+     * @return The closest [Appointment], or null if none found.
+     */
     suspend fun getClosestAppointmentForDoctor(doctorId: String): Appointment? {
         val all_app = loadAppointments(doctorId)
         if (all_app.isEmpty()) {
@@ -235,6 +278,129 @@ class DoctorDAO {
                 ChronoUnit.DAYS.between(today, date)
             }
             ?.first
+    }
+    /**
+     * Retrieves the most frequent patients for a doctor, limited by the specified number.
+     *
+     * @param doctorId The ID of the doctor.
+     * @param limit The maximum number of frequent patients to return (default is 5).
+     * @return List of pairs containing [User] and their appointment count.
+     * @throws Exception If an error occurs while loading frequent patients.
+     */
+    suspend fun getFrequentPatients(doctorId: String, limit: Int = 5): List<Pair<User, Int>> {
+        val mFireStore = FirebaseFirestore.getInstance()
+        val frequentPatients = mutableListOf<Pair<User, Int>>()
+
+        try {
+            val appointments = mFireStore.collection("appointments")
+                .whereEqualTo("doctorId", doctorId)
+                .get()
+                .await()
+            val patientAppointmentCount = appointments.documents
+                .mapNotNull { it.toObject(Appointment::class.java)?.patientId }
+                .groupingBy { it }
+                .eachCount()
+            val topPatientIds = patientAppointmentCount.entries
+                .sortedByDescending { it.value }
+                .take(limit)
+                .map { it.key }
+
+            if (topPatientIds.isNotEmpty()) {
+                val patients = mFireStore.collection("users")
+                    .whereIn(FieldPath.documentId(), topPatientIds)
+                    .get()
+                    .await()
+                patients.documents.forEach { doc ->
+                    val user = doc.toObject(User::class.java)?.copy(id = doc.id)
+                    user?.let {
+                        val count = patientAppointmentCount[doc.id] ?: 0
+                        frequentPatients.add(Pair(it, count))
+                    }
+                }
+                frequentPatients.sortByDescending { it.second }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw Exception("Error loading frequent patients: ${e.message}")
+        }
+
+        return frequentPatients
+    }
+/**
+ * Calculates and retrieves various statistics for a doctor, such as total appointments,
+ * completed appointments, cancelled appointments, upcoming appointments, average rating,
+ * total reviews, and monthly appointment stats for the last 6 months.
+ *
+ * @param doctorId The ID of the doctor.
+ * @return A map containing statistics with keys such as "totalAppointments", "completedAppointments", etc.
+ * @throws Exception If an error occurs while calculating statistics.
+ */
+    suspend fun getDoctorStatistics(doctorId: String): Map<String, Any> {
+        val mFireStore = FirebaseFirestore.getInstance()
+        val stats = mutableMapOf<String, Any>()
+
+        try {
+            val appointments = mFireStore.collection("appointments")
+                .whereEqualTo("doctorId", doctorId)
+                .get()
+                .await()
+
+            val appointmentList = appointments.documents.mapNotNull {
+                it.toObject(Appointment::class.java)
+            }
+            stats["totalAppointments"] = appointmentList.size
+            stats["completedAppointments"] = appointmentList.count { it.status == Status.COMPLETED }
+            stats["cancelledAppointments"] = appointmentList.count { it.status == Status.CANCELLED }
+            stats["upcomingAppointments"] = appointmentList.count {
+                it.status == Status.EXPECTED|| it.status == Status.EXPECTED
+            }
+            val reviews = mFireStore.collection("reviews")
+                .whereEqualTo("doctorId", doctorId)
+                .get()
+                .await()
+
+            val reviewList = reviews.documents.mapNotNull {
+                it.toObject(Review::class.java)
+            }
+
+            if (reviewList.isNotEmpty()) {
+                val averageRating = reviewList.map { it.rate }.average()
+                stats["averageRating"] = averageRating
+                stats["totalReviews"] = reviewList.size
+            } else {
+                stats["averageRating"] = 0.0
+                stats["totalReviews"] = 0
+            }
+            val formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy")
+            val now = LocalDate.now()
+            val monthlyStats = mutableMapOf<String, Int>()
+
+            for (i in 5 downTo 0) {
+                val month = now.minusMonths(i.toLong())
+                val monthKey = "${month.monthValue}/${month.year}"
+                val monthStart = month.withDayOfMonth(1)
+                val monthEnd = month.withDayOfMonth(month.lengthOfMonth())
+
+                val count = appointmentList.count { app ->
+                    try {
+                        val appDate = LocalDate.parse(app.date, formatter)
+                        !appDate.isBefore(monthStart) && !appDate.isAfter(monthEnd)
+                    } catch (e: Exception) {
+                        false
+                    }
+                }
+
+                monthlyStats[monthKey] = count
+            }
+
+            stats["monthlyAppointments"] = monthlyStats
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw Exception("Error calculating statistics: ${e.message}")
+        }
+
+        return stats
     }
 
 }
