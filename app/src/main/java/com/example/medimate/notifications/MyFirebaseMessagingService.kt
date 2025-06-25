@@ -1,7 +1,6 @@
 package com.example.medimate.notifications
 
 import android.Manifest
-import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat

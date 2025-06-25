@@ -1,6 +1,8 @@
 package com.example.medimate.register
 
 import android.widget.Toast
+import androidx.annotation.ColorRes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -8,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -18,13 +21,14 @@ import androidx.navigation.compose.rememberNavController
 import com.example.medimate.firebase.user.User
 import com.example.medimate.firebase.user.UserDAO
 import com.example.medimate.navigation.Screen
+import com.example.medimate.ui.theme.Black
+import com.example.medimate.ui.theme.MediMateButton
 import com.example.medimate.ui.theme.MediMateTheme
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.*
-
 @Composable
 fun RegisterScreen(navController: NavHostController) {
     var name by remember { mutableStateOf("") }
@@ -77,21 +81,32 @@ fun RegisterScreen(navController: NavHostController) {
                 )
             }
         )
-
         Spacer(modifier = Modifier.height(18.dp))
-        OutlinedTextField(
-            value = dateOfBirth?.let { convertMillisToDate(it) } ?: "",
-            onValueChange = {},
-            label = { Text("Date of Birth (MM/DD/YYYY)") },
-            readOnly = true,
-            modifier = Modifier.clickable { showDatePicker = true }.fillMaxWidth(),
-            leadingIcon = {
-                Icon(
-                    painter = painterResource(id = android.R.drawable.ic_menu_my_calendar),
-                    contentDescription =null
-                )
-            }
-        )
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .clickable { showDatePicker = true }
+        ) {
+            OutlinedTextField(
+                value = dateOfBirth?.let { convertMillisToDate(it) } ?: "",
+                onValueChange = {},
+                label = { Text("Date of Birth (MM/DD/YYYY)") },
+                readOnly = true,
+                enabled = false,
+                colors = OutlinedTextFieldDefaults.colors(
+                    disabledTextColor = Color.Black,
+                    disabledBorderColor = Color.Black,
+                    disabledLabelColor = Color.Black
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(id = android.R.drawable.ic_menu_my_calendar),
+                        contentDescription = null
+                    )
+                }
+            )
+        }
+
         Spacer(modifier = Modifier.height(18.dp))
         OutlinedTextField(
             value = password,
@@ -122,18 +137,17 @@ fun RegisterScreen(navController: NavHostController) {
         )
         Spacer(modifier = Modifier.height(18.dp))
 
-        Button(onClick = {
-//            if (dateOfBirth == null) {
-//                Toast.makeText(context, "Please select a date of birth", Toast.LENGTH_SHORT).show()
-//                return@Button
-//            }
+        MediMateButton("Create an Account",onClick = {
+            if (dateOfBirth == null) {
+                Toast.makeText(context, "Please select a date of birth", Toast.LENGTH_SHORT).show()
+                return@MediMateButton
+            }
             coroutineScope.launch {
                 registerUser(name, surname, email,
                     dateOfBirth!!.toString(), password, repeatPassword, fireStore, context)
             }
-        },colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary), modifier = Modifier.fillMaxWidth(),shape = MaterialTheme.shapes.large,enabled = name.isNotBlank() && surname.isNotBlank() && email.isNotBlank() && password.isNotBlank() && repeatPassword.isNotBlank()) {
-            Text("Create an Account", color = MaterialTheme.colorScheme.onSecondary)
         }
+        )
         Spacer(modifier = Modifier.height(18.dp))
         TextButton(onClick = { navController.navigate(Screen.Login.route) }) {
             Text("Already have an account? Login here",color= MaterialTheme.colorScheme.secondary)
@@ -156,10 +170,19 @@ fun RegisterScreen(navController: NavHostController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerModal(
+    minDate: Long? = null,
     onDateSelected: (Long?) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val datePickerState = rememberDatePickerState()
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = System.currentTimeMillis(),
+        initialDisplayMode = DisplayMode.Picker,
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                return utcTimeMillis >= System.currentTimeMillis() - 86400000
+            }
+        }
+    )
 
     DatePickerDialog(
         onDismissRequest = onDismiss,

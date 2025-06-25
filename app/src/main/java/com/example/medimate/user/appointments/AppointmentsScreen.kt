@@ -274,6 +274,7 @@ fun DatePickerFieldToModal(
 ) {
     var selectedDate by remember { mutableStateOf<Long?>(null) }
     var showModal by remember { mutableStateOf(false) }
+    val currentDate = System.currentTimeMillis()
 
     OutlinedTextField(
         value = selectedDate?.let { convertMillisToDate(it) } ?: "",
@@ -302,6 +303,7 @@ fun DatePickerFieldToModal(
 
     if (showModal) {
         DatePickerModal(
+            minDate = currentDate,
             onDateSelected = {
                 selectedDate = it
                 onDateSelected(convertMillisToDate(it!!))

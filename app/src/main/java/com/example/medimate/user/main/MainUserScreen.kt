@@ -61,10 +61,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.LightGray
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import coil.compose.AsyncImagePainter
 import com.example.healme.R
 import com.example.medimate.firebase.appointment.Appointment
 import com.example.medimate.firebase.doctor.Doctor
@@ -663,6 +665,14 @@ fun LoadingScreen() {
             repeatMode = RepeatMode.Reverse
         )
     )
+    val rotation by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(3000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        )
+    )
 
     Box(
         modifier = Modifier
@@ -678,9 +688,10 @@ fun LoadingScreen() {
                 modifier = Modifier
                     .size(120.dp)
                     .scale(pulseValue)
+                    .graphicsLayer { rotationZ = rotation }
                     .background(
                         color = PurpleMain,
-                        shape = RoundedCornerShape(24.dp)
+                        shape = CircleShape
                     ),
                 contentAlignment = Alignment.Center
             ) {
@@ -693,8 +704,8 @@ fun LoadingScreen() {
             LinearProgressIndicator(
                 modifier = Modifier
                     .fillMaxWidth(0.6f)
-                    .height(8.dp)
-                    .clip(RoundedCornerShape(4.dp)),
+                    .height(6.dp)
+                    .clip(RoundedCornerShape(50)),
                 color = PurpleMain,
                 trackColor = PurpleLight.copy(alpha = 0.2f)
             )
@@ -708,18 +719,23 @@ fun LoadingScreen() {
     }
 }
 
+//@Preview(showSystemUi = true)
+//@Composable
+//fun MainUserScreenPreview() {
+//    MediMateTheme {
+//        ScreenModel(
+//            navController = rememberNavController(),
+//            userId = "123",
+//            userName = "John",
+//            drawerState = rememberDrawerState(DrawerValue.Closed),
+//            closestAppointment = null,
+//            profilePictureUrl = ""
+//        )
+//    }
+//}
 @Preview(showSystemUi = true)
 @Composable
-fun MainUserScreenPreview() {
-    MediMateTheme {
-        ScreenModel(
-            navController = rememberNavController(),
-            userId = "123",
-            userName = "John",
-            drawerState = rememberDrawerState(DrawerValue.Closed),
-            closestAppointment = null,
-            profilePictureUrl = ""
-        )
-    }
+fun LoadingScreenPrev() {
+    LoadingScreen()
 }
 
