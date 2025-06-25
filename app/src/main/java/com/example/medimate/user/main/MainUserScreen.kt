@@ -260,6 +260,10 @@ fun HeaderCard(navController: NavController,userId: String,userName: String,prof
 @Composable
 fun UpcomingAppointmentsCard(appointment: Appointment?, navController: NavController) {
     val context = LocalContext.current
+    var doctorName by remember { mutableStateOf("") }
+    var doctorSurname by remember { mutableStateOf("") }
+    var doctorId by remember { mutableStateOf("") }
+    val doctorDao=DoctorDAO()
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -314,6 +318,11 @@ fun UpcomingAppointmentsCard(appointment: Appointment?, navController: NavContro
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     appointment?.let {
+                        LaunchedEffect(appointment) {
+                            doctorId=appointment.doctorId
+                            doctorName= doctorDao.getDoctorById(doctorId)?.name ?: ""
+                            doctorSurname= doctorDao.getDoctorById(doctorId)?.surname?: ""
+                        }
                         Text(
                             text = it.date,
                             style = MaterialTheme.typography.bodyMedium,
@@ -321,7 +330,7 @@ fun UpcomingAppointmentsCard(appointment: Appointment?, navController: NavContro
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "With: Dr. ${it.doctorId}",
+                            text = "With: Dr. ${doctorName}",
                             style = MaterialTheme.typography.bodySmall,
                             color = White.copy(alpha = 0.7f)
                         )
