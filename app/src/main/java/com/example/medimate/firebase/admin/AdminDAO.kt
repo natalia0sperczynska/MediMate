@@ -46,6 +46,21 @@ class AdminDAO {
             throw Exception("Error loading admin data: ${e.message}")
         }
     }
+    suspend fun getUsersCount():Int{
+        val db = FirebaseFirestore.getInstance()
+        val snapshot = db.collection("users").get().await()
+        return snapshot.size()
+    }
+    suspend fun getDoctorsCount():Int{
+        val db = FirebaseFirestore.getInstance()
+        val snapshot = db.collection("doctors").get().await()
+        return snapshot.size()
+    }
+    suspend fun getAppointmentsCount():Int{
+        val db = FirebaseFirestore.getInstance()
+        val snapshot = db.collection("appointments").get().await()
+        return snapshot.size()
+    }
 
     /**
      * Function updates admin data in Firestore.
@@ -79,6 +94,14 @@ class AdminDAO {
         val mFireStore = FirebaseFirestore.getInstance()
         try {
             mFireStore.collection("doctors").document(doctor.id).set(doctor).await()
+        } catch (e: Exception) {
+            throw Exception("Error adding doctor: ${e.message}")
+        }
+    }
+    suspend fun addAdmin(admin: Admin) {
+        val mFireStore = FirebaseFirestore.getInstance()
+        try {
+            mFireStore.collection("admins").document(admin.id).set(admin).await()
         } catch (e: Exception) {
             throw Exception("Error adding doctor: ${e.message}")
         }

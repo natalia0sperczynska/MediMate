@@ -159,7 +159,7 @@ fun EditDoctorDataScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
                 MediMateButton(
-                    text = if (isDeleting) "Deleting..." else "Delete User",
+                    text = if (isDeleting) "Deleting..." else "Delete Doctor",
                     onClick = {
                         scope.launch {
                             try {
