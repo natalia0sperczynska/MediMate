@@ -10,4 +10,6 @@
 
     <color name="colorSnackBarError">#D50B0B</color>
     <color name="colorSnackBarSuccess">#F519D120</color>
+<!--    <color name="colorAccent">0xFF68567B</color>-->
+    <color name="colorAccent">#4A327E</color>
 </resources>

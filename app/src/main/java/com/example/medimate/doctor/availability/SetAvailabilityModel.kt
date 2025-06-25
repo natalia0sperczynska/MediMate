@@ -1,35 +1,60 @@
 package com.example.medimate.doctor.availability
+
+import android.content.Context
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
-import androidx.lifecycle.ViewModel
-import com.example.medimate.firebase.doctor.Availability
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.example.medimate.firebase.appointment.Term
+import com.example.medimate.firebase.doctor.Doctor
+import com.example.medimate.firebase.doctor.DoctorDAO
+import com.example.medimate.user.appointments.getAvailableTermsForDate
 
-class SetAvailabilityModel : ViewModel() {
-    private val _weekAvailability = mutableStateListOf<DayAvailabilityUI>()
-    val weekAvailability: List<DayAvailabilityUI> get() = _weekAvailability
+class SetAvailabilityModel {
+    private val _currentAvailability = mutableStateListOf<Term>()
+    val currentAvailability: List<Term> get() = _currentAvailability
 
-//    init {
-//        _weekAvailability.addAll(
-//            listOf(
-//                "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"
-//            ).map { day ->
-//                DayAvailabilityUI(
-//                    day = day,
-//                    slots = Doctor.generateTimeSlots().map { Term(it.toString()) }
-//                )
-//            }
-//        )
-//    }
+    private var currentDate: String? = null
+    private var currentDoctor: Doctor? = null
 
-    fun toggleAvailability(day: String, index: Int) {
-        _weekAvailability.find { it.day == day }?.slots?.get(index)?.let{
-            it.isAvailable = !it.isAvailable
+    fun setCurrentDoctor(doctor: Doctor) {
+        currentDoctor = doctor
+    }
+
+    fun loadAvailability(terms: List<Term>, date: String) {
+        _currentAvailability.clear()
+        _currentAvailability.addAll(terms)
+        currentDate = date
+    }
+
+    fun toggleTerm(index: Int) {
+        if (index in _currentAvailability.indices) {
+            val term = _currentAvailability[index]
+            _currentAvailability[index] = term.copy(isAvailable = !term.isAvailable)
         }
     }
-    fun saveAvailability(doctorId: String){
-        val availability =  Availability(
-        )
-        Firebase.firestore.collection("doctors").document(doctorId).update("availability",availability)
+
+    fun getTermsForDate(dateString: String): List<Term> {
+        return currentDoctor?.getAvailableTermsForDate(dateString) ?: emptyList()
+    }
+
+    suspend fun saveDayAvailability(context: Context): Boolean {
+        return try {
+            currentDoctor?.let { doctor ->
+                currentDate?.let { date ->
+                    DoctorDAO().updateDoctorAvailabilityNotApp(
+                        doctor = doctor,
+                        date = date,
+                        terms = _currentAvailability
+                    )
+                    true
+                } ?: false
+            } ?: false
+        } catch (e: Exception) {
+            false
+        }
     }
 }

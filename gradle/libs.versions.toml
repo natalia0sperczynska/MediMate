@@ -11,6 +11,7 @@ coilCompose = "2.4.0"
 constraintlayoutVersion = "2.1.4"
 coreKtxVersion = "1.12.0"
 firebaseBomVersion = "33.15.0"
+firebaseMessaging = "24.1.1"
 firebaseStorageKtxVersion = "20.3.0"
 fragmentKtx = "1.8.6"
 githubZimkit = "2.0.0"
@@ -66,6 +67,7 @@ zimkit_android = "2.8.1"
 zimkitVersion = "2.7.0"
 firebaseStorageKtx = "21.0.2"
 playServicesBase = "18.0.1"
+firebaseFirestore = "25.1.4"
 
 [libraries]
 androidx-activity = { module = "androidx.activity:activity", version.ref = "activity" }
@@ -90,8 +92,10 @@ commons-email = { module = "org.apache.commons:commons-email", version.ref = "co
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-bom-v33150 = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging", version.ref = "firebaseMessaging" }
 firebase-storage-ktx-v2030 = { module = "com.google.firebase:firebase-storage-ktx", version.ref = "firebaseStorageKtxVersion" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+google-firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 hilt-android-v248 = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-compiler-v248 = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltCompiler" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -150,6 +154,7 @@ zimkit-v200 = { module = "com.github.ZEGOCLOUD:zimkit", version.ref = "githubZim
 #zimkit_android = { module = "com.github.ZEGOCLOUD:zimkit_android", version.ref = "zimkit_android" }
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
 play-services-base = { group = "com.google.android.gms", name = "play-services-base", version.ref = "playServicesBase" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 
 
 [plugins]
