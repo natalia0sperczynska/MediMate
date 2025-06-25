@@ -96,6 +96,11 @@ fun ModelNavDrawerAdmin(navController: NavController,
                     selected = false,
                     onClick = { navController.navigate(Screen.DoctorsAdmin.route) }
                 )
+                NavigationDrawerItem(
+                label = { Text(text = "Edit Doctors Availability", color = Black) },
+                selected = false,
+                onClick = { navController.navigate(Screen.EditDoctorAvailability.route) }
+            )
 
             }
         }

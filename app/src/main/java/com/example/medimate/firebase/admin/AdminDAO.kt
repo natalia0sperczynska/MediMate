@@ -46,6 +46,21 @@ class AdminDAO {
             throw Exception("Error loading admin data: ${e.message}")
         }
     }
+    suspend fun getUsersCount():Int{
+        val db = FirebaseFirestore.getInstance()
+        val snapshot = db.collection("users").get().await()
+        return snapshot.size()
+    }
+    suspend fun getDoctorsCount():Int{
+        val db = FirebaseFirestore.getInstance()
+        val snapshot = db.collection("doctors").get().await()
+        return snapshot.size()
+    }
+    suspend fun getAppointmentsCount():Int{
+        val db = FirebaseFirestore.getInstance()
+        val snapshot = db.collection("appointments").get().await()
+        return snapshot.size()
+    }
 
     /**
      * Function updates admin data in Firestore.

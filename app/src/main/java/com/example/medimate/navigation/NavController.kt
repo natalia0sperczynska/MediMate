@@ -17,6 +17,7 @@ import com.example.medimate.admin.usersManagement.ManageUsers
 import com.example.medimate.admin.main.MainAdminScreen
 import com.example.medimate.user.userDocumentation.UserDocumentation
 import com.example.medimate.admin.doctorsManagement.editDoctorData.DoctorsAdmin
+import com.example.medimate.admin.doctorsManagement.editDoctorData.EditDoctorAvailability
 import com.example.medimate.admin.doctorsManagement.editDoctorData.EditDoctorDataScreen
 import com.example.medimate.admin.doctorsManagement.reviewsManagement.ManageDoctorReviewsScreen
 import com.example.medimate.chat.ChatSelectionScreen
@@ -77,6 +78,9 @@ sealed class Screen(val route: String) {
         fun createRoute(isDoctor: Boolean) = "chat_selection/$isDoctor"
     }
     object DoctorAvailability : Screen("doctor_availability")
+
+    object EditDoctorAvailability : Screen("edit_doctor_availability")
+
 }
 
 @SuppressLint("ViewModelConstructorInComposable")
@@ -214,6 +218,9 @@ fun AppNavHost(navController: NavHostController) {
         }
         composable(Screen.DoctorAvailability.route) {
             SetAvailabilityScreen(navController)
+        }
+        composable(Screen.EditDoctorAvailability.route) {
+            EditDoctorAvailability(navController)
         }
     }
 }
