@@ -29,6 +29,13 @@ import com.example.medimate.user.appointments.convertMillisToDate
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
+/**
+ * Composable function that displays a screen for doctors to set their availability.
+ * Allows selecting a date and toggling time slots as available/unavailable.
+ *
+ * @param navController The navigation controller for handling screen transitions.
+ * @param viewModel The ViewModel managing the availability data.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SetAvailabilityScreen(
@@ -174,6 +181,14 @@ fun SetAvailabilityScreen(
         }
     }
 }
+/**
+ * Composable item representing a single availability time slot.
+ * Displays the time range and a checkbox to toggle availability.
+ *
+ * @param term The time slot term to display.
+ * @param onToggle Callback when the availability is toggled.
+ */
+
 @Composable
 fun AvailabilitySlotItem(
     term: Term,

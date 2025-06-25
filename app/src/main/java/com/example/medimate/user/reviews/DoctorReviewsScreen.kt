@@ -49,7 +49,20 @@ import com.example.medimate.ui.theme.PurpleLight2
 import com.example.medimate.ui.theme.PurpleMain
 import com.example.medimate.user.ModelNavDrawerUser
 
-
+/**
+ * Displays the doctor review screen, showing doctor information, user reviews,
+ * and allows logged-in users to submit a new review.
+ *
+ * @param navController The navigation controller to handle screen navigation.
+ * @param selectedDoctorId The unique ID of the doctor whose reviews are displayed.
+ *
+ * This screen includes:
+ * - Doctor details such as name, specialization, and average rating.
+ * - A form for logged-in users to leave a rating and text review.
+ * - A list of existing reviews for the selected doctor.
+ * - Loading indicator while data is being fetched.
+ * - Navigation back button in the top app bar.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DoctorReviewScreen(navController: NavController, selectedDoctorId: String) {
@@ -216,6 +229,11 @@ fun DoctorReviewScreen(navController: NavController, selectedDoctorId: String) {
     }
 }
 
+/**
+ * Displays an individual review item showing the rating and the review text.
+ *
+ * @param review The [Review] data object containing the rating and review text.
+ */
 @Composable
 fun ReviewItem(review: Review) {
     Card(

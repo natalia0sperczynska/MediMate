@@ -17,7 +17,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medimate.firebase.review.Review
 import kotlinx.coroutines.launch
-
+/**
+ * ViewModel responsible for managing doctor reviews.
+ * Loads and deletes reviews for a specific doctor.
+ *
+ * @property reviewDAO DAO responsible for Firebase review operations.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageDoctorReviewsScreen(navController: NavController,doctorId:String?){

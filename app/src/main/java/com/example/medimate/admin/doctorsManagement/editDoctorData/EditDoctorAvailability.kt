@@ -28,7 +28,12 @@ import com.example.medimate.ui.theme.Grey2
 import com.example.medimate.ui.theme.PurpleLight2
 import com.example.medimate.user.appointments.convertMillisToDate
 import kotlinx.coroutines.launch
-
+/**
+ * Screen for editing a doctor's availability for a specific date.
+ *
+ * @param navController The NavController for navigation.
+ * @param viewModel The ViewModel managing doctor availability.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditDoctorAvailability(
@@ -226,7 +231,12 @@ fun EditDoctorAvailability(
         }
     }
 }
-
+/**
+ * UI component representing a single availability slot with toggle functionality.
+ *
+ * @param term The Term to display.
+ * @param onToggle Callback when the term's availability is toggled.
+ */
 @Composable
 fun AvailabilitySlotItem(
     term: Term,

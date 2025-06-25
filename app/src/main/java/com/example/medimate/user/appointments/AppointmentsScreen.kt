@@ -88,7 +88,10 @@ import java.sql.Date
 import java.util.Calendar
 import java.util.Locale
 
-
+/**
+ * Main screen to display and manage appointments.
+ * Allows selecting doctor, date, and time slot.
+ */
 @Composable
 fun AppointmentsScreen(navController: NavController, selectedDoctorId: String? = null) {
     val viewModel = viewModel<FutureAppointmentsModel>()
@@ -182,7 +185,9 @@ fun AppointmentsScreen(navController: NavController, selectedDoctorId: String? =
     }
 
 }
-
+/**
+ * Displays Cancel and Confirm buttons for appointment actions.
+ */
 @Composable
 fun displayButtons(
     navController: NavController,
@@ -214,7 +219,9 @@ fun displayButtons(
     }
 
 }
-
+/**
+ * Date picker UI docked inside a text field with popup calendar.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerDocked() {
@@ -266,7 +273,12 @@ fun DatePickerDocked() {
         }
     }
 }
-
+/**
+ * Text field that triggers a date picker modal on click.
+ *
+ * @param label The label for the date field.
+ * @param onDateSelected Callback when a date is selected, returns date as String.
+ */
 @Composable
 fun DatePickerFieldToModal(
     label: String,
@@ -313,12 +325,23 @@ fun DatePickerFieldToModal(
     }
 
 }
-
+/**
+ * Converts milliseconds since epoch to formatted date string.
+ *
+ * @param millis Time in milliseconds.
+ * @return Formatted date string in MM/dd/yyyy format.
+ */
 fun convertMillisToDate(millis: Long): String {
     val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
     return formatter.format(Date(millis))
 }
-
+/**
+ * Dropdown to choose a doctor from the provided list.
+ *
+ * @param doctors List of available doctors.
+ * @param selectedDoctorId Currently selected doctor ID.
+ * @param onDoctorSelected Callback with selected doctor ID.
+ */
 @Composable
 fun ChoseDoctor(
     doctors: List<Doctor>, selectedDoctorId: String,
@@ -366,7 +389,13 @@ fun ChoseDoctor(
     }
 }
 
-
+/**
+ * Displays available time slots (terms) for the selected doctor and date.
+ *
+ * @param doctor Selected doctor.
+ * @param date Selected date as string.
+ * @param onTimeSelected Callback when a time slot is chosen.
+ */
 @Composable
 fun GetAvailableTerms(
     doctor: Doctor,
@@ -411,7 +440,13 @@ fun GetAvailableTerms(
         }
     }
 }
-
+/**
+ * Retrieves available terms for a given doctor on a specific date.
+ *
+ * @param doctor Doctor whose terms are fetched.
+ * @param dateString Date string in MM/dd/yyyy format.
+ * @return List of available terms.
+ */
 fun getAvailableTermsForDate(doctor: Doctor, dateString: String): List<Term> {
     val firestore = FirebaseFirestore.getInstance()
     doctor.availabilityChanges[dateString]?.let { return it.filter { term -> term.isAvailable } }
@@ -436,7 +471,14 @@ fun getAvailableTermsForDate(doctor: Doctor, dateString: String): List<Term> {
     }
     return defaultTerms.filter { it.isAvailable }
 }
-
+/**
+ * Confirms and saves the appointment to Firestore.
+ *
+ * @param appointment Appointment state to save.
+ * @param scope Coroutine scope for async work.
+ * @param snackbarHostState Snackbar state to show messages.
+ * @param onSuccess Callback after successful save.
+ */
 fun confirm(
     appointment: MutableState<Appointment?>, scope: CoroutineScope,
     snackbarHostState: SnackbarHostState, onSuccess: () -> Unit = {}
@@ -477,6 +519,13 @@ fun confirm(
     }
 }
 
+/**
+ * Cancels the current appointment selection and resets fields.
+ *
+ * @param appointment Appointment state to reset.
+ * @param scope Coroutine scope for async work.
+ * @param snackbarHostState Snackbar state to show messages.
+ */
 fun cancel(
     appointment: MutableState<Appointment?>,
     scope: CoroutineScope,

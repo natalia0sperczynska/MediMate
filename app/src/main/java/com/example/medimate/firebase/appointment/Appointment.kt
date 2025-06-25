@@ -1,6 +1,9 @@
 package com.example.medimate.firebase.appointment
 import androidx.annotation.Keep
 
+/**
+ * Data class representing a medical appointment.
+ */
 @Keep
 data class Appointment(
     var id: String = "",

@@ -12,6 +12,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel managing doctor reviews and doctor data.
+ *
+ * Responsibilities:
+ * - Loading a doctor by ID along with their reviews.
+ * - Adding new reviews for a doctor.
+ * - Keeping track of loading state and review submission status.
+ */
 open class ReviewModel: ViewModel(){
     private val reviewDAO = ReviewDAO()
     private val doctorDAO = DoctorDAO()

@@ -10,6 +10,20 @@ import javax.mail.*
 import javax.mail.internet.InternetAddress
 import javax.mail.internet.MimeMessage
 
+/**
+ * Sends an email asynchronously using SMTP via Gmail's SMTP server.
+ *
+ * This function performs the email sending operation on the IO dispatcher.
+ * It connects to Gmail SMTP with authentication and TLS enabled.
+ *
+ * @param context The context from which this is called (used if needed for future extensions).
+ * @param recipient The email address of the recipient.
+ * @param subject The subject line of the email.
+ * @param body The plain text body content of the email.
+ * @return `true` if the email was sent successfully, `false` if an error occurred.
+ *
+ * @throws MessagingException or other exceptions are caught internally and logged.
+ */
 suspend fun sendMail(
     context: Context,
     recipient: String,

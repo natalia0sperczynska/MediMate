@@ -45,7 +45,19 @@ import com.example.medimate.ui.theme.PurpleMain
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-
+/**
+ * Composable screen for adding a new admin to the MediMate system.
+ *
+ * This screen allows the current admin to input details of the new admin (name, surname, email, password),
+ * create a Firebase Authentication account, store the admin in the Firestore database, and send a confirmation email.
+ *
+ * UI includes:
+ * - Input fields for admin data
+ * - Snackbar for success/error feedback
+ * - CircularProgressIndicator while loading
+ *
+ * @param navController Controller used for navigation and drawer interactions.
+ */
 @Composable
 fun AddAdmin(navController: NavController) {
     val adminId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()

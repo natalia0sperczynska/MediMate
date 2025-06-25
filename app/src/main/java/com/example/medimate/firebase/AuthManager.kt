@@ -15,7 +15,10 @@ import androidx.compose.runtime.setValue
 import com.example.medimate.firebase.user.User
 import com.example.medimate.firebase.user.UserDAO
 import com.google.firebase.auth.FirebaseAuth
-
+/**
+ * Utility object for managing authentication state.
+ * Provides access to the current authenticated user.
+ */
 object AuthManager{
     fun getCurrentUser(): User?{
         val firebaseuser = FirebaseAuth.getInstance().currentUser
@@ -28,6 +31,10 @@ object AuthManager{
         }
     }
 }
+/**
+ * Repository object for managing current user data.
+ * Maintains the current user state and provides access to user data.
+ */
 object UserRepository {
     private val _currentUser = mutableStateOf<User?>(null)
     val currentUser: State<User?> = _currentUser
@@ -41,6 +48,11 @@ object UserRepository {
         return _currentUser.value?.profilePictureUrl
     }
 }
+/**
+ * Composable function that provides user data to child components.
+ *
+ * @param content The child composables that receive the user data.
+ */
 @Composable
 fun UserProvider(
     content: @Composable (String?) -> Unit

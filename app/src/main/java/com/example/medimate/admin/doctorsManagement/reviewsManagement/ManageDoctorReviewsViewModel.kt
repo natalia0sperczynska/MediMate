@@ -8,7 +8,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-
+/**
+ * ViewModel responsible for managing doctor reviews.
+ *
+ * Provides functionality to load reviews for a specific doctor,
+ * track loading and deleting states, and delete individual reviews,
+ * updating the doctor's overall rating accordingly.
+ *
+ * @property reviewDAO Data access object for review-related Firebase operations.
+ */
 open class ManageDoctorReviewsViewModel (
     private val reviewDAO: ReviewDAO = ReviewDAO()
 ) : ViewModel() {
@@ -32,7 +40,15 @@ open class ManageDoctorReviewsViewModel (
             }
         }
     }
-
+    /**
+     * Deletes a specific review and updates the doctor's average rating.
+     *
+     * Removes the review from the current list, recalculates the average rating,
+     * and updates Firebase accordingly.
+     *
+     * @param doctorId The ID of the doctor.
+     * @param review The [Review] object to delete.
+     */
     fun deleteReview(doctorId: String, review: Review) {
         viewModelScope.launch {
             _isDeleting.value = true

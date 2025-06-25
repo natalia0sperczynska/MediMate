@@ -19,6 +19,17 @@ import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.MediMateButton
 import kotlinx.coroutines.launch
 
+/**
+ * Composable screen for editing a doctor's data.
+ *
+ * Displays editable fields for personal, contact, and specialized information.
+ * Handles loading state, error states, and user interactions including
+ * saving changes, deleting the doctor, and navigating to manage reviews.
+ *
+ * @param navController Navigation controller for screen navigation actions.
+ * @param doctorId The unique identifier of the doctor to edit.
+ * @param viewModel The [EditDoctorDataViewModel] instance managing UI state and data operations.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditDoctorDataScreen(

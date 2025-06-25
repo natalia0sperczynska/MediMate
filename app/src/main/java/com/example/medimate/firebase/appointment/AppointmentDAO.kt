@@ -14,8 +14,10 @@ import java.util.Calendar
 import java.util.Locale
 import kotlinx.coroutines.tasks.await
 
+
 /**
- * Class for interacting with Firebase Firestore for appointment data management.
+ * Data access object for appointment-related Firestore operations.
+ * Provides methods for managing appointments and doctor availability.
  */
 class AppointmentDAO {
     val mFireStore = FirebaseFirestore.getInstance()

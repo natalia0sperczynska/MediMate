@@ -5,17 +5,22 @@ import com.example.medimate.firebase.review.Review
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-//ciekawostki
 /**
- * Data class representing a Doctor.
+ * Data class representing a medical doctor.
  *
- * @property id Unique identifier for the doctor.
- * @property name The doctor's first name.
- * @property surname The doctor's last name.
- * @property email The doctor's email address.
- * @property phoneNumber The doctor's phone number.
+ * @property id The unique identifier for the doctor.
+ * @property name The first name of the doctor.
+ * @property surname The last name of the doctor.
+ * @property email The email address of the doctor.
+ * @property phoneNumber The phone number of the doctor.
  * @property profilePicture URL to the doctor's profile picture.
- *
+ * @property specialisation The medical specialization of the doctor.
+ * @property room The room number where the doctor sees patients.
+ * @property availability The default weekly availability schedule.
+ * @property availabilityChanges Map of date-specific availability changes.
+ * @property rating The average rating of the doctor.
+ * @property reviews List of reviews for the doctor.
+ * @property fcmToken Firebase Cloud Messaging token for notifications.
  */
 
 data class Doctor(

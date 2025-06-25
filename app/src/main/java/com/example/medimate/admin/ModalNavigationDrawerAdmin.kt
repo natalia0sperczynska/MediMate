@@ -49,7 +49,17 @@ import com.example.medimate.ui.theme.PurpleGrey2
 import com.example.medimate.user.DrawerHeader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-
+/**
+ * Composable for an animated navigation drawer used in the admin section.
+ *
+ * Shows a modal drawer with navigation items for the admin screens.
+ * Includes drawer open/close animation and custom styling.
+ *
+ * @param navController The navigation controller used to navigate between screens.
+ * @param drawerState The current state of the drawer (open or closed).
+ * @param scope Coroutine scope used to launch drawer open/close actions.
+ * @param content The main content composable displayed alongside the drawer.
+ */
 @Composable
 fun ModelNavDrawerAdmin(navController: NavController,
                        drawerState: DrawerState,

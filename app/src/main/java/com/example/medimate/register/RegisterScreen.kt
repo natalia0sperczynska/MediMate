@@ -29,6 +29,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.*
+
+/**
+ * Composable screen displaying the user registration form.
+ *
+ * Users can input their personal details including name, surname, email,
+ * date of birth, and password. Supports date picking via a modal dialog.
+ * Handles registration logic and navigates to the login screen on success.
+ *
+ * @param navController Controller for navigation between app screens.
+ */
 @Composable
 fun RegisterScreen(navController: NavHostController) {
     var name by remember { mutableStateOf("") }
@@ -290,11 +300,6 @@ fun convertMillisToDate(millis: Long): String {
     return formatter.format(Date(millis))
 }
 
-/**
- * Preview composable for the RegisterScreen.
- *
- * Displays the registration screen UI in Android Studio preview.
- */
 @Preview(showSystemUi = true)
 @Composable
 fun RegisterScreenPreview() {

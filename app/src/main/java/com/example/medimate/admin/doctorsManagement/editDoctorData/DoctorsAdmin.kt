@@ -45,6 +45,11 @@ import com.example.medimate.ui.theme.White
 import com.example.medimate.user.doctorsView.MainViewModel
 import com.example.medimate.user.doctorsView.SearchBar
 
+/**
+ * Displays a screen for admins to view and manage all doctors.
+ *
+ * @param navController The NavController to handle navigation.
+ */
 @Composable
 fun DoctorsAdmin(navController: NavController) {
     val viewModel = viewModel<MainViewModel>()
@@ -75,7 +80,14 @@ fun DoctorsAdmin(navController: NavController) {
         }
     }
 }
-
+/**
+ * Renders a single doctor's information in the list with expand and edit options.
+ *
+ * @param doctor The doctor to display.
+ * @param isSelected Whether the doctor is currently selected.
+ * @param onDoctorSelected Callback when a doctor is selected.
+ * @param navController The NavController for navigation.
+ */
 @Composable
 fun SingleDoctorAdmin(
     doctor: Doctor,
@@ -129,7 +141,12 @@ fun SingleDoctorAdmin(
             }
         }
 }
-
+/**
+ * Displays a scrollable list of all doctors for admin selection.
+ *
+ * @param doctors List of doctors to display.
+ * @param navController The NavController for navigation.
+ */
 @Composable
 fun DoctorAdminList(doctors: List<Doctor>, navController: NavController) {
     var selectedDoctorId: String? by remember { mutableStateOf(null) }

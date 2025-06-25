@@ -1,7 +1,10 @@
 package com.example.medimate.firebase.doctor
 import com.example.medimate.firebase.appointment.Term
 import java.time.DayOfWeek
-
+/**
+ * Data class representing a doctor's weekly availability schedule.
+ * Contains default time slots for each day of the week.
+ */
 data class Availability (
     val monday: List<Term> = generateTimeSlots(),
     val tuesday: List<Term> = generateTimeSlots(),

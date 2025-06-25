@@ -11,6 +11,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.example.healme.R
+
+/**
+ * Displays a profile picture from a URL or a placeholder icon if no URL is provided.
+ *
+ * @param profilePictureUrl The URL of the profile picture image. If null or empty, the placeholder is shown.
+ * @param modifier Modifier to be applied to the Image composable.
+ * @param size The size of the profile picture (width and height).
+ * @param placeholder A composable lambda that provides a placeholder UI when no profile picture is available.
+ */
 @Composable
 fun ProfilePicture(
     profilePictureUrl: String?,

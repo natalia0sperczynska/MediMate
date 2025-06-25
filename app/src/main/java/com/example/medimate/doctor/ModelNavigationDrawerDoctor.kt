@@ -54,6 +54,11 @@ import com.google.rpc.context.AttributeContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 @Composable
+        /**
+         * Composable function that displays the header section of the doctor's navigation drawer.
+         *
+         * @param profilePictureUrl URL of the doctor's profile picture.
+         */
 fun DrawerHeaderDoctor(profilePictureUrl: String?){
     val auth = FirebaseAuth.getInstance()
     val name= auth.currentUser?.displayName
@@ -107,7 +112,14 @@ fun DrawerHeaderDoctor(profilePictureUrl: String?){
         HorizontalDivider(color = LightGrey)
     }
 }
-
+/**
+ * Composable function that provides a navigation drawer for the doctor interface.
+ *
+ * @param navController The navigation controller for handling screen transitions.
+ * @param drawerState The state of the navigation drawer.
+ * @param profilePictureUrl URL of the doctor's profile picture.
+ * @param content The main content to display alongside the drawer.
+ */
 @Composable
 fun ModelNavDrawerDoctor(navController: NavController,
                        drawerState: DrawerState,

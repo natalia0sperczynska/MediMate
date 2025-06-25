@@ -3,7 +3,16 @@ import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
+/**
+ * Data class representing a patient review of a doctor.
+ *
+ * @property rate The rating given (0.0-5.0).
+ * @property text The review text content.
+ * @property date The date the review was submitted.
+ * @property userId The ID of the user who submitted the review.
+ * @property doctorId The ID of the doctor being reviewed.
+ * @property timestamp The timestamp when the review was created.
+ */
 data class Review(
     val rate: Double= 0.0,
     val text: String = "",

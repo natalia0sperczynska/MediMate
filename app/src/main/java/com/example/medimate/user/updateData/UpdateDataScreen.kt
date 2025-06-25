@@ -37,7 +37,18 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import androidx.core.net.toUri
-
+/**
+ * Composable screen that allows a user to update their profile data,
+ * including personal details and profile picture.
+ *
+ * Features:
+ * - Displays current user data loaded from Firestore.
+ * - Allows editing of name, surname, email, phone, address, allergies, diseases, medications.
+ * - Upload and update of profile picture from device gallery.
+ * - Save or cancel changes.
+ *
+ * @param navController Navigation controller to handle screen transitions.
+ */
 @Composable
 fun UpdateDataScreen(navController: NavController) {
     val auth = FirebaseAuth.getInstance()
@@ -167,6 +178,17 @@ fun UpdateDataScreen(navController: NavController) {
     }
 }
 
+/**
+ * Uploads a profile picture to Firebase Storage, updates the user's profile
+ * picture URL in Firestore, and returns the new image URL on success.
+ *
+ * @param imageUri The Uri of the selected image to upload.
+ * @param userId The current user's unique ID; must not be null.
+ * @param context The Android context for showing Toast messages.
+ * @param coroutineScope The CoroutineScope used to launch asynchronous work.
+ * @param firestoreClass Instance of [UserDAO] for Firestore operations.
+ * @param onSuccess Callback invoked with the new profile picture URL upon successful upload.
+ */
 fun uploadProfilePic(
     imageUri: Uri,
     userId: String?,

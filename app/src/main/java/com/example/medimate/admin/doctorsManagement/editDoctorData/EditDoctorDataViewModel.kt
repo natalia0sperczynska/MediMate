@@ -8,7 +8,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-
+/**
+ * ViewModel responsible for managing the state and business logic
+ * related to editing a doctor's data.
+ *
+ * @property adminDAO DAO responsible for Firebase doctor operations.
+ */
 class EditDoctorDataViewModel(private val adminDAO: AdminDAO = AdminDAO()) : ViewModel() {
     private val _doctorState = MutableStateFlow<Doctor?>(null)
     val doctorState: StateFlow<Doctor?> = _doctorState.asStateFlow()

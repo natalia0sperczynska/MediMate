@@ -44,7 +44,19 @@ import com.example.medimate.ui.theme.PurpleMain
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-
+/**
+ * Composable screen for adding a new doctor to the MediMate system.
+ *
+ * This screen enables the admin to input details for a new doctor (name, surname, email, phone, specialization, room, password),
+ * create a Firebase Authentication account for them, save their data in the Firestore database, and send a confirmation email.
+ *
+ * UI includes:
+ * - Input fields for doctor data
+ * - Snackbar for success/error messages
+ * - CircularProgressIndicator while the process is running
+ *
+ * @param navController Controller used for navigation and drawer interactions.
+ */
 @Composable
 fun AddDoctor(navController: NavController) {
     val adminId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()

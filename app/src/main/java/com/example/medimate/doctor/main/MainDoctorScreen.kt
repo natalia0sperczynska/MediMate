@@ -10,7 +10,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.medimate.ui.theme.MediMateTheme
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.rememberScrollState
-
 import ProfilePicture
 import android.util.Log
 import android.widget.Toast
@@ -50,7 +49,11 @@ import com.example.medimate.navigation.Screen
 import com.example.medimate.user.main.SectionDivider
 import com.example.medimate.ui.theme.*
 import com.google.firebase.auth.FirebaseAuth
-
+/**
+ * Main screen for doctors displaying their dashboard with appointments, quick actions, and reviews.
+ *
+ * @param navController The navigation controller for handling screen transitions.
+ */
 @Composable
 fun MainDoctorScreen(navController: NavController) {
     val auth = FirebaseAuth.getInstance()
@@ -131,7 +134,12 @@ fun ScreenModelDoctor(
         }
     }
 }
-
+/**
+ * Composable function that displays the doctor's header card with profile information.
+ *
+ * @param doctorName The name of the doctor.
+ * @param profilePictureUrl URL of the doctor's profile picture.
+ */
 @Composable
 fun DoctorHeaderCard(doctorName: String, profilePictureUrl: String?) {
     Card(
@@ -194,7 +202,12 @@ fun DoctorHeaderCard(doctorName: String, profilePictureUrl: String?) {
         }
     }
 }
-
+/**
+ * Composable function that displays the doctor's next appointment card.
+ *
+ * @param closestAppointment The closest upcoming appointment.
+ * @param navController The navigation controller for handling screen transitions.
+ */
 @Composable
 fun NextAppointmentCard(closestAppointment: Appointment?, navController: NavController) {
 
@@ -272,7 +285,12 @@ fun NextAppointmentCard(closestAppointment: Appointment?, navController: NavCont
         }
     }
 }
-
+/**
+ * Composable function that displays the doctor's next appointment card.
+ *
+ * @param closestAppointment The closest upcoming appointment.
+ * @param navController The navigation controller for handling screen transitions.
+ */
 @Composable
 fun DoctorMainMenuSection(navController: NavController, doctorId: String) {
     Column(modifier = Modifier.padding(horizontal = 8.dp)) {
@@ -296,7 +314,13 @@ fun DoctorMainMenuSection(navController: NavController, doctorId: String) {
         }
     }
 }
-
+/**
+ * Data class representing a main menu item for the doctor's dashboard.
+ *
+ * @property icon The icon to display for the menu item.
+ * @property title The title text for the menu item.
+ * @property onClick The callback when the menu item is clicked.
+ */
 data class MainMenuItem(
     val icon: ImageVector,
     val title: String,
@@ -318,7 +342,13 @@ fun DoctorMainMenuItems(): List<MainMenuItem> = listOf(
     ) { nav, id -> nav.navigate(Screen.DoctorAvailability.route) },
     MainMenuItem(Icons.Default.Star, "Reviews") { nav, id -> nav.navigate(Screen.UpdateData.route) }
 )
-
+/**
+ * Composable function that displays a single menu card in the doctor's dashboard.
+ *
+ * @param icon The icon to display on the card.
+ * @param title The title text for the card.
+ * @param onClick The callback when the card is clicked.
+ */
 @Composable
 fun MainMenuCard(
     icon: ImageVector,
@@ -368,7 +398,12 @@ fun MainMenuCard(
         }
     }
 }
-
+/**
+ * Composable function that displays the doctor's recent reviews section.
+ *
+ * @param doctorId The ID of the doctor whose reviews to display.
+ * @param doctorDAO The data access object for doctor data.
+ */
 @Composable
 fun RecentReviewsSection(doctorId: String, doctorDAO: DoctorDAO = DoctorDAO()) {
     val coroutineScope = rememberCoroutineScope()
@@ -478,6 +513,11 @@ fun RecentReviewsSection(doctorId: String, doctorDAO: DoctorDAO = DoctorDAO()) {
     }
 }
 
+/**
+ * Composable function that displays the doctor's action buttons section.
+ *
+ * @param navController The navigation controller for handling screen transitions.
+ */
 @Composable
 fun DoctorActionsSection(navController: NavController) {
     Row(

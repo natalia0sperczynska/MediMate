@@ -7,6 +7,10 @@ import kotlinx.coroutines.tasks.await
 import com.google.firebase.Timestamp
 import java.util.Date
 
+/**
+ * Data access object for review-related Firestore operations.
+ * Provides methods for managing doctor reviews and ratings.
+ */
 class ReviewDAO {
     private val firestore = FirebaseFirestore.getInstance()
     private val doctorsCollection = firestore.collection("doctors")

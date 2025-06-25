@@ -74,7 +74,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medimate.firebase.appointment.AppointmentDAO
 import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.White
-
+/**
+ * Displays detailed information about a single appointment.
+ *
+ * This composable fetches appointment details and doctor information asynchronously,
+ * displays appointment data such as date, time, doctor, status, diagnosis, notes, and attached documents.
+ * It also allows cancellation of appointments that are in the EXPECTED status, showing a confirmation dialog.
+ *
+ * @param appointmentId The ID of the appointment to display.
+ * @param navController The NavController used to navigate between screens.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SingleAppointment(appointmentId:String,navController: NavController) {
@@ -283,6 +292,15 @@ fun SingleAppointment(appointmentId:String,navController: NavController) {
         }
     }
 }
+/**
+ * Displays a label and value row with an optional icon.
+ *
+ * This composable is used within the SingleAppointment screen to show individual pieces of information.
+ *
+ * @param label The label text to display.
+ * @param value The value text to display.
+ * @param icon Optional composable icon to show next to the value.
+ */
 @Composable
 private fun InfoRow(
     label: String,

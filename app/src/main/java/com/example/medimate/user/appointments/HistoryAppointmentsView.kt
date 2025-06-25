@@ -31,7 +31,15 @@ import com.example.medimate.firebase.user.UserDAO
 import com.example.medimate.ui.theme.MediMateTheme
 import com.example.medimate.ui.theme.Purple
 import com.example.medimate.user.ModelNavDrawerUser
-
+/**
+ * Screen composable that displays the user's past (history) appointments.
+ *
+ * It collects the past appointments from the [PastAppointmentsModel] ViewModel and
+ * displays them inside a column with a title. The UI includes a navigation drawer handled by
+ * [ModelNavDrawerUser].
+ *
+ * @param navController The NavController used to handle navigation events.
+ */
 @Composable
 fun HistoryAppointmentsScreen(navController: NavController) {
     val viewModel = viewModel<PastAppointmentsModel>()

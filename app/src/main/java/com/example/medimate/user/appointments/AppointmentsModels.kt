@@ -33,7 +33,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-
+/** ViewModel for managing doctors and appointments */
 open class AppointmentsModel: ViewModel(){
     private val mFireBase = AppointmentDAO()
     private val appointmentDAO = AppointmentDAO()

@@ -18,7 +18,6 @@ import com.google.firebase.messaging.RemoteMessage
  * FCM registration token is initially generated so this is where you would retrieve the token.
  */
 
-
 class MyFirebaseMessagingService : FirebaseMessagingService(){
 
     override fun onNewToken(token: String) {

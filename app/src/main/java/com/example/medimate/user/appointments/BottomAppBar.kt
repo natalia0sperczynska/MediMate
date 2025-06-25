@@ -22,8 +22,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.example.medimate.navigation.Screen
-
-
+/**
+ * A composable that displays a bottom app bar with navigation icons and a floating action button.
+ *
+ * The bottom app bar contains icons for navigating to:
+ * - Main Appointment View
+ * - Doctors list
+ * - Appointment History
+ * - An image-related action (not implemented)
+ *
+ * The floating action button currently has no defined action.
+ *
+ * @param navController The NavController used to handle navigation between screens.
+ */
 @Composable
 fun BottomAppBar(navController: NavController) {
     Scaffold(

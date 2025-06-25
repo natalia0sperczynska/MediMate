@@ -10,6 +10,10 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import java.util.concurrent.TimeUnit
 
+/**
+ * Data access object for appointment-related Firestore operations.
+ * Provides methods for managing appointments and doctor availability.
+ */
 class AppointmentWorkManager(
     context: Context,
     workerParams: WorkerParameters
@@ -23,7 +27,9 @@ class AppointmentWorkManager(
         }
     }
 }
-
+/**
+ * Utility object for scheduling the appointment status check worker.
+ */
 object AppointmentWorkScheduler {
     fun scheduleAppointmentCheck(context: Context) {
         val constraints = Constraints.Builder()

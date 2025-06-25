@@ -53,6 +53,12 @@ import com.google.rpc.context.AttributeContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+
+/**
+ * Composable displaying the header for the navigation drawer including the user's profile picture, name, and email.
+ *
+ * @param profilePictureUrl URL of the user's profile picture (nullable).
+ */
 @Composable
 fun DrawerHeader(profilePictureUrl: String?){
     val auth = FirebaseAuth.getInstance()
@@ -107,7 +113,14 @@ fun DrawerHeader(profilePictureUrl: String?){
         HorizontalDivider(color = LightGrey)
     }
     }
-
+/**
+ * Composable wrapping the main content with a modal navigation drawer for user navigation.
+ *
+ * @param navController The NavController to handle navigation events.
+ * @param drawerState The DrawerState controlling drawer open/close state.
+ * @param profilePictureUrl URL for the user's profile picture (nullable).
+ * @param content The main composable content shown inside the drawer layout.
+ */
 @Composable
 fun ModelNavDrawerUser(navController: NavController,
                        drawerState: DrawerState,

@@ -56,7 +56,14 @@ import kotlinx.coroutines.CoroutineScope
 
 import kotlinx.coroutines.launch
 
-
+/**
+ * Displays the main admin screen including admin info, statistics, and quick action menu.
+ *
+ * This screen loads admin-specific data such as the admin's name, count of doctors, users, and appointments.
+ * Displays a loading screen until data is loaded.
+ *
+ * @param navController The navigation controller used to navigate between screens.
+ */
 @Composable
 fun MainAdminScreen(navController: NavController) {
     val auth = FirebaseAuth.getInstance()
@@ -107,7 +114,17 @@ fun MainAdminScreen(navController: NavController) {
         }
     }
 }
-
+/**
+ * Composable that lays out the content of the admin screen.
+ *
+ * Displays header, statistics, quick action menu, and user actions in a vertical scrollable column.
+ *
+ * @param navController Navigation controller for screen navigation.
+ * @param adminName The name of the logged-in admin.
+ * @param doctorsCount Number of doctors registered in the system.
+ * @param usersCount Number of users registered in the system.
+ * @param appointmentsCount Number of appointments scheduled.
+ */
 @Composable
 fun AdminScreenContent(
     navController: NavController,
@@ -140,7 +157,13 @@ fun AdminScreenContent(
         UserActionsSection(navController)
     }
 }
-
+/**
+ * Displays the header card welcoming the admin user.
+ *
+ * Shows an icon and a welcome message with the admin's name.
+ *
+ * @param adminName The name of the logged-in admin.
+ */
 @Composable
 fun AdminHeaderCard(adminName: String) {
     Card(
@@ -192,8 +215,11 @@ fun AdminHeaderCard(adminName: String) {
         }
     }
 }
-
-
+/**
+ * Displays a horizontal scrollable row of quick action menu cards for admin tasks.
+ *
+ * @param navController Navigation controller to navigate to respective admin screens.
+ */
 @Composable
 fun MainMenuSectionAdmin(navController: NavController) {
     Column(modifier = Modifier.padding(horizontal = 8.dp)) {
@@ -231,8 +257,11 @@ fun MainMenuSectionAdmin(navController: NavController) {
     }
 }
 
-
-
+/**
+ * Provides the list of quick action menu items available to the admin.
+ *
+ * @return List of MainMenuItem objects representing each quick action.
+ */
 fun AdminMenuItems(): List<MainMenuItem> {
     return listOf(
         MainMenuItem(Icons.Default.Settings, "Manage Users"),
@@ -241,8 +270,13 @@ fun AdminMenuItems(): List<MainMenuItem> {
         MainMenuItem(Icons.Default.Adb, "Add Admin"),
     )
 }
-
-
+/**
+ * Displays statistics about the number of doctors, users, and appointments.
+ *
+ * @param doctorsCount Number of doctors registered in the system.
+ * @param usersCount Number of users registered in the system.
+ * @param appointmentsCount Number of appointments scheduled.
+ */
 @Composable
 fun AdminStatsSection(doctorsCount: Int, usersCount: Int, appointmentsCount: Int) {
     Row(
@@ -257,7 +291,13 @@ fun AdminStatsSection(doctorsCount: Int, usersCount: Int, appointmentsCount: Int
 
     }
 }
-
+/**
+ * Displays a card showing an individual statistic with an icon, value, and title.
+ *
+ * @param title The title of the statistic (e.g., "Doctors").
+ * @param value The value of the statistic to display.
+ * @param icon The icon representing the statistic.
+ */
 @Composable
 fun StatCard(title: String, value: String, icon: ImageVector) {
     Card(

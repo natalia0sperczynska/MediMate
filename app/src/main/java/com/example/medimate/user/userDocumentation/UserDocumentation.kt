@@ -38,7 +38,13 @@ import com.example.medimate.ui.theme.PurpleMain
 import com.example.medimate.ui.theme.White
 import androidx.core.net.toUri
 
-
+/**
+ * Composable screen that displays user documentation details and allows uploading documents.
+ *
+ * @param navController The NavController used for navigation.
+ * @param userId The unique identifier of the user whose documentation is shown.
+ * @param viewModel The ViewModel that handles user data loading and file upload.
+ */
 @Composable
 fun UserDocumentation(
     navController: NavController,

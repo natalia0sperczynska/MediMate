@@ -85,7 +85,13 @@ import com.google.firebase.firestore.firestore
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.currentCoroutineContext
 
-
+/**
+ * The main user screen showing a welcome header, upcoming appointment, doctors, and user actions.
+ *
+ * It loads user data asynchronously and handles the display of loading state.
+ *
+ * @param navController Navigation controller to handle navigation actions.
+ */
 @Composable
 fun MainUserScreen(navController: NavController) {
     val auth = FirebaseAuth.getInstance()
@@ -99,7 +105,6 @@ fun MainUserScreen(navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-
 
     LaunchedEffect(userId) {
         if (userId != null) {
@@ -157,7 +162,16 @@ fun MainUserScreen(navController: NavController) {
         }
     }
 }
-
+/**
+ * The main content of the user screen that displays header, appointments, doctors, and user action sections.
+ *
+ * @param navController Navigation controller for navigation between screens.
+ * @param userId The unique identifier of the current user.
+ * @param userName The display name of the current user.
+ * @param drawerState The state of the navigation drawer.
+ * @param closestAppointment The next upcoming appointment for the user.
+ * @param profilePictureUrl URL of the user's profile picture, if available.
+ */
 @Composable
 fun ScreenModel(
     navController: NavController,
@@ -191,6 +205,16 @@ fun ScreenModel(
 
 }
 
+/**
+ * Displays a header card with user greeting and profile picture.
+ *
+ * Clicking the card navigates to the user's documentation screen.
+ *
+ * @param navController Navigation controller to handle navigation.
+ * @param userId The unique identifier of the user.
+ * @param userName The display name of the user.
+ * @param profilePictureUrl URL for the user's profile picture, can be null.
+ */
 @Composable
 fun HeaderCard(navController: NavController,userId: String,userName: String,profilePictureUrl:String?) {
     Card(
@@ -256,7 +280,14 @@ fun HeaderCard(navController: NavController,userId: String,userName: String,prof
         }
     }
 }
-
+/**
+ * Card displaying the user's closest upcoming appointment.
+ *
+ * Clicking on the card navigates to the detailed appointment screen.
+ *
+ * @param appointment The user's upcoming appointment, nullable if none.
+ * @param navController Navigation controller for navigation actions.
+ */
 @Composable
 fun UpcomingAppointmentsCard(appointment: Appointment?, navController: NavController) {
     val context = LocalContext.current
@@ -354,7 +385,12 @@ fun UpcomingAppointmentsCard(appointment: Appointment?, navController: NavContro
         }
     }
 }
-
+/**
+ * Displays the main menu section with quick action cards for navigation.
+ *
+ * @param navController NavController to handle navigation events.
+ * @param userId The current user's ID used for routing to profile screens.
+ */
 @Composable
 fun MainMenuSection(navController: NavController, userId: String) {
     Column(modifier = Modifier.padding(horizontal = 8.dp)) {
@@ -396,7 +432,13 @@ fun MainMenuSection(navController: NavController, userId: String) {
         }
     }
 }
-
+/**
+ * Represents a single card in the main menu with an icon and title.
+ *
+ * @param icon The icon displayed on the card.
+ * @param title The title text shown below the icon.
+ * @param onClick Lambda invoked when the card is clicked.
+ */
 @Composable
 fun MainMenuCard(
     icon: ImageVector,
@@ -449,6 +491,11 @@ fun MainMenuCard(
     }
 }
 
+/**
+ * Displays a user action section with a logout button.
+ *
+ * @param navController NavController used to navigate on logout.
+ */
 @Composable
 fun UserActionsSection(navController: NavController) {
     Row(
@@ -466,7 +513,11 @@ fun UserActionsSection(navController: NavController) {
         )
     }
 }
-
+/**
+ * Displays a list of doctors with their details and actions.
+ *
+ * @param navController NavController to navigate to doctor-related screens.
+ */
 @Composable
 fun OurDoctors(navController: NavController) {
     var doctors by remember { mutableStateOf<List<Doctor>>(emptyList()) }
@@ -502,6 +553,12 @@ fun OurDoctors(navController: NavController) {
     }
 }
 
+/**
+ * Displays a card for a single doctor, including basic info, rating, and patient reviews.
+ *
+ * @param doctor Doctor data model to display.
+ * @param navController NavController to navigate to chat or other screens.
+ */
 @Composable
 fun DoctorCard(doctor: Doctor, navController: NavController) {
     var showReviews by remember { mutableStateOf(false) }
@@ -640,7 +697,11 @@ fun DoctorCard(doctor: Doctor, navController: NavController) {
         }
     }
 }
-
+/**
+ * Returns a list of main menu items with icons and titles.
+ *
+ * @return List of MainMenuItem objects representing the main menu options.
+ */
 fun MainMenuItems(): List<MainMenuItem> {
     return listOf(
         MainMenuItem(Icons.Default.Timelapse, "Appointments History"),
@@ -649,6 +710,14 @@ fun MainMenuItems(): List<MainMenuItem> {
         MainMenuItem(Icons.Default.Star, "Medical facts")
     )
 }
+/**
+ * Displays a customizable horizontal divider for section separation.
+ *
+ * @param modifier Modifier to be applied to the Divider.
+ * @param color Color of the divider line.
+ * @param thickness Thickness of the divider line.
+ * @param verticalPadding Vertical padding above and below the divider.
+ */
 @Composable
 fun SectionDivider(modifier: Modifier = Modifier,
                    color: Color = PurpleLight.copy(alpha = 0.2f),
@@ -663,6 +732,10 @@ fun SectionDivider(modifier: Modifier = Modifier,
     )
 }
 
+/**
+ * Shows a loading screen with an animated pulsing and rotating logo,
+ * a linear progress indicator, and a status message.
+ */
 @Composable
 fun LoadingScreen() {
     val infiniteTransition = rememberInfiniteTransition()
@@ -727,21 +800,6 @@ fun LoadingScreen() {
         }
     }
 }
-
-//@Preview(showSystemUi = true)
-//@Composable
-//fun MainUserScreenPreview() {
-//    MediMateTheme {
-//        ScreenModel(
-//            navController = rememberNavController(),
-//            userId = "123",
-//            userName = "John",
-//            drawerState = rememberDrawerState(DrawerValue.Closed),
-//            closestAppointment = null,
-//            profilePictureUrl = ""
-//        )
-//    }
-//}
 @Preview(showSystemUi = true)
 @Composable
 fun LoadingScreenPrev() {

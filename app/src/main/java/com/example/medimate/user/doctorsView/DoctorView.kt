@@ -69,7 +69,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 /**
- * Composable function for displaying a single doctor.
+ * Displays a single doctor's information card with expandable details and action buttons.
+ *
+ * @param doctor The [Doctor] data to display.
+ * @param isSelected Whether this doctor is currently selected.
+ * @param onDoctorSelected Callback invoked when this doctor is selected.
+ * @param navController Navigation controller to handle screen transitions.
  */
 @Composable
 fun SingleDoctor(
@@ -133,7 +138,12 @@ fun SingleDoctor(
         }
     }
 }
-
+/**
+ * Displays a scrollable list of doctors, allowing selection and navigation.
+ *
+ * @param doctors List of [Doctor] objects to display.
+ * @param navController Navigation controller for screen transitions.
+ */
 @Composable
 fun DoctorList(doctors: List<Doctor>, navController: NavController) {
     var selectedDoctorId: String? by remember { mutableStateOf(null) }
@@ -158,6 +168,9 @@ fun DoctorList(doctors: List<Doctor>, navController: NavController) {
 
 }
 
+/**
+ * ViewModel managing the search state and filtered list of doctors.
+ */
 class MainViewModel : ViewModel() {
     private val _searchText = MutableStateFlow("")
     private val _isSearching = MutableStateFlow(false)
@@ -196,13 +209,22 @@ class MainViewModel : ViewModel() {
     }
 
 }
-
+/**
+ * Suspended function to fetch the full list of doctors from the database.
+ *
+ * @return List of [Doctor].
+ */
 suspend fun getDoctorList(): List<Doctor> {
     val mFireBase = DoctorDAO()
     val doctors = mFireBase.getAllDoctors()
     return doctors
 }
 
+/**
+ * Main screen composable showing the search bar, list of doctors, and loading indicator.
+ *
+ * @param navController Navigation controller for navigation events.
+ */
 @Composable
 fun DoctorScreen(navController: NavController) {
     val viewModel = viewModel<MainViewModel>()
@@ -234,7 +256,13 @@ fun DoctorScreen(navController: NavController) {
         }
     }
 }
-
+/**
+ * Search bar composable with a text field and search icon.
+ *
+ * @param modifier Modifier for styling.
+ * @param viewModel The [MainViewModel] handling search logic.
+ * @param searchText Current search query string.
+ */
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier,
@@ -260,5 +288,4 @@ fun DoctorsViewPreview() {
     MediMateTheme {
         DoctorScreen(navController = rememberNavController())
     }
-    //dto,, przekazac tylko dane wyswietlane
 }

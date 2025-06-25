@@ -12,7 +12,12 @@ import com.example.medimate.firebase.appointment.Term
 import com.example.medimate.firebase.doctor.Doctor
 import com.example.medimate.firebase.doctor.DoctorDAO
 import com.example.medimate.user.appointments.getAvailableTermsForDate
-
+/**
+ * Data class representing a doctor's availability settings.
+ * Manages the current availability terms and provides methods to load, toggle, and save availability.
+ *
+ * @property currentAvailability The list of currently available terms.
+ */
 class SetAvailabilityModel {
     private val _currentAvailability = mutableStateListOf<Term>()
     val currentAvailability: List<Term> get() = _currentAvailability
