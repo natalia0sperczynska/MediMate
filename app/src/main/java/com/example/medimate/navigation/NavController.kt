@@ -8,6 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.medimate.admin.doctorsManagement.add.AddAdmin
 import com.example.medimate.admin.doctorsManagement.add.AddDoctor
 import com.example.medimate.user.main.MainUserScreen
 import com.example.medimate.chat.ChatScreen
@@ -39,6 +40,7 @@ sealed class Screen(val route: String) {
     object MainDoctor : Screen("main_doctor")
     object MainAdmin : Screen("main_admin")
     object AddDoctor : Screen("add_doctor")
+    object AddAdmin : Screen("add_admin")
     object ManageUsers : Screen("manage_users")
 
     object SingleAppointment : Screen("single_appointment/{appointmentId}"){
@@ -128,6 +130,9 @@ fun AppNavHost(navController: NavHostController) {
         }
         composable(Screen.AppointmentsHistory.route) {
             HistoryAppointmentsScreen(navController)
+        }
+        composable(Screen.AddAdmin.route) {
+            AddAdmin(navController)
         }
 
         composable(

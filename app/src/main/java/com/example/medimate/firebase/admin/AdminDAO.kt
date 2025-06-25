@@ -98,6 +98,14 @@ class AdminDAO {
             throw Exception("Error adding doctor: ${e.message}")
         }
     }
+    suspend fun addAdmin(admin: Admin) {
+        val mFireStore = FirebaseFirestore.getInstance()
+        try {
+            mFireStore.collection("admins").document(admin.id).set(admin).await()
+        } catch (e: Exception) {
+            throw Exception("Error adding doctor: ${e.message}")
+        }
+    }
     suspend fun deleteDoctor(doctorId: String) {
         val mFireStore = FirebaseFirestore.getInstance()
         try {

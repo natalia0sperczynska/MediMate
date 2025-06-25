@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Adb
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Person
@@ -220,6 +221,7 @@ fun MainMenuSectionAdmin(navController: NavController) {
                                 "Manage Users" -> navController.navigate(Screen.ManageUsers.route)
                                 "Manage Doctors" ->navController.navigate(Screen.DoctorsAdmin.route)
                                 "Edit Doctors Availability" -> navController.navigate(Screen.EditDoctorAvailability.route)
+                                "Add Admin" -> navController.navigate(Screen.AddAdmin.route)
                             }
                         }
                     )
@@ -236,54 +238,8 @@ fun AdminMenuItems(): List<MainMenuItem> {
         MainMenuItem(Icons.Default.Settings, "Manage Users"),
         MainMenuItem(Icons.Default.Person, "Manage Doctors"),
         MainMenuItem(Icons.Default.SmartToy, "Edit Doctors Availability"),
+        MainMenuItem(Icons.Default.Adb, "Add Admin"),
     )
-}
-
-@Composable
-fun AdminMenuCard(icon: ImageVector, title: String, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .size(120.dp, 100.dp)
-            .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(20.dp),
-        border = BorderStroke(1.dp, PurpleLight.copy(alpha = 0.2f))
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(
-                        color = PurpleMain.copy(alpha = 0.1f),
-                        shape = RoundedCornerShape(12.dp)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = title,
-                    tint = PurpleMain,
-                    modifier = Modifier.size(32.dp)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Black,
-                    textAlign = TextAlign.Center,
-                    maxLines = 2,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }
-    }
 }
 
 
@@ -298,6 +254,7 @@ fun AdminStatsSection(doctorsCount: Int, usersCount: Int, appointmentsCount: Int
         StatCard("Doctors", doctorsCount.toString(), Icons.Default.Person)
         StatCard("Users", usersCount.toString(), Icons.Default.Group)
         StatCard("Appointments", appointmentsCount.toString(), Icons.Default.Event)
+
     }
 }
 
