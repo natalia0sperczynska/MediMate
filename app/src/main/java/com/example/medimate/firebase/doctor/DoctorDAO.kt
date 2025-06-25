@@ -221,10 +221,6 @@ class DoctorDAO {
             }
             ?.first
     }
-
-
-
-
 }
 
 

@@ -154,7 +154,7 @@ fun ModelNavDrawerDoctor(navController: NavController,
                 NavigationDrawerItem(
                     label = { Text(text = "Chat", color = Black) },
                     selected = false,
-                    onClick = { navController.navigate(Screen.ChatSelection.createRoute(false)) }
+                    onClick = { navController.navigate(Screen.ChatSelection.createRoute(true)) }
                 )
                 NavigationDrawerItem(
                     label = { Text(text = "Appointments History", color = Black) },

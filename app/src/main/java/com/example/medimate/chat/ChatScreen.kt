@@ -25,6 +25,7 @@ import com.example.medimate.ui.theme.MediMateTheme
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import android.util.Log
 
 @SuppressLint("SimpleDateFormat")
 @Composable
@@ -47,6 +48,11 @@ fun ChatScreen(
         .collectAsState(initial = false)
     if (isTyping) {
         Text("Doctor is typing...", style = MaterialTheme.typography.labelSmall)
+    }
+    val chatId = listOf(currentUserId, targetUserId).sorted().joinToString("_")
+
+    LaunchedEffect(Unit) {
+        Log.d("ChatDebug", "currentUserId: $currentUserId, targetUserId: $targetUserId, chatId: $chatId")
     }
 
     LaunchedEffect(Unit) {

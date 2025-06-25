@@ -23,6 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.medimate.firebase.doctor.Doctor
 import com.example.medimate.firebase.doctor.DoctorDAO
 import com.example.medimate.firebase.user.User
+import com.example.medimate.firebase.user.UserDAO
 import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.MediMateTheme
 import com.example.medimate.ui.theme.PurpleMain
@@ -47,7 +48,8 @@ fun ChatSelectionScreen(
         coroutineScope.launch {
             try {
                 contacts = if (isDoctor) {
-                    DoctorDAO().getPatientsForDoctor(currentUserId)
+                    UserDAO().getAllUsers()
+                        .filter { it.id != currentUserId }
                         .sortedBy { "${it.name} ${it.surname}" }
                 } else {
                     DoctorDAO().getAllDoctors()
