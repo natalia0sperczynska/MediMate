@@ -25,6 +25,14 @@ import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * Composable screen that renders the user registration form.
+ *
+ * It allows users to input their name, surname, email, date of birth, password, and repeat password.
+ * It handles showing a date picker modal and registering the user using Firebase Authentication and Firestore.
+ *
+ * @param navController Controller used to navigate between screens.
+ */
 @Composable
 fun RegisterScreen(navController: NavHostController) {
     var name by remember { mutableStateOf("") }
@@ -38,28 +46,36 @@ fun RegisterScreen(navController: NavHostController) {
     val coroutineScope = rememberCoroutineScope()
     val fireStore = UserDAO()
 
-    Column(modifier = Modifier.padding(16.dp).fillMaxSize(),
+    Column(
+        modifier = Modifier.padding(16.dp).fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center) {
+        verticalArrangement = Arrangement.Center
+    ) {
         Text("Register", style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.secondary)
         Spacer(modifier = Modifier.height(18.dp))
 
-        OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name")},
+        OutlinedTextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Name") },
             modifier = Modifier.fillMaxWidth(),
             leadingIcon = {
                 Icon(
                     painter = painterResource(id = android.R.drawable.star_off),
-                    contentDescription =null
+                    contentDescription = null
                 )
             }
         )
         Spacer(modifier = Modifier.height(18.dp))
-        OutlinedTextField(value = surname, onValueChange = { surname = it }, label = { Text("Surname") },
+        OutlinedTextField(
+            value = surname,
+            onValueChange = { surname = it },
+            label = { Text("Surname") },
             modifier = Modifier.fillMaxWidth(),
             leadingIcon = {
                 Icon(
                     painter = painterResource(id = android.R.drawable.star_off),
-                    contentDescription =null
+                    contentDescription = null
                 )
             }
         )
@@ -73,7 +89,7 @@ fun RegisterScreen(navController: NavHostController) {
             leadingIcon = {
                 Icon(
                     painter = painterResource(id = android.R.drawable.ic_dialog_email),
-                    contentDescription =null
+                    contentDescription = null
                 )
             }
         )
@@ -88,7 +104,7 @@ fun RegisterScreen(navController: NavHostController) {
             leadingIcon = {
                 Icon(
                     painter = painterResource(id = android.R.drawable.ic_menu_my_calendar),
-                    contentDescription =null
+                    contentDescription = null
                 )
             }
         )
@@ -102,7 +118,7 @@ fun RegisterScreen(navController: NavHostController) {
             leadingIcon = {
                 Icon(
                     painter = painterResource(id = android.R.drawable.ic_secure),
-                    contentDescription =null
+                    contentDescription = null
                 )
             }
         )
@@ -116,27 +132,37 @@ fun RegisterScreen(navController: NavHostController) {
             leadingIcon = {
                 Icon(
                     painter = painterResource(id = android.R.drawable.ic_secure),
-                    contentDescription =null
+                    contentDescription = null
                 )
             }
         )
         Spacer(modifier = Modifier.height(18.dp))
 
-        Button(onClick = {
-//            if (dateOfBirth == null) {
-//                Toast.makeText(context, "Please select a date of birth", Toast.LENGTH_SHORT).show()
-//                return@Button
-//            }
-            coroutineScope.launch {
-                registerUser(name, surname, email,
-                    dateOfBirth!!.toString(), password, repeatPassword, fireStore, context)
-            }
-        },colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary), modifier = Modifier.fillMaxWidth(),shape = MaterialTheme.shapes.large,enabled = name.isNotBlank() && surname.isNotBlank() && email.isNotBlank() && password.isNotBlank() && repeatPassword.isNotBlank()) {
+        Button(
+            onClick = {
+                coroutineScope.launch {
+                    registerUser(
+                        name,
+                        surname,
+                        email,
+                        dateOfBirth!!.toString(),
+                        password,
+                        repeatPassword,
+                        fireStore,
+                        context
+                    )
+                }
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.large,
+            enabled = name.isNotBlank() && surname.isNotBlank() && email.isNotBlank() && password.isNotBlank() && repeatPassword.isNotBlank()
+        ) {
             Text("Create an Account", color = MaterialTheme.colorScheme.onSecondary)
         }
         Spacer(modifier = Modifier.height(18.dp))
         TextButton(onClick = { navController.navigate(Screen.Login.route) }) {
-            Text("Already have an account? Login here",color= MaterialTheme.colorScheme.secondary)
+            Text("Already have an account? Login here", color = MaterialTheme.colorScheme.secondary)
         }
     }
 
@@ -153,6 +179,12 @@ fun RegisterScreen(navController: NavHostController) {
     }
 }
 
+/**
+ * Composable modal dialog that shows a Material3 date picker.
+ *
+ * @param onDateSelected Lambda invoked with the selected date in milliseconds since epoch, or null if none selected.
+ * @param onDismiss Lambda invoked when the dialog is dismissed.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerModal(
@@ -181,6 +213,22 @@ fun DatePickerModal(
     }
 }
 
+/**
+ * Registers a new user with the given data using Firebase Authentication and Firestore.
+ *
+ * Performs validation on input fields, checks if the user already exists,
+ * creates the user in Firebase Auth, stores user data in Firestore, and signs out.
+ * Displays Toast messages on success or failure.
+ *
+ * @param name The user's first name.
+ * @param surname The user's surname.
+ * @param email The user's email address.
+ * @param dateOfBirth The user's date of birth as a string.
+ * @param password The user's password.
+ * @param repeatPassword The user's password repeated for confirmation.
+ * @param fireStore Instance of UserDAO to interact with Firestore.
+ * @param context Android Context for showing Toast messages.
+ */
 private suspend fun registerUser(
     name: String,
     surname: String,
@@ -233,11 +281,22 @@ private suspend fun registerUser(
     }
 }
 
+/**
+ * Converts a time in milliseconds since epoch to a formatted date string "MM/dd/yyyy".
+ *
+ * @param millis Time in milliseconds since epoch.
+ * @return Formatted date string in the form "MM/dd/yyyy".
+ */
 fun convertMillisToDate(millis: Long): String {
     val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
     return formatter.format(Date(millis))
 }
 
+/**
+ * Preview composable for the RegisterScreen.
+ *
+ * Displays the registration screen UI in Android Studio preview.
+ */
 @Preview(showSystemUi = true)
 @Composable
 fun RegisterScreenPreview() {

@@ -52,6 +52,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.rpc.context.AttributeContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+
 @Composable
 fun DrawerHeader(profilePictureUrl: String?){
     val auth = FirebaseAuth.getInstance()

@@ -27,6 +27,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import android.util.Log
 
+/**
+ * Composable screen for a chat conversation between the current user and a selected user (doctor or patient).
+ *
+ * @param targetUserId ID of the user to chat with.
+ * @param chatRepository Repository handling chat-related operations like message sending, receiving, and file uploads.
+ */
 @SuppressLint("SimpleDateFormat")
 @Composable
 fun ChatScreen(
@@ -41,24 +47,32 @@ fun ChatScreen(
     val coroutineScope = rememberCoroutineScope()
 
     var fileUri by remember { mutableStateOf<Uri?>(null) }
+
+    // File picker for image or document selection
     val filePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         fileUri = uri
     }
+
+    // Typing indicator
     val isTyping by chatRepository.observeTypingStatus(currentUserId, targetUserId)
         .collectAsState(initial = false)
+
     if (isTyping) {
         Text("Doctor is typing...", style = MaterialTheme.typography.labelSmall)
     }
+
     val chatId = listOf(currentUserId, targetUserId).sorted().joinToString("_")
 
     LaunchedEffect(Unit) {
         Log.d("ChatDebug", "currentUserId: $currentUserId, targetUserId: $targetUserId, chatId: $chatId")
     }
 
+    // Mark messages as read on screen open
     LaunchedEffect(Unit) {
         chatRepository.markMessagesAsRead(currentUserId, targetUserId)
     }
 
+    // Typing status updates
     LaunchedEffect(inputText) {
         if (inputText.isNotEmpty()) {
             chatRepository.setTypingStatus(currentUserId, targetUserId, true)
@@ -69,6 +83,7 @@ fun ChatScreen(
         }
     }
 
+    // File sending
     LaunchedEffect(fileUri) {
         fileUri?.let { uri ->
             sending = true
@@ -92,6 +107,7 @@ fun ChatScreen(
                 modifier = Modifier.padding(start = 16.dp, top = 8.dp)
             )
         }
+
         LazyColumn(
             modifier = Modifier.weight(1f).padding(8.dp),
             reverseLayout = false
@@ -106,7 +122,7 @@ fun ChatScreen(
                     Card(
                         colors = CardDefaults.cardColors(
                             containerColor = if (msg.senderId == currentUserId)
-                                Color(0xFF9C7CBC) else (Color.White)
+                                Color(0xFF9C7CBC) else Color.White
                         ),
                         shape = if (msg.senderId == currentUserId)
                             MaterialTheme.shapes.medium.copy(
@@ -141,7 +157,10 @@ fun ChatScreen(
                 }
             }
         }
+
         HorizontalDivider()
+
+        // Message input and send row
         Row(
             Modifier
                 .fillMaxWidth()
@@ -152,6 +171,7 @@ fun ChatScreen(
             IconButton(onClick = { filePickerLauncher.launch("image/*") }) {
                 Icon(Icons.Default.AttachFile, contentDescription = "Attach file")
             }
+
             TextField(
                 value = inputText,
                 onValueChange = { inputText = it },
@@ -159,6 +179,7 @@ fun ChatScreen(
                 placeholder = { Text("Type a message") },
                 enabled = !sending
             )
+
             Button(
                 onClick = {
                     coroutineScope.launch {
@@ -176,6 +197,10 @@ fun ChatScreen(
         }
     }
 }
+
+/**
+ * Preview of the ChatScreen for UI testing and development preview purposes.
+ */
 @Preview(showBackground = true)
 @Composable
 fun ChatScreenPreview() {

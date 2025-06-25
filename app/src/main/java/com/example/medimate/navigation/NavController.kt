@@ -21,6 +21,8 @@ import com.example.medimate.admin.doctorsManagement.editDoctorData.EditDoctorDat
 import com.example.medimate.admin.doctorsManagement.reviewsManagement.ManageDoctorReviewsScreen
 import com.example.medimate.chat.ChatSelectionScreen
 import com.example.medimate.admin.usersManagement.usersView.EditUserDataScreen
+import com.example.medimate.doctor.appointments.DoctorFutureAppointmentsScreen
+import com.example.medimate.doctor.appointments.DoctorPastAppointmentsScreen
 import com.example.medimate.doctor.availability.SetAvailabilityScreen
 import com.example.medimate.doctor.main.MainDoctorScreen
 import com.example.medimate.mainViews.MainScreen
@@ -214,6 +216,12 @@ fun AppNavHost(navController: NavHostController) {
         }
         composable(Screen.DoctorAvailability.route) {
             SetAvailabilityScreen(navController)
+        }
+        composable("doctor_future_appointments") {
+            DoctorFutureAppointmentsScreen(navController)
+        }
+        composable("doctor_past_appointments") {
+            DoctorPastAppointmentsScreen(navController)
         }
     }
 }

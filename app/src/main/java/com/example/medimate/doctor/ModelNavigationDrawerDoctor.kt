@@ -149,7 +149,7 @@ fun ModelNavDrawerDoctor(navController: NavController,
                 NavigationDrawerItem(
                     label = { Text(text = "My Appointments", color = Black) },
                     selected = false,
-                    onClick = { navController.navigate(Screen.FutureAppointments.route) }
+                    onClick = { navController.navigate("doctor_future_appointments") }
                 )
                 NavigationDrawerItem(
                     label = { Text(text = "Chat", color = Black) },
@@ -159,7 +159,7 @@ fun ModelNavDrawerDoctor(navController: NavController,
                 NavigationDrawerItem(
                     label = { Text(text = "Appointments History", color = Black) },
                     selected = false,
-                    onClick = { navController.navigate(Screen.AppointmentsHistory.route) }
+                    onClick = { navController.navigate("doctor_past_appointments") }
                 )
                 NavigationDrawerItem(
                     label = { Text(text = "Update Data", color = Black) },
@@ -171,7 +171,6 @@ fun ModelNavDrawerDoctor(navController: NavController,
                     selected = false,
                     onClick = { navController.navigate(Screen.Login.route) }
                 )
-
             }
         }
     ) {

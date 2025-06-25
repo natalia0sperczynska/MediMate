@@ -30,6 +30,20 @@ import com.example.medimate.ui.theme.PurpleMain
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
+/**
+ * A screen that lists either patients (for a doctor) or doctors (for a patient) and
+ * lets the user start a chat with any contact.
+ *
+ * * Behaviour *
+ * * Fetches contacts from Firestore on first composition.
+ * * Supports live search filtering.
+ * * Shows progress indicator while loading data.
+ * * Navigates to [Screen.ChatScreen] when a contact is tapped.
+ *
+ * @param navController NavController used for navigating to the chat screen.
+ * @param isDoctor `true` if the current user is a doctor (list patients), `false`
+ *                 otherwise (list doctors).
+ */
 @Composable
 fun ChatSelectionScreen(
     navController: NavController,
@@ -43,6 +57,7 @@ fun ChatSelectionScreen(
     var isLoading by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
 
+    // Fetch contacts when the composable first enters the composition.
     LaunchedEffect(currentUserId, isDoctor) {
         isLoading = true
         coroutineScope.launch {
@@ -83,38 +98,42 @@ fun ChatSelectionScreen(
             value = searchQuery,
             onValueChange = { searchQuery = it },
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("Search...") },
+            placeholder = { Text("Search…") },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (isLoading) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        } else {
-            val filteredContacts = contacts.filter {
-                when (it) {
-                    is User -> "${it.name} ${it.surname}".contains(searchQuery, ignoreCase = true)
-                    is Doctor -> "Dr. ${it.name} ${it.surname}".contains(searchQuery, ignoreCase = true)
-                    else -> false
+        when {
+            isLoading -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
                 }
             }
 
-            if (filteredContacts.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No contacts found", style = MaterialTheme.typography.bodyMedium)
+            else -> {
+                val filteredContacts = contacts.filter {
+                    when (it) {
+                        is User   -> "${it.name} ${it.surname}".contains(searchQuery, ignoreCase = true)
+                        is Doctor -> "Dr. ${it.name} ${it.surname}".contains(searchQuery, ignoreCase = true)
+                        else      -> false
+                    }
                 }
-            } else {
-                LazyColumn {
-                    items(filteredContacts) { contact ->
-                        ContactCard(
-                            contact = contact,
-                            onContactSelected = { id ->
-                                navController.navigate(Screen.ChatScreen.createRoute(id))
-                            }
-                        )
+
+                if (filteredContacts.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("No contacts found", style = MaterialTheme.typography.bodyMedium)
+                    }
+                } else {
+                    LazyColumn {
+                        items(filteredContacts) { contact ->
+                            ContactCard(
+                                contact = contact,
+                                onContactSelected = { id ->
+                                    navController.navigate(Screen.ChatScreen.createRoute(id))
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -122,6 +141,16 @@ fun ChatSelectionScreen(
     }
 }
 
+/**
+ * A reusable card displaying basic information about a [User] or [Doctor].
+ *
+ * * Shows an avatar icon, name, role/specialisation, and a chevron.
+ * * Invokes [onContactSelected] with the contact’s ID when tapped.
+ *
+ * @param contact The contact data (either a [User] or a [Doctor]).
+ * @param onContactSelected Lambda triggered when user selects the contact
+ *                          – receives the contact’s UID.
+ */
 @Composable
 fun ContactCard(
     contact: Any,
@@ -130,7 +159,7 @@ fun ContactCard(
     Card(
         onClick = {
             when (contact) {
-                is User -> onContactSelected(contact.id)
+                is User   -> onContactSelected(contact.id)
                 is Doctor -> onContactSelected(contact.id)
             }
         },
@@ -145,6 +174,7 @@ fun ContactCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Avatar
             Box(
                 modifier = Modifier
                     .size(48.dp)
@@ -164,6 +194,7 @@ fun ContactCard(
 
             Spacer(modifier = Modifier.width(16.dp))
 
+            // Name and role
             Column(modifier = Modifier.weight(1f)) {
                 when (contact) {
                     is User -> {
@@ -177,7 +208,6 @@ fun ContactCard(
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         )
                     }
-
                     is Doctor -> {
                         Text(
                             text = "Dr. ${contact.name} ${contact.surname}",
@@ -192,6 +222,7 @@ fun ContactCard(
                 }
             }
 
+            // Chevron
             Icon(
                 imageVector = Icons.Default.ChevronRight,
                 contentDescription = "Open chat",
@@ -201,6 +232,9 @@ fun ContactCard(
     }
 }
 
+/**
+ * Design-time preview for **ChatSelectionScreen**.
+ */
 @Preview(showBackground = true)
 @Composable
 fun ChatSelectionScreenPreview() {

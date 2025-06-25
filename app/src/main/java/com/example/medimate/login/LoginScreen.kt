@@ -1,8 +1,6 @@
 package com.example.medimate.login
 
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -12,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -22,15 +19,17 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.healme.R
 import com.example.medimate.navigation.Screen
-import com.example.medimate.register.RegisterScreen
-import com.example.medimate.ui.theme.Grey2
-import com.example.medimate.ui.theme.MediMateTheme
-import com.example.medimate.ui.theme.PurpleGrey2
-import com.example.medimate.ui.theme.PurpleMain
-import com.example.medimate.ui.theme.White
+import com.example.medimate.ui.theme.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
+/**
+ * Composable login screen with Firebase authentication.
+ *
+ * Handles login for admin, doctor, and user roles.
+ *
+ * @param navController Navigation controller to handle screen transitions.
+ */
 @Composable
 fun LoginScreen(navController: NavController) {
     val context = LocalContext.current
@@ -38,6 +37,8 @@ fun LoginScreen(navController: NavController) {
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var passwordVisible by remember { mutableStateOf(false) }
+
+    // Toggle icon based on password visibility
     val icon = if (passwordVisible)
         painterResource(id = android.R.drawable.ic_secure)
     else
@@ -50,7 +51,6 @@ fun LoginScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        //Image(painter = painterResource(id = R.drawable.medimate_logo), contentDescription = null, modifier = Modifier.size(200.dp))
         Text(
             text = stringResource(R.string.app_name),
             style = MaterialTheme.typography.headlineLarge,
@@ -59,6 +59,7 @@ fun LoginScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(18.dp))
 
+        // Email input
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -75,6 +76,7 @@ fun LoginScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Password input
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
@@ -93,11 +95,11 @@ fun LoginScreen(navController: NavController) {
                 }
             },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-
-            )
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Login button with Firebase auth logic
         Button(
             onClick = {
                 isLoading = true
@@ -164,6 +166,7 @@ fun LoginScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Navigate to Register screen
         TextButton(onClick = { navController.navigate(Screen.Register.route) }) {
             Text(
                 "Don't have an account? Register here",
@@ -173,6 +176,9 @@ fun LoginScreen(navController: NavController) {
     }
 }
 
+/**
+ * Preview function for displaying the LoginScreen in Android Studio.
+ */
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun LoginScreenPreview() {

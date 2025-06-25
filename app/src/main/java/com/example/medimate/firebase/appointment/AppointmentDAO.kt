@@ -12,6 +12,7 @@ import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import kotlinx.coroutines.tasks.await
 
 /**
  * Class for interacting with Firebase Firestore for appointment data management.
@@ -19,6 +20,7 @@ import java.util.Locale
 class AppointmentDAO {
     val mFireStore = FirebaseFirestore.getInstance()
     val doctorDAO = DoctorDAO()
+    val db = FirebaseFirestore.getInstance()
     suspend fun addAppointment(appointment: Appointment) {
         val firestore = FirebaseFirestore.getInstance()
         //transaction
@@ -182,6 +184,13 @@ class AppointmentDAO {
         val apptDate = dateFormat.parse(appointmentDate)
         val today = dateFormat.parse(currentDate)
         return apptDate.before(today)
+    }
+    suspend fun getAppointmentsForDoctor(doctorId: String): List<Appointment> {
+        val result = db.collection("appointments")
+            .whereEqualTo("doctorId", doctorId)
+            .get()
+            .await()
+        return result.documents.mapNotNull { it.toObject(Appointment::class.java) }
     }
 
 
