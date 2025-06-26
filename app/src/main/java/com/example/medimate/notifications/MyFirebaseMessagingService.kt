@@ -27,6 +27,11 @@ class MyFirebaseMessagingService : FirebaseMessagingService(){
                 .update("fcmToken", token)
                 .addOnFailureListener { e ->
                     Log.e("FCM", "Eroor token save", e)
+                    Firebase.firestore.collection("doctors").document(userId)
+                        .update("fcmToken", token)
+                        .addOnFailureListener { e2 ->
+                            Log.e("FCM", "Doctor token save also failed", e2)
+                        }
                 }
         }
 

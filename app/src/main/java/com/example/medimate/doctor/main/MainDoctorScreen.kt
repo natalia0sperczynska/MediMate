@@ -639,7 +639,7 @@ fun DailyStatsCard(appointmentsToday: Int, completed: Int, averageRating: Double
         ) {
             StatItem(
                 value = appointmentsToday.toString(),
-                label = "Today's Appointments",
+                label = "Monthly Appointments",
                 icon = Icons.Default.Event
             )
             StatItem(

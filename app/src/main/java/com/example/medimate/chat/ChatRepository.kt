@@ -3,10 +3,12 @@ package com.example.medimate.chat
 import android.net.Uri
 import com.example.medimate.firebase.Message
 import com.example.medimate.firebase.appointment.Status
+import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.storage
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.flow.Flow
@@ -96,9 +98,12 @@ class ChatRepository {
             "pdf", "doc", "docx" -> "document"
             else -> "file"
         }
+        val storage = Firebase.storage("gs://medimate-79d20.firebasestorage.app")
+        val filename = "profile_${System.currentTimeMillis()}"
         val storageRef = storage.reference.child("chat_files/$currentUserId/${System.currentTimeMillis()}.$ext")
+        val downloadUrl = storageRef.downloadUrl.await().toString()
         storageRef.putFile(fileUri).await()
-        return Pair(storageRef.downloadUrl.await().toString(), fileType)
+        return Pair(downloadUrl, fileType)
     }
 
     /**

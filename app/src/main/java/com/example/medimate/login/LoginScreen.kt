@@ -6,6 +6,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import com.google.android.gms.tasks.Tasks
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.firestore
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -20,6 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.healme.R
 import com.example.medimate.navigation.Screen
 import com.example.medimate.ui.theme.*
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -38,7 +42,6 @@ fun LoginScreen(navController: NavController) {
     var isLoading by remember { mutableStateOf(false) }
     var passwordVisible by remember { mutableStateOf(false) }
 
-    // Toggle icon based on password visibility
     val icon = if (passwordVisible)
         painterResource(id = android.R.drawable.ic_secure)
     else
@@ -59,7 +62,6 @@ fun LoginScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(18.dp))
 
-        // Email input
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -76,7 +78,6 @@ fun LoginScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Password input
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
@@ -99,7 +100,6 @@ fun LoginScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Login button with Firebase auth logic
         Button(
             onClick = {
                 isLoading = true
@@ -109,42 +109,56 @@ fun LoginScreen(navController: NavController) {
                         if (task.isSuccessful) {
                             val user = FirebaseAuth.getInstance().currentUser
                             user?.let { firebaseUser ->
-                                FirebaseFirestore.getInstance()
-                                    .collection("admins")
-                                    .document(firebaseUser.uid)
-                                    .get()
-                                    .addOnSuccessListener { adminDoc ->
-                                        if (adminDoc.exists()) {
-                                            navController.navigate(Screen.MainAdmin.route)
-                                        } else {
-                                            FirebaseFirestore.getInstance()
-                                                .collection("doctors")
-                                                .document(firebaseUser.uid)
-                                                .get()
-                                                .addOnSuccessListener { doctorDoc ->
-                                                    if (doctorDoc.exists()) {
-                                                        navController.navigate(Screen.MainDoctor.route)
-                                                    } else {
-                                                        navController.navigate(Screen.MainUser.route)
-                                                    }
-                                                }
-                                                .addOnFailureListener {
-                                                    Toast.makeText(
-                                                        context,
-                                                        "Error checking doctor status",
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
-                                                }
+                                val db = Firebase.firestore
+                                val uid = firebaseUser.uid
+
+                                val adminTask = db.collection("admins").document(uid).get()
+                                val doctorTask = db.collection("doctors").document(uid).get()
+                                val userTask = db.collection("users").document(uid).get()
+
+                                Tasks.whenAll(adminTask, doctorTask, userTask)
+                                    .addOnSuccessListener {
+                                        val adminDoc = adminTask.result
+                                        val doctorDoc = doctorTask.result
+                                        val userDoc = userTask.result
+
+                                        isLoading = false
+                                        when {
+                                            adminDoc.exists() ->
+                                                navController.navigate(Screen.MainAdmin.route)
+
+                                            doctorDoc.exists() ->
+                                                navController.navigate(Screen.MainDoctor.route)
+
+                                            userDoc.exists() ->
+                                                navController.navigate(Screen.MainUser.route)
+
+                                            else -> {
+                                                Toast.makeText(
+                                                    context,
+                                                    "Account not configured",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                                FirebaseAuth.getInstance().signOut()
+                                            }
                                         }
                                     }
-                                    .addOnFailureListener {
+                                    .addOnFailureListener { exception ->
+                                        isLoading = false
                                         Toast.makeText(
                                             context,
-                                            "Error checking admin status",
+                                            "Error checking user roles: ${exception.message}",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     }
                             }
+                        } else {
+                            isLoading = false
+                            Toast.makeText(
+                                context,
+                                "Authentication failed: ${task.exception?.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
             },
@@ -165,8 +179,6 @@ fun LoginScreen(navController: NavController) {
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
-        // Navigate to Register screen
         TextButton(onClick = { navController.navigate(Screen.Register.route) }) {
             Text(
                 "Don't have an account? Register here",
